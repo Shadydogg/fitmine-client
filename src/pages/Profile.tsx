@@ -1,26 +1,27 @@
-// v1.4.0 — Profile через Bearer access_token
+// Profile.tsx — v2.4.2 (через SessionContext + accessToken)
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
+import { useSession } from '@/context/SessionContext';
 
 export default function Profile() {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { accessToken, isAuthenticated } = useSession();
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem('accessToken');
-    if (!token || token.length < 20) {
-      console.warn('❌ accessToken не найден');
+    if (!isAuthenticated || !accessToken) {
+      console.warn('❌ accessToken отсутствует или пользователь не авторизован');
       setLoading(false);
       return;
     }
 
     fetch('https://api.fitmine.vip/api/profile', {
       headers: {
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${accessToken}`,
       },
     })
       .then((res) => res.json())
@@ -37,7 +38,7 @@ export default function Profile() {
       .finally(() => {
         setLoading(false);
       });
-  }, []);
+  }, [accessToken, isAuthenticated]);
 
   if (loading) {
     return (

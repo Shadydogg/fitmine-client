@@ -1,4 +1,4 @@
-// App.tsx — v2.5.0 (refresh_token + auto-refresh + initData)
+// App.tsx — v2.6.0 (SessionProvider, initData, refresh_token)
 import React, { useEffect, useState } from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -8,11 +8,13 @@ import Landing from './pages/Landing';
 import Profile from './pages/Profile';
 import Dashboard from './pages/Dashboard';
 import useTokenRefresher from './hooks/useTokenRefresher';
+import { SessionProvider, useSession } from './context/SessionContext';
 
-export default function App() {
+function AppRoutes() {
   const { i18n } = useTranslation();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const { setTokens } = useSession();
 
   // 🔁 Автообновление токенов
   useTokenRefresher();
@@ -57,9 +59,7 @@ export default function App() {
       const data = await res.json();
 
       if (data.ok && data.access_token && data.refresh_token) {
-        localStorage.setItem('access_token', data.access_token);
-        localStorage.setItem('refresh_token', data.refresh_token);
-        localStorage.setItem('user', JSON.stringify(data.user));
+        setTokens(data.access_token, data.refresh_token, data.user); // ✅ сохраняем через контекст
         console.log('✅ Авторизация успешна, токены сохранены');
         navigate('/profile');
       } else {
@@ -80,5 +80,14 @@ export default function App() {
       <Route path="/profile" element={<Profile />} />
       <Route path="/dashboard" element={<Dashboard />} />
     </Routes>
+  );
+}
+
+// ✅ Оборачиваем AppRoutes в глобальный SessionProvider
+export default function App() {
+  return (
+    <SessionProvider>
+      <AppRoutes />
+    </SessionProvider>
   );
 }

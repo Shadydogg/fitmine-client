@@ -1,28 +1,55 @@
-// useTokenRefresher.ts — v1.0.0
-import { useEffect } from 'react';
-import api from '../api/apiClient';
+// useSession.ts — v1.0.0
+import { useEffect, useState } from 'react';
 
-export default function useTokenRefresher() {
+export default function useSession() {
+  const [accessToken, setAccessToken] = useState<string | null>(null);
+  const [refreshToken, setRefreshToken] = useState<string | null>(null);
+  const [user, setUser] = useState<any>(null);
+
   useEffect(() => {
-    const interval = setInterval(() => {
-      const refresh_token = localStorage.getItem('refresh_token');
-      if (!refresh_token) return;
+    const load = () => {
+      setAccessToken(localStorage.getItem('access_token'));
+      setRefreshToken(localStorage.getItem('refresh_token'));
+      const storedUser = localStorage.getItem('user');
+      setUser(storedUser ? JSON.parse(storedUser) : null);
+    };
 
-      api.post('/refresh', null, {
-        headers: {
-          Authorization: `Bearer ${refresh_token}`,
-        },
-      }).then(res => {
-        const { access_token, refresh_token: new_refresh } = res.data;
-        localStorage.setItem('access_token', access_token);
-        localStorage.setItem('refresh_token', new_refresh);
-        console.log('🔁 Токены обновлены');
-      }).catch(err => {
-        console.warn('⚠️ Автообновление токена не удалось');
-      });
+    load();
 
-    }, 10 * 60 * 1000); // каждые 10 минут
-
-    return () => clearInterval(interval);
+    // 🔄 Обновление при изменении в другом табе
+    const sync = () => load();
+    window.addEventListener('storage', sync);
+    return () => window.removeEventListener('storage', sync);
   }, []);
+
+  const isAuthenticated = !!accessToken;
+
+  const setTokens = (access_token: string, refresh_token: string, user: any) => {
+    localStorage.setItem('access_token', access_token);
+    localStorage.setItem('refresh_token', refresh_token);
+    localStorage.setItem('user', JSON.stringify(user));
+
+    setAccessToken(access_token);
+    setRefreshToken(refresh_token);
+    setUser(user);
+  };
+
+  const clearSession = () => {
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    localStorage.removeItem('user');
+
+    setAccessToken(null);
+    setRefreshToken(null);
+    setUser(null);
+  };
+
+  return {
+    accessToken,
+    refreshToken,
+    user,
+    isAuthenticated,
+    setTokens,
+    clearSession,
+  };
 }
