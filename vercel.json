@@ -1,0 +1,16 @@
+{
+  "rewrites": [
+    {
+      "source": "/tgapp",
+      "destination": "/"
+    },
+    {
+      "source": "/tgapp/:path*",
+      "destination": "/"
+    },
+    {
+      "source": "/api/:path*",
+      "destination": "https://api.fitmine.vip/api/:path*"
+    }
+  ]
+}
