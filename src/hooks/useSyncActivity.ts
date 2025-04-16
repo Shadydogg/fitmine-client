@@ -1,7 +1,8 @@
-// useSyncActivity.ts — v1.5.1 (JWT + Energy + NFT + Premium)
+// useSyncActivity.ts — v1.6.0
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { calculateEnergy } from "../lib/calculateEnergy";
+import { useSession } from "../context/SessionContext";
 
 interface ActivityData {
   steps: number;
@@ -16,6 +17,8 @@ interface ActivityData {
 }
 
 export default function useSyncActivity(): ActivityData {
+  const { accessToken, sessionLoaded, isAuthenticated } = useSession();
+
   const [data, setData] = useState<ActivityData>({
     steps: 0,
     stepsGoal: 10000,
@@ -29,19 +32,25 @@ export default function useSyncActivity(): ActivityData {
   });
 
   useEffect(() => {
+    if (!sessionLoaded) return;
+
     const fetchData = async () => {
       try {
-        const token = localStorage.getItem('accessToken') || '';
-        if (!token || token.length < 20) {
-          console.warn('❌ accessToken не найден или недействителен');
+        if (!accessToken || !isAuthenticated) {
+          console.warn("❌ accessToken отсутствует или пользователь не авторизован");
+          setData((prev) => ({ ...prev, loading: false }));
           return;
         }
 
-        const res = await axios.post("https://api.fitmine.vip/api/sync", {}, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const res = await axios.post(
+          "https://api.fitmine.vip/api/sync",
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }
+        );
 
         const d = res.data;
 
@@ -72,7 +81,7 @@ export default function useSyncActivity(): ActivityData {
     };
 
     fetchData();
-  }, []);
+  }, [accessToken, sessionLoaded, isAuthenticated]);
 
   return data;
 }
