@@ -1,4 +1,4 @@
-// App.tsx — v3.3.2 (обновление initData при каждом запуске)
+// App.tsx — v2.5.0 (refresh_token + auto-refresh + initData)
 import React, { useEffect, useState } from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -7,12 +7,17 @@ import './i18n/setup';
 import Landing from './pages/Landing';
 import Profile from './pages/Profile';
 import Dashboard from './pages/Dashboard';
+import useTokenRefresher from './hooks/useTokenRefresher';
 
 export default function App() {
   const { i18n } = useTranslation();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
+  // 🔁 Автообновление токенов
+  useTokenRefresher();
+
+  // 📦 Сохраняем initData от Telegram
   useEffect(() => {
     const tg = window.Telegram?.WebApp;
 
@@ -20,7 +25,6 @@ export default function App() {
       tg.ready();
       tg.expand?.();
 
-      // 📦 Всегда обновляем initData (иначе может устареть)
       const initDataRaw = tg.initData;
       if (initDataRaw && initDataRaw.length > 10) {
         localStorage.setItem('initData', initDataRaw);
@@ -32,6 +36,7 @@ export default function App() {
     }
   }, [i18n]);
 
+  // 🚀 Авторизация Telegram + получение токенов
   const handleStart = async () => {
     const initDataRaw = localStorage.getItem('initData') || '';
 
@@ -51,10 +56,11 @@ export default function App() {
 
       const data = await res.json();
 
-      if (data.ok && data.access_token) {
-        localStorage.setItem('accessToken', data.access_token);
+      if (data.ok && data.access_token && data.refresh_token) {
+        localStorage.setItem('access_token', data.access_token);
+        localStorage.setItem('refresh_token', data.refresh_token);
         localStorage.setItem('user', JSON.stringify(data.user));
-        console.log('✅ Авторизация успешна, access_token сохранён');
+        console.log('✅ Авторизация успешна, токены сохранены');
         navigate('/profile');
       } else {
         alert(`❌ Ошибка авторизации: ${data.error || 'Неизвестная'}`);
