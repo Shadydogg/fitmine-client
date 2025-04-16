@@ -25,11 +25,12 @@ export default function useSyncGoogleFit() {
       try {
         const res = await axios.post<{
           ok: boolean;
-          steps: number;
-          calories: number;
-          minutes: number;
-          distance: number;
-          date: string;
+          steps?: number;
+          calories?: number;
+          minutes?: number;
+          distance?: number;
+          date?: string;
+          error?: string;
         }>('https://api.fitmine.vip/api/sync/google', {}, {
           headers: {
             Authorization: `Bearer ${accessToken}`
@@ -38,11 +39,11 @@ export default function useSyncGoogleFit() {
 
         if (res.data.ok) {
           setData({
-            steps: res.data.steps,
-            calories: res.data.calories,
-            minutes: res.data.minutes,
-            distance: res.data.distance,
-            date: res.data.date
+            steps: res.data.steps || 0,
+            calories: res.data.calories || 0,
+            minutes: res.data.minutes || 0,
+            distance: res.data.distance || 0,
+            date: res.data.date || new Date().toISOString()
           });
         } else {
           setError(res.data.error || 'Ошибка при синхронизации');
