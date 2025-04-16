@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import useSyncActivity from "../hooks/useSyncActivity";
 import DashboardSummary from "../components/DashboardSummary";
 import AnimatedBackground from "../components/AnimatedBackground";
-import { useSession } from "@/context/SessionContext";
+import { useSession } from "../context/SessionContext";
 
 export default function Dashboard() {
   const { t } = useTranslation();
