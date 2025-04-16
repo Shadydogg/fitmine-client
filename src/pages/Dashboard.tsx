@@ -7,6 +7,7 @@ import DashboardSummary from "../components/DashboardSummary";
 import AnimatedBackground from "../components/AnimatedBackground";
 import BottomTab from "../components/BottomTab";
 import { useSession } from "../context/SessionContext";
+import ConnectGoogleFit from "../components/ConnectGoogleFit";
 
 export default function Dashboard() {
   const { t } = useTranslation();
@@ -14,7 +15,6 @@ export default function Dashboard() {
   const { user, sessionLoaded, accessToken } = useSession();
   const { loading } = useSyncActivity();
 
-  // 🌀 Пока не загружена сессия
   if (!sessionLoaded) {
     return (
       <div className="flex items-center justify-center min-h-screen text-gray-400 text-center">
@@ -23,7 +23,6 @@ export default function Dashboard() {
     );
   }
 
-  // ❌ Без accessToken или user — ошибка
   if (!accessToken || !user) {
     return (
       <div className="flex items-center justify-center min-h-screen text-red-400 text-center">
@@ -105,7 +104,47 @@ export default function Dashboard() {
         )}
       </motion.div>
 
-      {/* 🔻 Навигация снизу */}
+      {/* ⚙️ Google Fit */}
+      <motion.div
+        initial={{ opacity: 0, y: 6 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 1.1, duration: 0.4 }}
+        className="mt-8 text-center"
+      >
+        {user.google_connected ? (
+          <button
+            onClick={() => {
+              fetch('https://api.fitmine.vip/api/sync/google', {
+                method: 'POST',
+                headers: {
+                  Authorization: `Bearer ${accessToken}`
+                }
+              })
+                .then(res => res.json())
+                .then(data => {
+                  if (data.ok) {
+                    alert('📊 Активность синхронизирована!');
+                  } else {
+                    alert(`❌ Ошибка: ${data.error}`);
+                  }
+                })
+                .catch(() => alert('❌ Ошибка соединения'));
+            }}
+            className="mt-2 px-5 py-2 bg-lime-500 text-white font-medium rounded-full shadow hover:scale-105 transition-transform"
+          >
+            🔄 Синхронизировать Google Fit
+          </button>
+        ) : (
+          <div className="mt-4 max-w-xs mx-auto">
+            <div className="text-sm text-yellow-300 mb-2">
+              🔓 Google Fit не подключён
+            </div>
+            <ConnectGoogleFit />
+          </div>
+        )}
+      </motion.div>
+
+      {/* 🔻 Навигация */}
       <BottomTab current="dashboard" />
     </div>
   );
