@@ -1,4 +1,3 @@
-// App.tsx — v2.8.0 (синхронный navigate, sessionLoaded уже устойчив)
 import React, { useEffect, useState } from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -10,16 +9,17 @@ import Dashboard from './pages/Dashboard';
 import useTokenRefresher from './hooks/useTokenRefresher';
 import { SessionProvider, useSession } from './context/SessionContext';
 
+// 👉 Обособленные маршруты внутри контекста
 function AppRoutes() {
   const { i18n } = useTranslation();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const { setTokens, sessionLoaded } = useSession();
 
-  // 🔁 Автообновление токенов
+  // 🔁 Фоновая проверка refresh_token (если есть)
   useTokenRefresher();
 
-  // 📦 Сохраняем initData от Telegram
+  // 📦 initData от Telegram
   useEffect(() => {
     const tg = window.Telegram?.WebApp;
 
@@ -38,7 +38,7 @@ function AppRoutes() {
     }
   }, [i18n]);
 
-  // 🚀 Авторизация Telegram + получение токенов
+  // 🚀 Telegram авторизация
   const handleStart = async () => {
     const initDataRaw = localStorage.getItem('initData') || '';
 
@@ -61,11 +61,10 @@ function AppRoutes() {
       if (data.ok && data.access_token && data.refresh_token) {
         setTokens(data.access_token, data.refresh_token, data.user);
         console.log('✅ Авторизация успешна, токены сохранены');
-        navigate('/profile'); // ✅ безопасно
+        navigate('/profile');
       } else {
         alert(`❌ Ошибка авторизации: ${data.error || 'Неизвестная'}`);
       }
-
     } catch (err) {
       console.error('❌ Ошибка запроса:', err);
       alert('Ошибка соединения с сервером');
@@ -74,11 +73,11 @@ function AppRoutes() {
     }
   };
 
-  // 🌀 Пока не загружен контекст — просто ждём
+  // ⏳ Пока контекст не загружен — рендерим ожидание
   if (!sessionLoaded) {
     return (
-      <div className="flex items-center justify-center min-h-screen text-gray-500 text-center">
-        Загрузка...
+      <div className="flex items-center justify-center min-h-screen text-gray-400">
+        Загрузка сессии...
       </div>
     );
   }
@@ -88,10 +87,14 @@ function AppRoutes() {
       <Route path="/" element={<Landing onStart={handleStart} loading={loading} />} />
       <Route path="/profile" element={<Profile />} />
       <Route path="/dashboard" element={<Dashboard />} />
+      {/* 🔮 Готов к будущим страницам */}
+      {/* <Route path="/xp" element={<XP />} />
+      <Route path="/shop" element={<Shop />} /> */}
     </Routes>
   );
 }
 
+// 🎯 Оборачиваем глобальным SessionProvider
 export default function App() {
   return (
     <SessionProvider>

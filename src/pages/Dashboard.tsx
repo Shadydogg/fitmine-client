@@ -1,4 +1,3 @@
-// Dashboard.tsx — v1.4.0 (SessionContext + UI polish + a11y)
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -6,20 +5,38 @@ import { motion } from "framer-motion";
 import useSyncActivity from "../hooks/useSyncActivity";
 import DashboardSummary from "../components/DashboardSummary";
 import AnimatedBackground from "../components/AnimatedBackground";
+import BottomTab from "../components/BottomTab";
 import { useSession } from "../context/SessionContext";
 
 export default function Dashboard() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { user, sessionLoaded, accessToken } = useSession();
   const { loading } = useSyncActivity();
-  const { user } = useSession();
+
+  // 🌀 Пока не загружена сессия
+  if (!sessionLoaded) {
+    return (
+      <div className="flex items-center justify-center min-h-screen text-gray-400 text-center">
+        {t("dashboard.loading", "Загрузка активности...")}
+      </div>
+    );
+  }
+
+  // ❌ Без accessToken или user — ошибка
+  if (!accessToken || !user) {
+    return (
+      <div className="flex items-center justify-center min-h-screen text-red-400 text-center">
+        {t("dashboard.error", "Авторизация не удалась")}
+      </div>
+    );
+  }
 
   return (
-    <div className="relative w-full min-h-screen flex flex-col items-center justify-center overflow-hidden bg-gradient-to-br from-black via-zinc-900 to-black text-white">
-
+    <div className="relative w-full min-h-screen flex flex-col items-center justify-start overflow-hidden bg-gradient-to-br from-black via-zinc-900 to-black text-white pb-24">
       <AnimatedBackground />
 
-      {/* 👤 Аватар-переход в профиль */}
+      {/* 👤 Профиль */}
       <button
         onClick={() => navigate("/profile")}
         aria-label="Профиль"
@@ -45,7 +62,7 @@ export default function Dashboard() {
 
       {/* 🧩 Заголовок */}
       <motion.h1
-        className="text-3xl font-extrabold mt-12 mb-4 text-center tracking-wide z-10"
+        className="text-3xl font-extrabold mt-20 mb-4 text-center tracking-wide z-10"
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
@@ -53,7 +70,7 @@ export default function Dashboard() {
         {t("dashboard.title", "Твоя активность сегодня")}
       </motion.h1>
 
-      {/* 🔁 Контент: кольца или загрузка */}
+      {/* 🔁 Контент */}
       <motion.div
         initial="hidden"
         animate="visible"
@@ -77,16 +94,19 @@ export default function Dashboard() {
           <>
             <DashboardSummary />
             <motion.div
-              className="mt-8 text-center text-sm text-gray-400 max-w-sm"
+              className="mt-8 text-center text-sm text-amber-300 max-w-sm font-medium"
               initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.9, duration: 0.4 }}
             >
-              {t("dashboard.motivation", "Открой все кольца и получи бонус!")}
+              🎁 {t("dashboard.motivation", "Открой все кольца и получи бонус!")}
             </motion.div>
           </>
         )}
       </motion.div>
+
+      {/* 🔻 Навигация снизу */}
+      <BottomTab current="dashboard" />
     </div>
   );
 }

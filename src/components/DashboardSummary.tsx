@@ -1,4 +1,3 @@
-//v1.4.1
 import Ring from "./Ring";
 import Tooltip from "./Tooltip";
 import useSyncActivity from "../hooks/useSyncActivity";
@@ -28,16 +27,17 @@ export default function DashboardSummary() {
 
   if (loading) {
     return (
-      <div className="text-gray-400 text-sm text-center animate-pulse">
+      <div className="text-gray-400 text-sm text-center animate-pulse mt-4">
         {t("dashboard.loading", "Загрузка данных активности...")}
       </div>
     );
   }
 
   return (
-    <div className="w-full flex flex-col items-center justify-center gap-8 py-6">
+    <div className="w-full flex flex-col items-center justify-center gap-8 py-6 px-2 sm:px-4">
+      {/* Заголовок */}
       <motion.div
-        className="text-2xl font-semibold text-white drop-shadow tracking-wide mb-2"
+        className="text-2xl font-semibold text-white drop-shadow-md tracking-wide mb-2 text-center"
         initial={{ opacity: 0, y: -6 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
@@ -45,13 +45,14 @@ export default function DashboardSummary() {
         {t("dashboard.title", "Твоя активность сегодня")}
       </motion.div>
 
+      {/* Кольца */}
       <motion.div
-        className="flex flex-row items-center justify-center gap-6"
+        className="flex flex-row items-center justify-center gap-6 sm:gap-10"
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.4, duration: 0.3 }}
       >
-        <Tooltip content={t("tooltip.steps")}>
+        <Tooltip content={t("tooltip.steps", "Сколько шагов ты сделал")}>
           <Ring
             progress={stepsGoal ? steps / stepsGoal : 0}
             label={t("ring.steps", "Шаги")}
@@ -59,7 +60,7 @@ export default function DashboardSummary() {
           />
         </Tooltip>
 
-        <Tooltip content={t("tooltip.calories")}>
+        <Tooltip content={t("tooltip.calories", "Сожжённые калории за сегодня")}>
           <Ring
             progress={caloriesGoal ? calories / caloriesGoal : 0}
             label={t("ring.calories", "Калории")}
@@ -67,7 +68,7 @@ export default function DashboardSummary() {
           />
         </Tooltip>
 
-        <Tooltip content={t("tooltip.energy")}>
+        <Tooltip content={t("tooltip.energy", "Общая энергия с бонусами")}>
           <Ring
             progress={energy}
             label={t("ring.energy", "Энергия")}

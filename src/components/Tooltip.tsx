@@ -8,7 +8,7 @@ interface Props {
 export default function Tooltip({ content, children }: Props) {
   const [visible, setVisible] = useState(false);
 
-  const toggle = () => setVisible(!visible);
+  const toggle = () => setVisible((v) => !v);
   const show = () => setVisible(true);
   const hide = () => setVisible(false);
 
@@ -17,12 +17,19 @@ export default function Tooltip({ content, children }: Props) {
       className="relative flex flex-col items-center group select-none"
       onMouseEnter={show}
       onMouseLeave={hide}
-      onClick={toggle}
       onTouchStart={toggle}
+      onClick={toggle}
     >
       {children}
+
       {visible && (
-        <div className="absolute bottom-full mb-2 px-3 py-1 text-xs text-white bg-black bg-opacity-80 rounded shadow-lg z-50 whitespace-nowrap animate-fade-in">
+        <div
+          className="absolute bottom-full mb-2 px-3 py-1 text-xs text-white backdrop-blur-md rounded-xl border border-white/10 bg-white/10 shadow-xl z-50 animate-fade-in"
+          style={{
+            transform: "translateY(-4px)",
+            transition: "opacity 0.25s ease, transform 0.25s ease",
+          }}
+        >
           {content}
         </div>
       )}

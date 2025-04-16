@@ -1,4 +1,3 @@
-//v1.1.0
 import { useEffect, useRef } from "react";
 
 export default function AnimatedBackground() {
@@ -15,8 +14,9 @@ export default function AnimatedBackground() {
     let h = (canvas.height = window.innerHeight);
 
     const waves = Array.from({ length: 5 }, (_, i) => ({
-      r: 120 + i * 60,
-      alpha: 0.05 + i * 0.04,
+      r: 100 + i * 60,
+      alpha: 0.06 + i * 0.035,
+      colorShift: i * 60,
     }));
 
     let frame = 0;
@@ -27,9 +27,14 @@ export default function AnimatedBackground() {
       const cy = h * mouse.current.y;
 
       for (const wave of waves) {
-        const r = wave.r + Math.sin(frame * 0.02) * 8;
+        const r = wave.r + Math.sin(frame * 0.03) * 10;
+
+        // RGB-волны с hue shift
+        const hue = (frame + wave.colorShift) % 360;
+        const color = `hsla(${hue}, 100%, 60%, ${wave.alpha})`;
+
         const gradient = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
-        gradient.addColorStop(0, `rgba(0,255,198,${wave.alpha})`);
+        gradient.addColorStop(0, color);
         gradient.addColorStop(1, "transparent");
 
         ctx.fillStyle = gradient;
@@ -72,7 +77,7 @@ export default function AnimatedBackground() {
   return (
     <canvas
       ref={canvasRef}
-      className="fixed top-0 left-0 w-full h-full -z-10 opacity-20 pointer-events-none"
+      className="fixed top-0 left-0 w-full h-full -z-10 opacity-30 pointer-events-none transition-opacity duration-300"
     />
   );
 }
