@@ -1,4 +1,4 @@
-// SessionContext.tsx — v1.0.0
+// SessionContext.tsx — v1.2.0
 import React, { createContext, useContext, useEffect, useState } from 'react';
 
 type Session = {
@@ -6,6 +6,7 @@ type Session = {
   refreshToken: string | null;
   user: any;
   isAuthenticated: boolean;
+  sessionLoaded: boolean;
   setTokens: (access: string, refresh: string, user: any) => void;
   clearSession: () => void;
 };
@@ -16,16 +17,33 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [refreshToken, setRefreshToken] = useState<string | null>(null);
   const [user, setUser] = useState<any>(null);
+  const [sessionLoaded, setSessionLoaded] = useState(false);
 
+  // ✅ Гарантированная инициализация токенов из localStorage
   useEffect(() => {
-    const storedAccess = localStorage.getItem('access_token');
-    const storedRefresh = localStorage.getItem('refresh_token');
-    const storedUser = localStorage.getItem('user');
-    if (storedAccess) setAccessToken(storedAccess);
-    if (storedRefresh) setRefreshToken(storedRefresh);
-    if (storedUser) setUser(JSON.parse(storedUser));
+    const syncFromStorage = () => {
+      const storedAccess = localStorage.getItem('access_token');
+      const storedRefresh = localStorage.getItem('refresh_token');
+      const storedUser = localStorage.getItem('user');
+
+      setAccessToken(storedAccess);
+      setRefreshToken(storedRefresh);
+      setUser(storedUser ? JSON.parse(storedUser) : null);
+    };
+
+    syncFromStorage();
+    setSessionLoaded(true);
+
+    // 🔄 Автообновление из других вкладок
+    const onStorageChange = () => {
+      syncFromStorage();
+    };
+
+    window.addEventListener('storage', onStorageChange);
+    return () => window.removeEventListener('storage', onStorageChange);
   }, []);
 
+  // ✅ Устанавливаем токены и обновляем стейт
   const setTokens = (access: string, refresh: string, userObj: any) => {
     localStorage.setItem('access_token', access);
     localStorage.setItem('refresh_token', refresh);
@@ -34,6 +52,7 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
     setAccessToken(access);
     setRefreshToken(refresh);
     setUser(userObj);
+    setSessionLoaded(true); // 💡 Точно готово к использованию
   };
 
   const clearSession = () => {
@@ -44,6 +63,7 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
     setAccessToken(null);
     setRefreshToken(null);
     setUser(null);
+    setSessionLoaded(false);
   };
 
   return (
@@ -52,7 +72,8 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
         accessToken,
         refreshToken,
         user,
-        isAuthenticated: !!accessToken,
+        isAuthenticated: !!accessToken && sessionLoaded,
+        sessionLoaded,
         setTokens,
         clearSession,
       }}
@@ -62,7 +83,6 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
   );
 };
 
-// 👇 Хук для подключения к контексту
 export const useSession = () => {
   const context = useContext(SessionContext);
   if (!context) {

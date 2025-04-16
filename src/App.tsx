@@ -1,4 +1,4 @@
-// App.tsx — v2.6.0 (SessionProvider, initData, refresh_token)
+// App.tsx — v2.8.0 (синхронный navigate, sessionLoaded уже устойчив)
 import React, { useEffect, useState } from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -14,7 +14,7 @@ function AppRoutes() {
   const { i18n } = useTranslation();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const { setTokens } = useSession();
+  const { setTokens, sessionLoaded } = useSession();
 
   // 🔁 Автообновление токенов
   useTokenRefresher();
@@ -59,9 +59,9 @@ function AppRoutes() {
       const data = await res.json();
 
       if (data.ok && data.access_token && data.refresh_token) {
-        setTokens(data.access_token, data.refresh_token, data.user); // ✅ сохраняем через контекст
+        setTokens(data.access_token, data.refresh_token, data.user);
         console.log('✅ Авторизация успешна, токены сохранены');
-        navigate('/profile');
+        navigate('/profile'); // ✅ безопасно
       } else {
         alert(`❌ Ошибка авторизации: ${data.error || 'Неизвестная'}`);
       }
@@ -74,6 +74,15 @@ function AppRoutes() {
     }
   };
 
+  // 🌀 Пока не загружен контекст — просто ждём
+  if (!sessionLoaded) {
+    return (
+      <div className="flex items-center justify-center min-h-screen text-gray-500 text-center">
+        Загрузка...
+      </div>
+    );
+  }
+
   return (
     <Routes>
       <Route path="/" element={<Landing onStart={handleStart} loading={loading} />} />
@@ -83,7 +92,6 @@ function AppRoutes() {
   );
 }
 
-// ✅ Оборачиваем AppRoutes в глобальный SessionProvider
 export default function App() {
   return (
     <SessionProvider>
