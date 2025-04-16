@@ -1,4 +1,3 @@
-//v1.5.0 (обновлённая версия)
 const plugin = require("tailwindcss/plugin");
 
 module.exports = {
@@ -63,12 +62,12 @@ module.exports = {
         ringWave: 'ringWave 1s ease-out',
       },
       width: {
-        'ring': '6.5rem',
+        ring: '6.5rem',
         'ring-sm': '5.5rem',
         'ring-lg': '8rem',
       },
       height: {
-        'ring': '6.5rem',
+        ring: '6.5rem',
         'ring-sm': '5.5rem',
         'ring-lg': '8rem',
       },

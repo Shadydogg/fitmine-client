@@ -27,32 +27,24 @@ export default function DashboardSummary() {
 
   if (loading) {
     return (
-      <div className="text-gray-400 text-sm text-center animate-pulse mt-4">
+      <div className="text-gray-400 text-sm text-center animate-pulse">
         {t("dashboard.loading", "Загрузка данных активности...")}
       </div>
     );
   }
 
   return (
-    <div className="w-full flex flex-col items-center justify-center gap-8 py-6 px-2 sm:px-4">
-      {/* Заголовок */}
-      <motion.div
-        className="text-2xl font-semibold text-white drop-shadow-md tracking-wide mb-2 text-center"
-        initial={{ opacity: 0, y: -6 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-      >
-        {t("dashboard.title", "Твоя активность сегодня")}
-      </motion.div>
+    <div className="w-full flex flex-col items-center justify-center gap-8 py-6">
 
-      {/* Кольца */}
+      {/* 👇 Удалён заголовок */}
+
       <motion.div
-        className="flex flex-row items-center justify-center gap-6 sm:gap-10"
+        className="flex flex-row items-center justify-center gap-6"
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.4, duration: 0.3 }}
       >
-        <Tooltip content={t("tooltip.steps", "Сколько шагов ты сделал")}>
+        <Tooltip content={t("tooltip.steps")}>
           <Ring
             progress={stepsGoal ? steps / stepsGoal : 0}
             label={t("ring.steps", "Шаги")}
@@ -60,7 +52,7 @@ export default function DashboardSummary() {
           />
         </Tooltip>
 
-        <Tooltip content={t("tooltip.calories", "Сожжённые калории за сегодня")}>
+        <Tooltip content={t("tooltip.calories")}>
           <Ring
             progress={caloriesGoal ? calories / caloriesGoal : 0}
             label={t("ring.calories", "Калории")}
@@ -68,7 +60,7 @@ export default function DashboardSummary() {
           />
         </Tooltip>
 
-        <Tooltip content={t("tooltip.energy", "Общая энергия с бонусами")}>
+        <Tooltip content={t("tooltip.energy")}>
           <Ring
             progress={energy}
             label={t("ring.energy", "Энергия")}
