@@ -13,7 +13,7 @@ export default function Dashboard() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { user, sessionLoaded, accessToken, setTokens } = useSession();
-  const { loading, refetch } = useSyncActivity(); // ✅ добавили refetch
+  const activity = useSyncActivity(); // ✅ общий хук
 
   if (!sessionLoaded) {
     return (
@@ -35,9 +35,7 @@ export default function Dashboard() {
     try {
       const res = await fetch("https://api.fitmine.vip/api/sync/google", {
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
+        headers: { Authorization: `Bearer ${accessToken}` },
       });
 
       const data = await res.json();
@@ -45,11 +43,9 @@ export default function Dashboard() {
       if (data.ok) {
         alert("📊 Активность синхронизирована!");
 
-        // 🔁 Обновляем user-профиль
+        // 🔁 Обновляем user
         const profileRes = await fetch("https://api.fitmine.vip/api/profile", {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
+          headers: { Authorization: `Bearer ${accessToken}` },
         });
 
         const profileData = await profileRes.json();
@@ -62,8 +58,8 @@ export default function Dashboard() {
           );
         }
 
-        // 🔁 Обновляем активность в интерфейсе
-        refetch();
+        // 🔁 Обновляем активность
+        activity.refetch(); // ✅ важно
       } else {
         alert(`❌ Ошибка: ${data.error}`);
       }
@@ -79,14 +75,9 @@ export default function Dashboard() {
       {/* 👤 Профиль */}
       <button
         onClick={() => navigate("/profile")}
-        aria-label="Профиль"
         className="absolute top-4 right-4 w-10 h-10 rounded-full overflow-hidden border-2 border-white shadow-md hover:scale-105 transition-transform z-20"
       >
-        <img
-          src={user?.photo_url || "/default-avatar.png"}
-          alt="Аватар пользователя"
-          className="w-full h-full object-cover"
-        />
+        <img src={user?.photo_url || "/default-avatar.png"} alt="avatar" className="w-full h-full object-cover" />
       </button>
 
       {/* 🎯 XP */}
@@ -100,7 +91,6 @@ export default function Dashboard() {
         🎯 XP и Уровень
       </motion.button>
 
-      {/* 🧩 Заголовок */}
       <motion.h1
         className="text-3xl font-extrabold mt-20 mb-4 text-center tracking-wide z-10"
         initial={{ opacity: 0, y: 10 }}
@@ -116,20 +106,17 @@ export default function Dashboard() {
         animate="visible"
         variants={{
           hidden: { opacity: 0 },
-          visible: {
-            opacity: 1,
-            transition: { staggerChildren: 0.2, delayChildren: 0.5 },
-          },
+          visible: { opacity: 1, transition: { staggerChildren: 0.2, delayChildren: 0.5 } },
         }}
         className="z-10"
       >
-        {loading ? (
+        {activity.loading ? (
           <div className="text-gray-500 mt-6 animate-pulse">
             {t("dashboard.loading", "Загрузка активности...")}
           </div>
         ) : (
           <>
-            <DashboardSummary />
+            <DashboardSummary data={activity} />
             <motion.div
               className="mt-8 text-center text-sm text-amber-300 max-w-sm font-medium"
               initial={{ opacity: 0, y: 6 }}
@@ -158,15 +145,12 @@ export default function Dashboard() {
           </button>
         ) : (
           <div className="mt-4 max-w-xs mx-auto">
-            <div className="text-sm text-yellow-300 mb-2">
-              🔓 Google Fit не подключён
-            </div>
+            <div className="text-sm text-yellow-300 mb-2">🔓 Google Fit не подключён</div>
             <ConnectGoogleFit />
           </div>
         )}
       </motion.div>
 
-      {/* 🔻 Навигация */}
       <BottomTab current="dashboard" />
     </div>
   );
