@@ -9,7 +9,7 @@ import ConnectGoogleFit from '../components/ConnectGoogleFit';
 export default function Profile() {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { accessToken, isAuthenticated, sessionLoaded, user } = useSession();
+  const { accessToken, isAuthenticated, sessionLoaded, user, refreshUser } = useSession(); // ✅ refreshUser
 
   const [loading, setLoading] = useState(true);
 
@@ -108,6 +108,7 @@ export default function Profile() {
                     .then(data => {
                       if (data.ok) {
                         alert('📊 Активность синхронизирована!');
+                        refreshUser(); // ✅ Обновление user с Supabase
                       } else {
                         alert(`❌ Ошибка: ${data.error}`);
                       }
