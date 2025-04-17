@@ -1,4 +1,3 @@
-// Ring.tsx — v1.4.1 (🎉 confetti + 🔊 звук + 🟡 bounce при 100%)
 import { motion, useMotionValue, useTransform, animate } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import confetti from "canvas-confetti";
@@ -49,11 +48,18 @@ export default function Ring({ progress, label, color = "#22c55e", onClick }: Pr
       setTimeout(() => setShouldBounce(false), 1000);
     }
 
+    // 🔁 Сброс при снижении прогресса
+    if (progress < 1 && hasCelebrated.current) {
+      hasCelebrated.current = false;
+    }
+
     return controls.stop;
   }, [progress]);
 
   return (
     <motion.div
+      role="button"
+      tabIndex={0}
       className="relative w-24 sm:w-28 h-24 sm:h-28 cursor-pointer"
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{
@@ -67,6 +73,11 @@ export default function Ring({ progress, label, color = "#22c55e", onClick }: Pr
         duration: 0.6,
       }}
       onClick={onClick}
+      onKeyDown={(e) => {
+        if ((e.key === "Enter" || e.key === " ") && onClick) {
+          onClick();
+        }
+      }}
       aria-label={`Кольцо ${label} заполнено на ${Math.round(progress * 100)}%`}
     >
       <svg className="w-full h-full" viewBox="0 0 100 100">
