@@ -34,20 +34,15 @@ const Landing: React.FC<Props> = ({ onStart, loading }) => {
         type="button"
         onClick={onStart}
         disabled={loading}
-        aria-label="Начать"
+        aria-label={t('landing.start')}
         className={`px-8 py-3 rounded-full font-semibold text-lg transition-all duration-300 ease-in-out focus:outline-none shadow-xl
-          ${
-            loading
-              ? 'bg-gray-500 cursor-not-allowed text-white/70'
-              : 'bg-gradient-to-r from-pink-500 via-yellow-400 to-purple-500 text-white hover:brightness-110 hover:scale-105'
-          }
+          ${loading
+            ? 'bg-gray-500 cursor-not-allowed text-white/70'
+            : 'bg-gradient-to-r from-yellow-400 via-pink-500 to-violet-500 text-white hover:scale-105'}
         `}
       >
-        {loading ? t('loading', 'Загрузка...') : t('landing.start', 'Начать')}
+        {t('landing.start')}
       </button>
-
-      {/* 🧾 Подпись */}
-      <div className="mt-8 text-xs text-gray-500">@FitMineBot</div>
     </div>
   );
 };

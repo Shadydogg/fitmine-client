@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useSession } from '../context/SessionContext';
+import { useTranslation } from 'react-i18next';
 
 interface GoogleActivityData {
   steps: number;
@@ -12,6 +13,7 @@ interface GoogleActivityData {
 
 export default function useSyncGoogleFit() {
   const { accessToken, sessionLoaded } = useSession();
+  const { t } = useTranslation();
 
   const [data, setData] = useState<GoogleActivityData | null>(null);
   const [loading, setLoading] = useState(false);
@@ -45,19 +47,20 @@ export default function useSyncGoogleFit() {
             distance: res.data.distance || 0,
             date: res.data.date || new Date().toISOString()
           });
+          setError(null);
         } else {
-          setError(res.data.error || 'Ошибка при синхронизации');
+          setError(res.data.error || t('googleFit.errorSync'));
         }
 
       } catch (err: any) {
-        setError(err?.message || 'Ошибка подключения');
+        setError(err?.message || t('googleFit.errorRequest'));
       } finally {
         setLoading(false);
       }
     };
 
     fetchGoogleFit();
-  }, [accessToken, sessionLoaded]);
+  }, [accessToken, sessionLoaded, t]);
 
   return { data, loading, error };
 }
