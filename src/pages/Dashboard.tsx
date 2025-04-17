@@ -12,7 +12,7 @@ import ConnectGoogleFit from "../components/ConnectGoogleFit";
 export default function Dashboard() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { user, sessionLoaded, accessToken } = useSession();
+  const { user, sessionLoaded, accessToken, setTokens } = useSession();
   const { loading } = useSyncActivity();
 
   if (!sessionLoaded) {
@@ -31,6 +31,40 @@ export default function Dashboard() {
     );
   }
 
+  const syncGoogleAndUpdate = async () => {
+    try {
+      const res = await fetch("https://api.fitmine.vip/api/sync/google", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      const data = await res.json();
+
+      if (data.ok) {
+        alert("📊 Активность синхронизирована!");
+
+        // 🔁 Обновление user
+        const profileRes = await fetch("https://api.fitmine.vip/api/profile", {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+
+        const profileData = await profileRes.json();
+        if (profileData.ok) {
+          localStorage.setItem("user", JSON.stringify(profileData.user));
+          setTokens(accessToken, localStorage.getItem("refresh_token") || "", profileData.user);
+        }
+      } else {
+        alert(`❌ Ошибка: ${data.error}`);
+      }
+    } catch {
+      alert("❌ Ошибка соединения");
+    }
+  };
+
   return (
     <div className="relative w-full min-h-screen flex flex-col items-center justify-start overflow-hidden bg-gradient-to-br from-black via-zinc-900 to-black text-white pb-24">
       <AnimatedBackground />
@@ -48,7 +82,7 @@ export default function Dashboard() {
         />
       </button>
 
-      {/* 🎯 Кнопка XP */}
+      {/* 🎯 XP */}
       <motion.button
         onClick={() => navigate("/xp")}
         className="absolute top-4 left-4 px-3 py-1 rounded-full text-sm bg-fit-gradient shadow-glow hover:scale-105 transition-glow z-20"
@@ -77,10 +111,7 @@ export default function Dashboard() {
           hidden: { opacity: 0 },
           visible: {
             opacity: 1,
-            transition: {
-              staggerChildren: 0.2,
-              delayChildren: 0.5,
-            },
+            transition: { staggerChildren: 0.2, delayChildren: 0.5 },
           },
         }}
         className="z-10"
@@ -113,23 +144,7 @@ export default function Dashboard() {
       >
         {user.google_connected ? (
           <button
-            onClick={() => {
-              fetch('https://api.fitmine.vip/api/sync/google', {
-                method: 'POST',
-                headers: {
-                  Authorization: `Bearer ${accessToken}`
-                }
-              })
-                .then(res => res.json())
-                .then(data => {
-                  if (data.ok) {
-                    alert('📊 Активность синхронизирована!');
-                  } else {
-                    alert(`❌ Ошибка: ${data.error}`);
-                  }
-                })
-                .catch(() => alert('❌ Ошибка соединения'));
-            }}
+            onClick={syncGoogleAndUpdate}
             className="mt-2 px-5 py-2 bg-lime-500 text-white font-medium rounded-full shadow hover:scale-105 transition-transform"
           >
             🔄 Синхронизировать Google Fit
