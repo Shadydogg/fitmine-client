@@ -8,10 +8,10 @@ import Profile from './pages/Profile';
 import Dashboard from './pages/Dashboard';
 import useTokenRefresher from './hooks/useTokenRefresher';
 import { SessionProvider, useSession } from './context/SessionContext';
-import LanguageSwitcher from './components/LanguageSwitcher';
 
+// 👉 Внутренние маршруты сессии
 function AppRoutes() {
-  const { i18n, t } = useTranslation();
+  const { i18n } = useTranslation();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
@@ -21,8 +21,10 @@ function AppRoutes() {
     accessToken
   } = useSession();
 
+  // 🔁 Фоновое обновление access/refresh токенов
   useTokenRefresher();
 
+  // 📦 Telegram initData
   useEffect(() => {
     const tg = window.Telegram?.WebApp;
 
@@ -33,14 +35,15 @@ function AppRoutes() {
       const initDataRaw = tg.initData;
       if (initDataRaw && initDataRaw.length > 10) {
         localStorage.setItem('initData', initDataRaw);
-        console.log(t('app.initDataUpdated'));
+        console.log('📦 initData обновлён в localStorage');
       }
 
       const lang = tg.initDataUnsafe?.user?.language_code || 'en';
       i18n.changeLanguage(['ru', 'en', 'zh', 'es'].includes(lang) ? lang : 'en');
     }
-  }, [i18n, t]);
+  }, [i18n]);
 
+  // ✅ Автосинхронизация профиля из Supabase → setTokens
   useEffect(() => {
     if (sessionLoaded && accessToken) {
       fetch('https://api.fitmine.vip/api/profile', {
@@ -49,28 +52,76 @@ function AppRoutes() {
         }
       })
         .then(res => res.json())
-        .then(data => {
-          if (data && data.user) {
-            localStorage.setItem('user', JSON.stringify(data.user));
+        .then(res => {
+          if (res.ok && res.user) {
+            localStorage.setItem('user', JSON.stringify(res.user));
+            setTokens(accessToken, localStorage.getItem('refresh_token') || '', res.user); // ✅ синхронизация контекста
+            console.log('✅ Профиль обновлён из Supabase и сохранён в контексте');
           }
         })
-        .catch(console.error);
+        .catch(err => {
+          console.warn('⚠️ Ошибка загрузки профиля:', err.message);
+        });
     }
-  }, [sessionLoaded, accessToken]);
+  }, [sessionLoaded, accessToken, setTokens]);
+
+  // 🚀 Telegram авторизация
+  const handleStart = async () => {
+    const initDataRaw = localStorage.getItem('initData') || '';
+
+    if (!initDataRaw || initDataRaw.length < 20) {
+      alert('❌ Ошибка: подпись Telegram недоступна.');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res = await fetch("https://api.fitmine.vip/api/verifyTelegram", {
+        method: "POST",
+        headers: {
+          Authorization: `tma ${initDataRaw}`
+        }
+      });
+
+      const data = await res.json();
+
+      if (data.ok && data.access_token && data.refresh_token) {
+        setTokens(data.access_token, data.refresh_token, data.user);
+        console.log('✅ Авторизация успешна, токены сохранены');
+        navigate('/profile');
+      } else {
+        alert(`❌ Ошибка авторизации: ${data.error || 'Неизвестная'}`);
+      }
+    } catch (err) {
+      console.error('❌ Ошибка запроса:', err);
+      alert('Ошибка соединения с сервером');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // ⏳ Пока сессия не загружена
+  if (!sessionLoaded) {
+    return (
+      <div className="flex items-center justify-center min-h-screen text-gray-400">
+        Загрузка сессии...
+      </div>
+    );
+  }
 
   return (
     <Routes>
-      <Route path="/" element={<Landing onStart={() => navigate('/dashboard')} loading={loading} />} />
-      <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/" element={<Landing onStart={handleStart} loading={loading} />} />
       <Route path="/profile" element={<Profile />} />
+      <Route path="/dashboard" element={<Dashboard />} />
     </Routes>
   );
 }
 
+// 🎯 Обёртка провайдера
 export default function App() {
   return (
     <SessionProvider>
-      <LanguageSwitcher />
       <AppRoutes />
     </SessionProvider>
   );

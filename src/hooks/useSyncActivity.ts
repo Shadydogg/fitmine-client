@@ -2,7 +2,6 @@ import { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import { calculateEnergy } from "../lib/calculateEnergy";
 import { useSession } from "../context/SessionContext";
-import { useTranslation } from "react-i18next";
 
 interface ActivityData {
   steps: number;
@@ -19,7 +18,6 @@ interface ActivityData {
 
 export default function useSyncActivity(): ActivityData {
   const { accessToken, sessionLoaded, isAuthenticated } = useSession();
-  const { t } = useTranslation();
   const [version, setVersion] = useState(0); // 🔁 триггер на обновление
 
   const [data, setData] = useState<Omit<ActivityData, "refetch">>({
@@ -44,7 +42,7 @@ export default function useSyncActivity(): ActivityData {
     const fetchData = async () => {
       try {
         if (!accessToken || !isAuthenticated) {
-          console.warn(t("sync.errorNoToken"));
+          console.warn("❌ accessToken отсутствует или пользователь не авторизован");
           setData((prev) => ({ ...prev, loading: false }));
           return;
         }
@@ -59,28 +57,36 @@ export default function useSyncActivity(): ActivityData {
           }
         );
 
-        const { steps, calories, hasNFT, isPremium } = res.data;
-        const energy = calculateEnergy(res.data);
+        const d = res.data;
+
+        const energy = calculateEnergy({
+          steps: d.steps || 0,
+          calories: d.calories || 0,
+          activeMinutes: d.minutes || 0,
+          hasNFT: d.hasNFT || false,
+          isPremium: d.isPremium || false,
+          isEarlyAccess: d.isEarlyAccess || false,
+        });
 
         setData({
-          steps,
-          stepsGoal: 10000,
-          calories,
-          caloriesGoal: 2000,
+          steps: d.steps || 0,
+          stepsGoal: d.stepsGoal || 10000,
+          calories: d.calories || 0,
+          caloriesGoal: d.caloriesGoal || 2000, // ✅ теперь всегда 2000, даже если сервер ничего не прислал
           energy,
           energyGoal: 100,
-          hasNFT,
-          isPremium,
+          hasNFT: d.hasNFT || false,
+          isPremium: d.isPremium || false,
           loading: false,
         });
-      } catch (error) {
-        console.error("Error syncing activity:", error);
+      } catch (err) {
+        console.error("❌ Ошибка синхронизации активности:", err);
         setData((prev) => ({ ...prev, loading: false }));
       }
     };
 
     fetchData();
-  }, [accessToken, sessionLoaded, isAuthenticated, version, t]);
+  }, [accessToken, sessionLoaded, isAuthenticated, version]);
 
   return { ...data, refetch };
 }
