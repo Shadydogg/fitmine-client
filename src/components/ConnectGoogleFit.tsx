@@ -1,27 +1,42 @@
 import { usePlatform } from '../hooks/usePlatform';
 
+const CLIENT_ID = '913307768705-78gti3vn7gkjrjk1nemvrqopknqm0ieb.apps.googleusercontent.com';
+const REDIRECT_URI = 'https://www.fitmine.vip/api/oauth/callback';
+const SCOPES = [
+  'https://www.googleapis.com/auth/fitness.activity.read',
+  'https://www.googleapis.com/auth/fitness.location.read',
+  'https://www.googleapis.com/auth/fitness.body.read'
+].join(' ');
+
 export default function ConnectGoogleFit() {
   const { isTelegramIOS } = usePlatform();
 
   const handleGoogleConnect = () => {
     const initData = localStorage.getItem('initData') || '';
     if (!initData || initData.length < 20) {
-      alert("❌ Ошибка: Telegram initData не найден.");
+      alert('❌ Ошибка: Telegram initData не найден.');
       return;
     }
 
-    // 📦 Кодируем initData → передаём в ?state=
-    const encoded = btoa(initData);
-    const url = new URL("https://api.fitmine.vip/api/oauth/google");
-    url.searchParams.set("state", encoded);
+    // 📦 Передаём initData в state (base64)
+    const state = btoa(initData);
+
+    const url = new URL('https://accounts.google.com/o/oauth2/v2/auth');
+    url.searchParams.set('client_id', CLIENT_ID);
+    url.searchParams.set('redirect_uri', REDIRECT_URI);
+    url.searchParams.set('response_type', 'code');
+    url.searchParams.set('access_type', 'offline');
+    url.searchParams.set('scope', SCOPES);
+    url.searchParams.set('prompt', 'consent');
+    url.searchParams.set('state', state);
 
     // 🚀 Открываем в новой вкладке
-    window.open(url.toString(), "_blank");
+    window.open(url.toString(), '_blank');
   };
 
   const handleIOSShortcut = () => {
     // 📱 Открывает ярлык на iOS через Shortcuts
-    window.location.href = "shortcuts://run-shortcut?name=FitMineGoogleFit";
+    window.location.href = 'shortcuts://run-shortcut?name=FitMineGoogleFit';
   };
 
   return (
