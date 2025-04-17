@@ -14,7 +14,12 @@ function AppRoutes() {
   const { i18n } = useTranslation();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const { setTokens, sessionLoaded, accessToken } = useSession();
+
+  const {
+    setTokens,
+    sessionLoaded,
+    accessToken
+  } = useSession();
 
   // 🔁 Фоновое обновление access/refresh токенов
   useTokenRefresher();
@@ -38,7 +43,7 @@ function AppRoutes() {
     }
   }, [i18n]);
 
-  // ✅ Автоматическая синхронизация профиля
+  // ✅ Автосинхронизация профиля из Supabase → setTokens
   useEffect(() => {
     if (sessionLoaded && accessToken) {
       fetch('https://api.fitmine.vip/api/profile', {
@@ -50,14 +55,15 @@ function AppRoutes() {
         .then(res => {
           if (res.ok && res.user) {
             localStorage.setItem('user', JSON.stringify(res.user));
-            console.log('🔁 Профиль обновлён из Supabase');
+            setTokens(accessToken, localStorage.getItem('refresh_token') || '', res.user); // ✅ синхронизация контекста
+            console.log('✅ Профиль обновлён из Supabase и сохранён в контексте');
           }
         })
         .catch(err => {
           console.warn('⚠️ Ошибка загрузки профиля:', err.message);
         });
     }
-  }, [sessionLoaded, accessToken]);
+  }, [sessionLoaded, accessToken, setTokens]);
 
   // 🚀 Telegram авторизация
   const handleStart = async () => {
@@ -112,7 +118,7 @@ function AppRoutes() {
   );
 }
 
-// 🎯 Сессия обёрнута глобальным провайдером
+// 🎯 Обёртка провайдера
 export default function App() {
   return (
     <SessionProvider>
