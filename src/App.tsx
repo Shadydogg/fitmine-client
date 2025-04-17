@@ -9,17 +9,17 @@ import Dashboard from './pages/Dashboard';
 import useTokenRefresher from './hooks/useTokenRefresher';
 import { SessionProvider, useSession } from './context/SessionContext';
 
-// 👉 Обособленные маршруты внутри контекста
+// 👉 Внутренние маршруты сессии
 function AppRoutes() {
   const { i18n } = useTranslation();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const { setTokens, sessionLoaded } = useSession();
+  const { setTokens, sessionLoaded, accessToken } = useSession();
 
-  // 🔁 Фоновая проверка refresh_token (если есть)
+  // 🔁 Фоновое обновление access/refresh токенов
   useTokenRefresher();
 
-  // 📦 initData от Telegram
+  // 📦 Telegram initData
   useEffect(() => {
     const tg = window.Telegram?.WebApp;
 
@@ -37,6 +37,27 @@ function AppRoutes() {
       i18n.changeLanguage(['ru', 'en', 'zh', 'es'].includes(lang) ? lang : 'en');
     }
   }, [i18n]);
+
+  // ✅ Автоматическая синхронизация профиля
+  useEffect(() => {
+    if (sessionLoaded && accessToken) {
+      fetch('https://api.fitmine.vip/api/profile', {
+        headers: {
+          Authorization: `Bearer ${accessToken}`
+        }
+      })
+        .then(res => res.json())
+        .then(res => {
+          if (res.ok && res.user) {
+            localStorage.setItem('user', JSON.stringify(res.user));
+            console.log('🔁 Профиль обновлён из Supabase');
+          }
+        })
+        .catch(err => {
+          console.warn('⚠️ Ошибка загрузки профиля:', err.message);
+        });
+    }
+  }, [sessionLoaded, accessToken]);
 
   // 🚀 Telegram авторизация
   const handleStart = async () => {
@@ -73,7 +94,7 @@ function AppRoutes() {
     }
   };
 
-  // ⏳ Пока контекст не загружен — рендерим ожидание
+  // ⏳ Пока сессия не загружена
   if (!sessionLoaded) {
     return (
       <div className="flex items-center justify-center min-h-screen text-gray-400">
@@ -87,14 +108,11 @@ function AppRoutes() {
       <Route path="/" element={<Landing onStart={handleStart} loading={loading} />} />
       <Route path="/profile" element={<Profile />} />
       <Route path="/dashboard" element={<Dashboard />} />
-      {/* 🔮 Готов к будущим страницам */}
-      {/* <Route path="/xp" element={<XP />} />
-      <Route path="/shop" element={<Shop />} /> */}
     </Routes>
   );
 }
 
-// 🎯 Оборачиваем глобальным SessionProvider
+// 🎯 Сессия обёрнута глобальным провайдером
 export default function App() {
   return (
     <SessionProvider>
