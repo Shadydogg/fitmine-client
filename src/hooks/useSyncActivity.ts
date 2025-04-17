@@ -72,7 +72,7 @@ export default function useSyncActivity(): ActivityData {
           steps: d.steps || 0,
           stepsGoal: d.stepsGoal || 10000,
           calories: d.calories || 0,
-          caloriesGoal: d.caloriesGoal || 500,
+          caloriesGoal: d.caloriesGoal || 2000,
           energy,
           energyGoal: 100,
           hasNFT: d.hasNFT || false,

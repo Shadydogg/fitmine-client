@@ -32,7 +32,8 @@ export default function DashboardSummary({ data }: Props) {
   const [showInfo, setShowInfo] = useState(false);
 
   return (
-    <div className="w-full flex flex-col items-center justify-center gap-8 py-6">
+    <div className="w-full flex flex-col items-center justify-center gap-4 py-6">
+      {/* 🔁 Кольца */}
       <motion.div
         className="flex flex-row items-center justify-center gap-6"
         initial={{ opacity: 0, scale: 0.9 }}
@@ -52,14 +53,6 @@ export default function DashboardSummary({ data }: Props) {
             <span className="text-xs text-gray-300 mt-1">
               {Math.round(calories)} / {caloriesGoal} ккал
             </span>
-
-            {/* 🔥 Кнопка раскрытия */}
-            <button
-              onClick={() => setShowInfo(!showInfo)}
-              className="text-[10px] mt-1 text-amber-400 hover:text-white transition-colors"
-            >
-              {showInfo ? "Скрыть расчёт" : "ℹ️ Как мы считаем калории"}
-            </button>
           </div>
         </Tooltip>
 
@@ -71,7 +64,15 @@ export default function DashboardSummary({ data }: Props) {
         </Tooltip>
       </motion.div>
 
-      {/* 💬 Раскрывающийся текст */}
+      {/* 🔥 Кнопка под кольцами */}
+      <button
+        onClick={() => setShowInfo(!showInfo)}
+        className="text-[11px] mt-1 text-amber-400 hover:text-white transition-colors"
+      >
+        {showInfo ? "Скрыть расчёт калорий" : "ℹ️ Как мы считаем калории"}
+      </button>
+
+      {/* 💬 Раскрывающийся блок */}
       <AnimatePresence>
         {showInfo && (
           <motion.div
@@ -82,12 +83,12 @@ export default function DashboardSummary({ data }: Props) {
             className="text-xs text-gray-400 max-w-xs text-left bg-white/5 p-3 rounded-xl mt-2 border border-white/10 backdrop-blur"
           >
             <p className="text-amber-300 font-semibold mb-1">🔥 Как мы считаем калории</p>
-            <p>Твоя цель — 2000 ккал в день, и она учитывает:</p>
+            <p>Твоя цель — <b>2000 ккал в день</b>, и она включает:</p>
             <ul className="list-disc list-inside pl-2 my-1">
-              <li><b>~1500 ккал</b> — калории, которые организм тратит в покое (BMR)</li>
-              <li><b>~500 ккал</b> — активные калории за счёт ходьбы и тренировок</li>
+              <li><b>~1500 ккал</b> — в состоянии покоя (BMR)</li>
+              <li><b>~500 ккал</b> — активные: шаги, тренировки и движение</li>
             </ul>
-            <p>Мы используем данные Google Fit, включающие все потраченные калории — и в покое, и в движении 🧠💓</p>
+            <p>Мы используем <b>данные Google Fit</b>, которые учитывают все сожжённые калории — даже в покое 🧠💓</p>
           </motion.div>
         )}
       </AnimatePresence>
