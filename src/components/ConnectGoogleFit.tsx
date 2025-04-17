@@ -12,7 +12,7 @@ export default function ConnectGoogleFit() {
 
     // 📦 Кодируем initData → передаём в ?state=
     const encoded = btoa(initData);
-    const url = new URL("https://fitmine.vip/api/oauth/google");
+    const url = new URL("https://api.fitmine.vip/api/oauth/google");
     url.searchParams.set("state", encoded);
 
     // 🚀 Открываем в новой вкладке
