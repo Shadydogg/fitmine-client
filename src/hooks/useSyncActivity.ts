@@ -1,4 +1,3 @@
-// useSyncActivity.ts — v1.6.0
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { calculateEnergy } from "../lib/calculateEnergy";
@@ -51,6 +50,12 @@ export default function useSyncActivity(): ActivityData {
             },
           }
         );
+
+        if (!res.data.ok) {
+          console.warn("❌ API /api/sync вернул ошибку:", res.data.error);
+          setData((prev) => ({ ...prev, loading: false }));
+          return;
+        }
 
         const d = res.data;
 
