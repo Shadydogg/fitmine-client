@@ -51,12 +51,6 @@ export default function useSyncActivity(): ActivityData {
           }
         );
 
-        if (!res.data.ok) {
-          console.warn("❌ API /api/sync вернул ошибку:", res.data.error);
-          setData((prev) => ({ ...prev, loading: false }));
-          return;
-        }
-
         const d = res.data;
 
         const energy = calculateEnergy({
