@@ -1,4 +1,3 @@
-// SessionContext.tsx — v1.2.0
 import React, { createContext, useContext, useEffect, useState } from 'react';
 
 type Session = {
@@ -9,6 +8,7 @@ type Session = {
   sessionLoaded: boolean;
   setTokens: (access: string, refresh: string, user: any) => void;
   clearSession: () => void;
+  refreshUser: () => Promise<void>; // ✅ новое
 };
 
 const SessionContext = createContext<Session | undefined>(undefined);
@@ -52,7 +52,28 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
     setAccessToken(access);
     setRefreshToken(refresh);
     setUser(userObj);
-    setSessionLoaded(true); // 💡 Точно готово к использованию
+    setSessionLoaded(true);
+  };
+
+  // ✅ Обновление user из API /profile
+  const refreshUser = async () => {
+    if (!accessToken) return;
+
+    try {
+      const res = await fetch('https://api.fitmine.vip/api/profile', {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      const data = await res.json();
+      if (data.ok && data.user) {
+        localStorage.setItem('user', JSON.stringify(data.user));
+        setUser(data.user);
+        console.log('✅ Пользователь обновлён через refreshUser');
+      }
+    } catch (err) {
+      console.warn('⚠️ Ошибка при обновлении пользователя:', err);
+    }
   };
 
   const clearSession = () => {
@@ -76,6 +97,7 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
         sessionLoaded,
         setTokens,
         clearSession,
+        refreshUser, // ✅ экспортируем
       }}
     >
       {children}
