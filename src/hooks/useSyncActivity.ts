@@ -24,7 +24,7 @@ export default function useSyncActivity(): ActivityData {
     steps: 0,
     stepsGoal: 10000,
     calories: 0,
-    caloriesGoal: 500,
+    caloriesGoal: 2000,
     energy: 0,
     energyGoal: 100,
     hasNFT: false,
