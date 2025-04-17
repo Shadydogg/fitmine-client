@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import { calculateEnergy } from "../lib/calculateEnergy";
 import { useSession } from "../context/SessionContext";
@@ -13,12 +13,14 @@ interface ActivityData {
   hasNFT: boolean;
   isPremium: boolean;
   loading: boolean;
+  refetch: () => void;
 }
 
 export default function useSyncActivity(): ActivityData {
   const { accessToken, sessionLoaded, isAuthenticated } = useSession();
+  const [version, setVersion] = useState(0); // 🔁 триггер на обновление
 
-  const [data, setData] = useState<ActivityData>({
+  const [data, setData] = useState<Omit<ActivityData, "refetch">>({
     steps: 0,
     stepsGoal: 10000,
     calories: 0,
@@ -29,6 +31,10 @@ export default function useSyncActivity(): ActivityData {
     isPremium: false,
     loading: true,
   });
+
+  const refetch = useCallback(() => {
+    setVersion(v => v + 1);
+  }, []);
 
   useEffect(() => {
     if (!sessionLoaded) return;
@@ -80,7 +86,7 @@ export default function useSyncActivity(): ActivityData {
     };
 
     fetchData();
-  }, [accessToken, sessionLoaded, isAuthenticated]);
+  }, [accessToken, sessionLoaded, isAuthenticated, version]); // 🔁 следим за версией
 
-  return data;
+  return { ...data, refetch };
 }

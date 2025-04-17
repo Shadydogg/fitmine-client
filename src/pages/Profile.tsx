@@ -9,8 +9,7 @@ import ConnectGoogleFit from '../components/ConnectGoogleFit';
 export default function Profile() {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { accessToken, isAuthenticated, sessionLoaded, user, refreshUser } = useSession(); // ✅ refreshUser
-
+  const { accessToken, isAuthenticated, sessionLoaded, user } = useSession();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -92,34 +91,9 @@ export default function Profile() {
       {user && (
         <div className="mt-6 max-w-sm w-full text-center">
           {user.google_connected ? (
-            <>
-              <div className="text-sm text-green-400 mb-2">
-                ✅ Google Fit подключён
-              </div>
-              <button
-                onClick={() => {
-                  fetch('https://api.fitmine.vip/api/sync/google', {
-                    method: 'POST',
-                    headers: {
-                      Authorization: `Bearer ${accessToken}`
-                    }
-                  })
-                    .then(res => res.json())
-                    .then(data => {
-                      if (data.ok) {
-                        alert('📊 Активность синхронизирована!');
-                        refreshUser(); // ✅ Обновление user с Supabase
-                      } else {
-                        alert(`❌ Ошибка: ${data.error}`);
-                      }
-                    })
-                    .catch(() => alert('❌ Ошибка соединения'));
-                }}
-                className="px-4 py-2 mt-2 text-sm bg-green-500 text-white rounded-full shadow hover:scale-105 transition-transform"
-              >
-                🔄 Синхронизировать активность
-              </button>
-            </>
+            <div className="text-sm text-green-400 mb-2">
+              ✅ Google Fit подключён
+            </div>
           ) : (
             <>
               <div className="text-sm text-yellow-300 mb-2">

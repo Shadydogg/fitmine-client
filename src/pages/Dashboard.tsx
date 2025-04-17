@@ -13,7 +13,7 @@ export default function Dashboard() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { user, sessionLoaded, accessToken, setTokens } = useSession();
-  const { loading } = useSyncActivity();
+  const { loading, refetch } = useSyncActivity(); // ✅ добавили refetch
 
   if (!sessionLoaded) {
     return (
@@ -45,7 +45,7 @@ export default function Dashboard() {
       if (data.ok) {
         alert("📊 Активность синхронизирована!");
 
-        // 🔁 Обновление user
+        // 🔁 Обновляем user-профиль
         const profileRes = await fetch("https://api.fitmine.vip/api/profile", {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -55,8 +55,15 @@ export default function Dashboard() {
         const profileData = await profileRes.json();
         if (profileData.ok) {
           localStorage.setItem("user", JSON.stringify(profileData.user));
-          setTokens(accessToken, localStorage.getItem("refresh_token") || "", profileData.user);
+          setTokens(
+            accessToken,
+            localStorage.getItem("refresh_token") || "",
+            profileData.user
+          );
         }
+
+        // 🔁 Обновляем активность в интерфейсе
+        refetch();
       } else {
         alert(`❌ Ошибка: ${data.error}`);
       }
