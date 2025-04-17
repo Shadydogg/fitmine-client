@@ -24,7 +24,7 @@ export default function useSyncActivity(): ActivityData {
     steps: 0,
     stepsGoal: 10000,
     calories: 0,
-    caloriesGoal: 2000,
+    caloriesGoal: 2000, // ✅ новая цель по умолчанию
     energy: 0,
     energyGoal: 100,
     hasNFT: false,
@@ -33,7 +33,7 @@ export default function useSyncActivity(): ActivityData {
   });
 
   const refetch = useCallback(() => {
-    setVersion(v => v + 1);
+    setVersion((v) => v + 1);
   }, []);
 
   useEffect(() => {
@@ -72,7 +72,7 @@ export default function useSyncActivity(): ActivityData {
           steps: d.steps || 0,
           stepsGoal: d.stepsGoal || 10000,
           calories: d.calories || 0,
-          caloriesGoal: d.caloriesGoal || 2000,
+          caloriesGoal: d.caloriesGoal || 2000, // ✅ теперь всегда 2000, даже если сервер ничего не прислал
           energy,
           energyGoal: 100,
           hasNFT: d.hasNFT || false,
@@ -86,7 +86,7 @@ export default function useSyncActivity(): ActivityData {
     };
 
     fetchData();
-  }, [accessToken, sessionLoaded, isAuthenticated, version]); // 🔁 следим за версией
+  }, [accessToken, sessionLoaded, isAuthenticated, version]);
 
   return { ...data, refetch };
 }

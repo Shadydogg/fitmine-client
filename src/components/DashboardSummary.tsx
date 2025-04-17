@@ -3,7 +3,6 @@ import Tooltip from "./Tooltip";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
-import { Info, ChevronDown, ChevronUp } from "lucide-react"; // ✅ иконки
 
 interface Props {
   data: {
@@ -65,37 +64,27 @@ export default function DashboardSummary({ data }: Props) {
         </Tooltip>
       </motion.div>
 
-      {/* 🔥 Кнопка-инфо */}
-      <motion.button
+      {/* 🔥 Кнопка под кольцами */}
+      <button
         onClick={() => setShowInfo(!showInfo)}
-        className="text-[11px] mt-2 text-amber-400 hover:text-white transition-all flex items-center gap-1"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.0 }}
+        className="text-[11px] mt-1 text-amber-400 hover:text-white transition-colors"
       >
-        <Info className="w-3.5 h-3.5" />
-        {showInfo ? "Скрыть расчёт калорий" : "Как мы считаем калории"}
-        {showInfo ? (
-          <ChevronUp className="w-3.5 h-3.5" />
-        ) : (
-          <ChevronDown className="w-3.5 h-3.5" />
-        )}
-      </motion.button>
+        {showInfo ? "Скрыть расчёт калорий" : "ℹ️ Как мы считаем калории"}
+      </button>
 
-      {/* 💬 Инфо-блок */}
+      {/* 💬 Раскрывающийся блок */}
       <AnimatePresence>
         {showInfo && (
           <motion.div
-            key="info-box"
-            initial={{ opacity: 0, y: 6 }}
+            key="explanation"
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 6 }}
-            transition={{ duration: 0.4 }}
-            className="text-[11px] text-gray-400 max-w-xs text-left bg-white/5 p-3 rounded-xl border border-white/10 backdrop-blur-sm"
+            exit={{ opacity: 0, y: 10 }}
+            className="text-xs text-gray-400 max-w-xs text-left bg-white/5 p-3 rounded-xl mt-2 border border-white/10 backdrop-blur"
           >
             <p className="text-amber-300 font-semibold mb-1">🔥 Как мы считаем калории</p>
             <p>Твоя цель — <b>2000 ккал в день</b>, и она включает:</p>
-            <ul className="list-disc list-inside pl-3 my-1">
+            <ul className="list-disc list-inside pl-2 my-1">
               <li><b>~1500 ккал</b> — в состоянии покоя (BMR)</li>
               <li><b>~500 ккал</b> — активные: шаги, тренировки и движение</li>
             </ul>

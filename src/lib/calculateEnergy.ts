@@ -18,7 +18,7 @@ export function calculateEnergy({
 }: EnergyInput): number {
   // 🔢 Нормализованные значения
   const stepScore = Math.min(steps / 10000, 1);
-  const calScore = Math.min(calories / 500, 1);
+  const calScore = Math.min(calories / 2000, 1);
   const minScore = Math.min(activeMinutes / 30, 1);
 
   // ⚖️ Весовые коэффициенты
