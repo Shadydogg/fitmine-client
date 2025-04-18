@@ -24,7 +24,11 @@ const LandCard: React.FC<LandCardProps> = ({ land }) => {
     >
       <h2 className="text-xl font-bold capitalize mb-2">{land.name}</h2>
       <p className="text-sm">Rarity: <span className="font-semibold">{land.rarity}</span></p>
-      <p className="text-sm">Bonus Multiplier: {land.bonusMultiplier.toFixed(2)}×</p>
+      <p className="text-sm">
+        Bonus Multiplier: {typeof land.bonusMultiplier === "number" && !isNaN(land.bonusMultiplier)
+          ? land.bonusMultiplier.toFixed(2) + "×"
+          : "N/A"}
+      </p>
       <p className="text-sm">Slots: {land.slots}</p>
       <p className="text-sm mb-2">Connected: {land.connectedMinerIds.length}/{land.slots}</p>
 
