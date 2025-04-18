@@ -1,6 +1,9 @@
-import React from "react";
+// 📄 src/components/NFTCard.tsx — v1.2.0
+
+import React, { useState } from "react";
 import { NFTMiner } from "../types/nft";
 import { cn } from "../lib/utils";
+import UpgradePanel from "./UpgradePanel";
 
 interface NFTCardProps {
   nft: NFTMiner;
@@ -15,9 +18,11 @@ const rarityColor: Record<NFTMiner["rarity"], string> = {
 };
 
 const NFTCard: React.FC<NFTCardProps> = ({ nft }) => {
+  const [level, setLevel] = useState(nft.level);
+
   const componentBonus = nft.components.reduce((sum, c) => sum + c.bonusPercent, 0);
   const miningPower = Math.floor(
-    nft.baseHashrate * (1 + componentBonus / 100) * (nft.ep / 500) * nft.landBonus * (1 + nft.level * 0.1)
+    nft.baseHashrate * (1 + componentBonus / 100) * (nft.ep / 500) * nft.landBonus * (1 + level * 0.1)
   );
 
   return (
@@ -29,7 +34,7 @@ const NFTCard: React.FC<NFTCardProps> = ({ nft }) => {
     >
       <h2 className="text-lg font-bold capitalize">{nft.rarity} Miner</h2>
       <p className="text-sm">Base Hashrate: {nft.baseHashrate}</p>
-      <p className="text-sm">Level: {nft.level}</p>
+      <p className="text-sm">Level: {level}</p>
       <p className="text-sm">EP: {nft.ep}/500</p>
       <p className="text-sm">Land Bonus: {nft.landBonus.toFixed(2)}×</p>
       <p className="text-sm text-green-600 font-semibold">Mining Power: {miningPower}</p>
@@ -43,9 +48,7 @@ const NFTCard: React.FC<NFTCardProps> = ({ nft }) => {
         </ul>
       </div>
 
-      <button className="mt-4 px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700">
-        Upgrade Miner
-      </button>
+      <UpgradePanel nftId={nft.id} currentLevel={level} onUpgraded={setLevel} />
     </div>
   );
 };
