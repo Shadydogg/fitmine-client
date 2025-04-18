@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import './i18n/setup';
@@ -9,28 +9,22 @@ import Dashboard from './pages/Dashboard';
 import NFTPage from './pages/NFTPage';
 import BottomTab from './components/BottomTab';
 import useTokenRefresher from './hooks/useTokenRefresher';
+import useProfileSync from './hooks/useProfileSync'; // ✅ новое подключение
 import { SessionProvider, useSession } from './context/SessionContext';
 
-// 👉 Внутренние маршруты сессии
 function AppRoutes() {
   const { i18n } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const [loading, setLoading] = useState(false);
+  const { setTokens, sessionLoaded, accessToken } = useSession();
 
-  const {
-    setTokens,
-    sessionLoaded,
-    accessToken
-  } = useSession();
+  useTokenRefresher();     // 🔁 автоматическое обновление токенов
+  useProfileSync();        // ✅ один вызов API /api/profile при необходимости
 
-  // 🔁 Фоновое обновление access/refresh токенов
-  useTokenRefresher();
-
-  // 📦 Telegram initData
-  useEffect(() => {
+  // Telegram initData
+  React.useEffect(() => {
     const tg = window.Telegram?.WebApp;
-
     if (tg) {
       tg.ready();
       tg.expand?.();
@@ -46,33 +40,8 @@ function AppRoutes() {
     }
   }, [i18n]);
 
-  // ✅ Единоразовая автосинхронизация профиля
-  useEffect(() => {
-    if (sessionLoaded && accessToken) {
-      const localUser = JSON.parse(localStorage.getItem('user') || '{}');
-      if (localUser?.telegram_id) return; // ❌ Уже синхронизировано, не дёргаем API
-
-      fetch('https://api.fitmine.vip/api/profile', {
-        headers: { Authorization: `Bearer ${accessToken}` }
-      })
-        .then(res => res.json())
-        .then(res => {
-          if (res.ok && res.user) {
-            localStorage.setItem('user', JSON.stringify(res.user));
-            setTokens(accessToken, localStorage.getItem('refresh_token') || '', res.user);
-            console.log('✅ Профиль обновлён из Supabase и сохранён в контексте');
-          }
-        })
-        .catch(err => {
-          console.warn('⚠️ Ошибка загрузки профиля:', err.message);
-        });
-    }
-  }, [sessionLoaded, accessToken, setTokens]);
-
-  // 🚀 Telegram авторизация
   const handleStart = async () => {
     const initDataRaw = localStorage.getItem('initData') || '';
-
     if (!initDataRaw || initDataRaw.length < 20) {
       alert('❌ Ошибка: подпись Telegram недоступна.');
       return;
@@ -82,13 +51,10 @@ function AppRoutes() {
     try {
       const res = await fetch("https://api.fitmine.vip/api/verifyTelegram", {
         method: "POST",
-        headers: {
-          Authorization: `tma ${initDataRaw}`
-        }
+        headers: { Authorization: `tma ${initDataRaw}` }
       });
 
       const data = await res.json();
-
       if (data.ok && data.access_token && data.refresh_token) {
         setTokens(data.access_token, data.refresh_token, data.user);
         console.log('✅ Авторизация успешна, токены сохранены');
@@ -125,7 +91,6 @@ function AppRoutes() {
   );
 }
 
-// 🎯 Обёртка провайдера
 export default function App() {
   return (
     <SessionProvider>
