@@ -7,6 +7,10 @@ import Landing from './pages/Landing';
 import Profile from './pages/Profile';
 import Dashboard from './pages/Dashboard';
 import NFTPage from './pages/NFTPage';
+import LandPage from './pages/LandPage';
+import LandProfile from './pages/LandProfile';
+import ManageLandPanel from './pages/ManageLandPanel';
+
 import BottomTab from './components/BottomTab';
 import useTokenRefresher from './hooks/useTokenRefresher';
 import useProfileSync from './hooks/useProfileSync'; // ✅ новое подключение
@@ -85,6 +89,9 @@ function AppRoutes() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/nft" element={<NFTPage />} />
+        <Route path="/lands" element={<LandPage />} />
+        <Route path="/land/:landId" element={<LandProfile />} />
+        <Route path="/land/:landId/manage" element={<ManageLandPanel />} />
       </Routes>
       <BottomTab current={location.pathname.replace('/', '') || 'dashboard'} />
     </>

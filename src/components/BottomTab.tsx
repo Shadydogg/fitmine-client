@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { Home, Activity, User, ShoppingCart, Sword, Boxes } from "lucide-react";
+import { Home, Activity, User, ShoppingCart, Sword, Boxes, Layers } from "lucide-react";
 
 interface Props {
   current: string;
@@ -10,6 +10,7 @@ const tabs = [
   { icon: <Activity size={20} />, label: "XP", path: "/xp", key: "xp" },
   { icon: <Sword size={20} />, label: "PvP", path: "/pvp", key: "pvp" },
   { icon: <Boxes size={20} />, label: "NFT", path: "/nft", key: "nft" },
+  { icon: <Layers size={20} />, label: "Земли", path: "/lands", key: "land" }, // ✅ новая вкладка
   { icon: <ShoppingCart size={20} />, label: "Магазин", path: "/shop", key: "shop" },
   { icon: <User size={20} />, label: "Профиль", path: "/profile", key: "profile" },
 ];
