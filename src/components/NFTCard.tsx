@@ -1,4 +1,4 @@
-// 📄 src/components/NFTCard.tsx — v1.2.0
+// 📄 src/components/NFTCard.tsx — v1.2.1
 
 import React, { useState } from "react";
 import { NFTMiner } from "../types/nft";
@@ -22,7 +22,7 @@ const NFTCard: React.FC<NFTCardProps> = ({ nft }) => {
 
   const componentBonus = nft.components.reduce((sum, c) => sum + c.bonusPercent, 0);
   const miningPower = Math.floor(
-    nft.baseHashrate * (1 + componentBonus / 100) * (nft.ep / 500) * nft.landBonus * (1 + level * 0.1)
+    nft.baseHashrate * (1 + componentBonus / 100) * (nft.ep / 500) * (nft.landBonus || 1) * (1 + level * 0.1)
   );
 
   return (
@@ -36,7 +36,9 @@ const NFTCard: React.FC<NFTCardProps> = ({ nft }) => {
       <p className="text-sm">Base Hashrate: {nft.baseHashrate}</p>
       <p className="text-sm">Level: {level}</p>
       <p className="text-sm">EP: {nft.ep}/500</p>
-      <p className="text-sm">Land Bonus: {nft.landBonus.toFixed(2)}×</p>
+      <p className="text-sm">
+        Land Bonus: {typeof nft.landBonus === 'number' ? nft.landBonus.toFixed(2) + '×' : 'N/A'}
+      </p>
       <p className="text-sm text-green-600 font-semibold">Mining Power: {miningPower}</p>
 
       <div className="mt-2">
