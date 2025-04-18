@@ -32,7 +32,7 @@ const LandPage: React.FC = () => {
         </div>
       )}
 
-      {/* ✨ Анимация карточек */}
+      {/* ✨ Анимация карточек при появлении */}
       <motion.div
         className="px-4 mt-8 flex flex-col gap-6 z-10"
         initial="hidden"
@@ -43,7 +43,7 @@ const LandPage: React.FC = () => {
             opacity: 1,
             transition: {
               staggerChildren: 0.15,
-              delayChildren: 0.3,
+              delayChildren: 0.4,
             },
           },
         }}
@@ -52,16 +52,17 @@ const LandPage: React.FC = () => {
           <motion.div
             key={land.id}
             variants={{
-              hidden: { opacity: 0, y: 10 },
+              hidden: { opacity: 0, y: 20 },
               visible: { opacity: 1, y: 0 },
             }}
+            transition={{ duration: 0.35, ease: "easeOut" }}
           >
             <LandCard land={land} />
           </motion.div>
         ))}
       </motion.div>
 
-      <BottomTab current="земли" />
+      <BottomTab current="land" />
     </div>
   );
 };
