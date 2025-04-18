@@ -1,9 +1,12 @@
 {
   "name": "fitmine-client",
-  "version": "3.3.6",
+  "version": "3.3.7",
   "private": true,
   "dependencies": {
     "@telegram-apps/sdk": "^3.7.1",
+    "@react-three/fiber": "^9.1.2",
+    "@react-three/drei": "^10.0.6",
+    "three": "^0.175.0",
     "axios": "^1.6.1",
     "classnames": "^2.3.2",
     "clsx": "^2.1.1",
