@@ -46,19 +46,20 @@ function AppRoutes() {
     }
   }, [i18n]);
 
-  // ✅ Автосинхронизация профиля из Supabase → setTokens
+  // ✅ Единоразовая автосинхронизация профиля
   useEffect(() => {
     if (sessionLoaded && accessToken) {
+      const localUser = JSON.parse(localStorage.getItem('user') || '{}');
+      if (localUser?.telegram_id) return; // ❌ Уже синхронизировано, не дёргаем API
+
       fetch('https://api.fitmine.vip/api/profile', {
-        headers: {
-          Authorization: `Bearer ${accessToken}`
-        }
+        headers: { Authorization: `Bearer ${accessToken}` }
       })
         .then(res => res.json())
         .then(res => {
           if (res.ok && res.user) {
             localStorage.setItem('user', JSON.stringify(res.user));
-            setTokens(accessToken, localStorage.getItem('refresh_token') || '', res.user); // ✅ синхронизация контекста
+            setTokens(accessToken, localStorage.getItem('refresh_token') || '', res.user);
             console.log('✅ Профиль обновлён из Supabase и сохранён в контексте');
           }
         })
@@ -103,7 +104,6 @@ function AppRoutes() {
     }
   };
 
-  // ⏳ Пока сессия не загружена
   if (!sessionLoaded) {
     return (
       <div className="flex items-center justify-center min-h-screen text-gray-400">
