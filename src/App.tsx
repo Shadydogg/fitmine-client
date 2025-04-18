@@ -6,6 +6,8 @@ import './i18n/setup';
 import Landing from './pages/Landing';
 import Profile from './pages/Profile';
 import Dashboard from './pages/Dashboard';
+import NFTPage from './pages/NFTPage';
+import BottomTab from './components/BottomTab';
 import useTokenRefresher from './hooks/useTokenRefresher';
 import { SessionProvider, useSession } from './context/SessionContext';
 
@@ -110,11 +112,15 @@ function AppRoutes() {
   }
 
   return (
-    <Routes>
-      <Route path="/" element={<Landing onStart={handleStart} loading={loading} />} />
-      <Route path="/profile" element={<Profile />} />
-      <Route path="/dashboard" element={<Dashboard />} />
-    </Routes>
+    <>
+      <Routes>
+        <Route path="/" element={<Landing onStart={handleStart} loading={loading} />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/nft" element={<NFTPage />} />
+      </Routes>
+      <BottomTab />
+    </>
   );
 }
 
