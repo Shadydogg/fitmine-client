@@ -1,78 +1,104 @@
-import React, { useEffect, useRef } from 'react';
-import confetti from 'canvas-confetti';
+// Ring.tsx — v1.4.1 (🎉 confetti + 🔊 звук + 🟡 bounce при 100%)
+import { motion, useMotionValue, useTransform, animate } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import confetti from "canvas-confetti";
 
-type RingProps = {
+interface Props {
+  progress: number;
   label: string;
-  value: number;
-  goal: number;
-  unit?: string;
-};
+  color?: string;
+  onClick?: () => void;
+}
 
-const Ring: React.FC<RingProps> = ({ label, value, goal, unit = '' }) => {
-  const percentage = Math.min((value / goal) * 100, 100);
-  const isComplete = percentage >= 100;
-  const confettiShown = useRef(false);
+export default function Ring({ progress, label, color = "#22c55e", onClick }: Props) {
+  const radius = 45;
+  const stroke = 6;
+  const normalizedRadius = radius - stroke / 2;
+  const circumference = normalizedRadius * 2 * Math.PI;
+
+  const progressValue = useMotionValue(0);
+  const strokeOffset = useTransform(progressValue, v => circumference - (v / 100) * circumference);
+  const display = useTransform(progressValue, v => `${Math.round(v)}%`);
+
+  const hasCelebrated = useRef(false);
+  const [shouldBounce, setShouldBounce] = useState(false);
 
   useEffect(() => {
-    if (isComplete && !confettiShown.current) {
-      confettiShown.current = true;
+    const controls = animate(progressValue, progress * 100, {
+      duration: 1.5,
+      ease: "easeOut",
+    });
+
+    if (progress >= 1 && !hasCelebrated.current) {
+      hasCelebrated.current = true;
+
+      // 🎉 Конфетти
       confetti({
         particleCount: 100,
-        spread: 70,
+        spread: 80,
         origin: { y: 0.6 },
-        colors: ['#0ff', '#0f0', '#ff0'],
+        colors: [color, "#ffffff"],
       });
+
+      // 🔊 Звук
+      const sound = new Audio("/sounds/success.mp3");
+      sound.play().catch(console.error);
+
+      // 🟡 Bounce
+      setShouldBounce(true);
+      setTimeout(() => setShouldBounce(false), 1000);
     }
-  }, [isComplete]);
 
-  const radius = 60;
-  const stroke = 10;
-  const normalizedRadius = radius - stroke * 0.5;
-  const circumference = normalizedRadius * 2 * Math.PI;
-  const strokeDashoffset = circumference - (percentage / 100) * circumference;
-
-  const gradientId = `gradient-${label}`;
+    return controls.stop;
+  }, [progress]);
 
   return (
-    <div className="flex flex-col items-center text-center">
-      <svg
-        height={radius * 2}
-        width={radius * 2}
-        className="drop-shadow-[0_0_10px_rgba(0,255,255,0.6)]"
-      >
-        <defs>
-          <linearGradient id={gradientId} x1="1" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#0ff" />
-            <stop offset="100%" stopColor="#39f" />
-          </linearGradient>
-        </defs>
+    <motion.div
+      className="relative w-24 sm:w-28 h-24 sm:h-28 cursor-pointer"
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{
+        opacity: 1,
+        scale: shouldBounce ? [1, 1.2, 0.9, 1] : 1,
+      }}
+      transition={{
+        type: "spring",
+        stiffness: 300,
+        damping: 15,
+        duration: 0.6,
+      }}
+      onClick={onClick}
+      aria-label={`Кольцо ${label} заполнено на ${Math.round(progress * 100)}%`}
+    >
+      <svg className="w-full h-full" viewBox="0 0 100 100">
         <circle
-          stroke="#222"
+          stroke="#e5e7eb"
           fill="transparent"
           strokeWidth={stroke}
           r={normalizedRadius}
-          cx={radius}
-          cy={radius}
+          cx="50"
+          cy="50"
         />
-        <circle
-          stroke={`url(#${gradientId})`}
+        <motion.circle
+          stroke={color}
           fill="transparent"
           strokeWidth={stroke}
-          strokeLinecap="round"
           strokeDasharray={circumference}
-          strokeDashoffset={strokeDashoffset}
+          strokeLinecap="round"
           r={normalizedRadius}
-          cx={radius}
-          cy={radius}
-          className="transition-all duration-700"
+          cx="50"
+          cy="50"
+          style={{
+            strokeDashoffset: strokeOffset,
+            filter: `drop-shadow(0 0 6px ${color})`,
+          }}
         />
       </svg>
-      <div className="absolute flex flex-col items-center justify-center mt-[-70px]">
-        <div className="text-2xl font-bold text-cyan-400 drop-shadow">{value}{unit}</div>
-        <div className="text-xs text-zinc-400">{label}</div>
+      <div className="absolute inset-0 flex flex-col items-center justify-center">
+        <motion.span className="text-lg sm:text-xl font-bold text-white">
+          {display}
+        </motion.span>
+        <span className="text-xs text-gray-300 mt-1">{label}</span>
       </div>
-    </div>
+    </motion.div>
   );
-};
-
-export default Ring;
+}

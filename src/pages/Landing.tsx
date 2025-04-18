@@ -1,60 +1,53 @@
-// 📄 /src/pages/Landing.tsx v2.1.0
-
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import logo from '../assets/logo.png';
 
-interface LandingProps {
+type Props = {
   onStart: () => void;
   loading: boolean;
-}
+};
 
-const Landing: React.FC<LandingProps> = ({ onStart, loading }) => {
+const Landing: React.FC<Props> = ({ onStart, loading }) => {
+  const { t } = useTranslation();
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-black via-zinc-900 to-gray-950 text-white flex flex-col items-center justify-center px-6 relative overflow-hidden">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-black via-zinc-900 to-black text-white text-center px-6 relative overflow-hidden">
+      {/* 🔮 Логотип */}
+      <img
+        src={logo}
+        alt="FitMine Logo"
+        className="w-60 md:w-72 mb-6 drop-shadow-[0_0_30px_rgba(255,255,255,0.15)] rounded-2xl"
+      />
 
-      {/* 💫 Анимированный фон */}
-      <div className="absolute inset-0 opacity-20 pointer-events-none animate-pulse z-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-cyan-500/20 via-transparent to-transparent"></div>
+      {/* 💡 Заголовок */}
+      <h1 className="text-5xl font-extrabold bg-gradient-to-r from-yellow-300 via-pink-500 to-violet-500 text-transparent bg-clip-text mb-4 drop-shadow-md">
+        FitMine
+      </h1>
 
-      {/* 🔥 Лого и заголовок */}
-      <div className="z-10 text-center mb-10">
-        <img
-          src="/logo.png"
-          alt="FitMine Logo"
-          className="h-20 mx-auto mb-6 drop-shadow-[0_0_15px_rgba(0,255,255,0.6)]"
-        />
-        <h1 className="text-4xl font-extrabold text-cyan-400 tracking-wide drop-shadow-lg">
-          Welcome to FitMine
-        </h1>
-        <p className="text-md mt-3 text-zinc-300 max-w-md mx-auto leading-relaxed">
-          Gamify your health. Sync your steps, earn rewards, challenge friends, level up.
-        </p>
-      </div>
+      {/* 💬 Подзаголовок */}
+      <p className="text-sm text-gray-400 max-w-md mb-6 leading-relaxed">
+        {t('landing.description', 'Зарабатывай очки за активность и прокачивай свой NFT-персонаж в реальной жизни')}
+      </p>
 
       {/* 🚀 Кнопка запуска */}
       <button
+        type="button"
         onClick={onStart}
         disabled={loading}
-        className="z-10 mt-4 bg-cyan-500 text-black font-semibold text-lg px-8 py-4 rounded-2xl ring-4 ring-cyan-700 shadow-[0_0_20px_rgba(0,255,255,0.7)] hover:scale-105 hover:bg-cyan-400 transition-all animate-pulse disabled:opacity-50 disabled:cursor-not-allowed"
+        aria-label="Начать"
+        className={`px-8 py-3 rounded-full font-semibold text-lg transition-all duration-300 ease-in-out focus:outline-none shadow-xl
+          ${
+            loading
+              ? 'bg-gray-500 cursor-not-allowed text-white/70'
+              : 'bg-gradient-to-r from-pink-500 via-yellow-400 to-purple-500 text-white hover:brightness-110 hover:scale-105'
+          }
+        `}
       >
-        {loading ? '⏳ Loading...' : '🚀 Start Now'}
+        {loading ? t('loading', 'Загрузка...') : t('landing.start', 'Начать')}
       </button>
 
-      {/* 🔗 Подключение платформ */}
-      <div className="z-10 mt-10 text-sm text-zinc-400">
-        Connect with:
-        <div className="flex gap-6 justify-center mt-3">
-          <img
-            src="/telegram.svg"
-            className="h-6 hover:scale-110 transition"
-            alt="Telegram"
-          />
-          <img
-            src="/google-fit.svg"
-            className="h-6 hover:scale-110 transition"
-            alt="Google Fit"
-          />
-        </div>
-      </div>
+      {/* 🧾 Подпись */}
+      <div className="mt-8 text-xs text-gray-500">@FitMineBot</div>
     </div>
   );
 };
