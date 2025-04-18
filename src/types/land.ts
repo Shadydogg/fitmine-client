@@ -1,12 +1,19 @@
-export type LandRarity = "common" | "rare" | "epic" | "legendary" | "mythical";
+export type LandRarity =
+  | "common"
+  | "rare"
+  | "epic"
+  | "legendary"
+  | "mythical";
 
 export interface LandNFT {
   id: string;
+  telegram_id: number; // Telegram ID
   name: string;
   rarity: LandRarity;
-  bonusMultiplier: number; // множитель для добычи
-  slots: number; // количество майнеров, которых можно разместить
-  image?: string; // иконка земли
-  connectedMinerIds: string[]; // ID подключенных NFT
+  bonus_multiplier: number;
+  slots: number;
+  connected_miner_ids: string[];
+  image?: string;
   description?: string;
+  created_at?: string;
 }
