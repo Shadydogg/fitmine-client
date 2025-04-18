@@ -2,6 +2,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
+
 import { useNFTInventory } from "../hooks/useNFTInventory";
 import { useSession } from "../context/SessionContext";
 
@@ -24,7 +25,11 @@ const NFTPage: React.FC = () => {
         onClick={() => navigate("/profile")}
         className="absolute top-4 right-4 w-10 h-10 rounded-full overflow-hidden border-2 border-white shadow-md hover:scale-105 transition-transform z-20"
       >
-        <img src={user?.photo_url || "/default-avatar.png"} alt="avatar" className="w-full h-full object-cover" />
+        <img
+          src={user?.photo_url || "/default-avatar.png"}
+          alt="avatar"
+          className="w-full h-full object-cover"
+        />
       </button>
 
       {/* 🎯 XP */}
@@ -38,9 +43,9 @@ const NFTPage: React.FC = () => {
         🎯 XP и Уровень
       </motion.button>
 
-      {/* 🔤 Заголовок */}
+      {/* 🧠 Заголовок */}
       <motion.h1
-        className="mt-20 text-3xl font-extrabold text-center tracking-wide z-10"
+        className="mt-20 text-3xl font-extrabold text-center tracking-wide z-10 drop-shadow-md"
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
@@ -48,7 +53,7 @@ const NFTPage: React.FC = () => {
         {t("nft.title", "Твои NFT майнеры")}
       </motion.h1>
 
-      {/* 💎 Состояния */}
+      {/* 🧩 Контент */}
       {loading ? (
         <div className="text-gray-500 mt-8 animate-pulse z-10">
           {t("nft.loading", "Загрузка NFT...")}

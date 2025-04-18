@@ -1,6 +1,7 @@
-import React, { Suspense } from "react";
+import React, { Suspense, useRef } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, useGLTF } from "@react-three/drei";
+import { motion } from "framer-motion";
 
 const MinerModel = () => {
   const { scene } = useGLTF("/3d/futuristic_miner.glb");
@@ -11,7 +12,11 @@ useGLTF.preload("/3d/futuristic_miner.glb");
 
 const NFT3DPreview = () => {
   return (
-    <div className="w-model h-model rounded-xl overflow-hidden bg-gradient-to-tr from-zinc-900 via-zinc-800 to-zinc-900 border border-zinc-700 shadow-inner animate-nftReveal">
+    <motion.div
+      className="relative w-full h-48 sm:h-56 md:h-64 rounded-xl overflow-hidden bg-gradient-to-tr from-zinc-900 via-zinc-800 to-zinc-900 border border-zinc-700 shadow-inner"
+      whileHover={{ scale: 1.02, rotateX: -1, rotateY: 2 }}
+      transition={{ type: "spring", stiffness: 100, damping: 15 }}
+    >
       <Canvas
         dpr={[1, 2]}
         camera={{ position: [2.5, 2.5, 2.5], fov: 35 }}
@@ -43,7 +48,7 @@ const NFT3DPreview = () => {
         {/* 🌀 Swipe / rotate */}
         <OrbitControls enableZoom={false} autoRotate={false} />
       </Canvas>
-    </div>
+    </motion.div>
   );
 };
 
