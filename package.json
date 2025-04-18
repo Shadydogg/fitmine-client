@@ -4,9 +4,9 @@
   "private": true,
   "dependencies": {
     "@telegram-apps/sdk": "^3.7.1",
-    "@react-three/fiber": "^9.1.2",
-    "@react-three/drei": "^10.0.6",
-    "three": "^0.175.0",
+    "@react-three/fiber": "^8.13.6",
+    "@react-three/drei": "^9.88.7",
+    "three": "^0.160.0",
     "axios": "^1.6.1",
     "classnames": "^2.3.2",
     "clsx": "^2.1.1",
