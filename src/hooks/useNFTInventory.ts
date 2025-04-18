@@ -4,19 +4,19 @@ import { useSession } from "../context/SessionContext";
 import { api } from "../api/apiClient";
 
 export function useNFTInventory() {
-  const { session } = useSession();
+  const { accessToken } = useSession();
   const [nfts, setNfts] = useState<NFTMiner[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!session?.access_token) return;
+    if (!accessToken) return;
 
     const fetchNFTs = async () => {
       try {
         const { data } = await api.get("/nft", {
           headers: {
-            Authorization: `Bearer ${session.access_token}`,
+            Authorization: `Bearer ${accessToken}`,
           },
         });
         setNfts(data);
@@ -28,7 +28,7 @@ export function useNFTInventory() {
     };
 
     fetchNFTs();
-  }, [session?.access_token]);
+  }, [accessToken]);
 
   return { nfts, loading, error };
 }
