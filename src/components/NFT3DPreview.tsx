@@ -7,22 +7,41 @@ const MinerModel = () => {
   return <primitive object={scene} scale={1.5} />;
 };
 
+useGLTF.preload("/3d/futuristic_miner.glb");
+
 const NFT3DPreview = () => {
   return (
     <div className="w-model h-model rounded-xl overflow-hidden bg-gradient-to-tr from-zinc-900 via-zinc-800 to-zinc-900 border border-zinc-700 shadow-inner animate-nftReveal">
-      <Canvas camera={{ position: [2.5, 2.5, 2.5], fov: 40 }}>
+      <Canvas
+        dpr={[1, 2]}
+        camera={{ position: [2.5, 2.5, 2.5], fov: 35 }}
+        shadows
+      >
         {/* 💡 Illuvium-style lighting */}
         <ambientLight intensity={0.4} />
         <directionalLight position={[5, 5, 5]} intensity={1.5} />
         <pointLight position={[-5, -5, -5]} intensity={0.5} color="#00ffff" />
-        <spotLight position={[0, 10, 0]} angle={0.3} penumbra={0.5} intensity={0.6} castShadow />
+        <spotLight
+          position={[0, 10, 0]}
+          angle={0.3}
+          penumbra={0.5}
+          intensity={0.6}
+          castShadow
+        />
 
-        <Suspense fallback={null}>
+        <Suspense
+          fallback={
+            <mesh>
+              <boxGeometry args={[1, 1, 1]} />
+              <meshStandardMaterial color="gray" />
+            </mesh>
+          }
+        >
           <MinerModel />
         </Suspense>
 
-        {/* 🌀 Swipe interaction (drag to rotate) */}
-        <OrbitControls enableZoom={false} enableRotate={true} autoRotate={false} />
+        {/* 🌀 Swipe / rotate */}
+        <OrbitControls enableZoom={false} autoRotate={false} />
       </Canvas>
     </div>
   );

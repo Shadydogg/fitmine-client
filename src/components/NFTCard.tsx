@@ -1,5 +1,3 @@
-// 📄 src/components/NFTCard.tsx — v1.5.0
-
 import React, { useState, useEffect, useMemo } from "react";
 import { NFTMiner } from "../types/nft";
 import { cn } from "../lib/utils";
@@ -27,7 +25,7 @@ const rarityTextColor: Record<NFTMiner["rarity"], string> = {
 };
 
 const NFTCard: React.FC<NFTCardProps> = ({ nft }) => {
-  const [level, setLevel] = useState(nft.level || 1);
+  const [level, setLevel] = useState(typeof nft.level === "number" ? nft.level : 1);
   const [animatedPower, setAnimatedPower] = useState(0);
 
   const componentBonus = useMemo(
@@ -36,21 +34,24 @@ const NFTCard: React.FC<NFTCardProps> = ({ nft }) => {
   );
 
   const miningPower = useMemo(() => {
-    const base = nft.baseHashrate || 0;
-    const ep = nft.ep || 0;
+    const base = typeof nft.baseHashrate === "number" ? nft.baseHashrate : 0;
+    const ep = typeof nft.ep === "number" ? nft.ep : 0;
     const landBonus = typeof nft.landBonus === "number" ? nft.landBonus : 1;
 
-    return Math.floor(
-      base * (1 + componentBonus / 100) * (ep / 500) * landBonus * (1 + level * 0.1)
-    );
+    return Math.floor(base * (1 + componentBonus / 100) * (ep / 500) * landBonus * (1 + level * 0.1));
   }, [nft.baseHashrate, nft.ep, nft.landBonus, componentBonus, level]);
 
   useEffect(() => {
+    if (miningPower <= 0) {
+      setAnimatedPower(0);
+      return;
+    }
+
     let start = 0;
     const step = () => {
       if (start < miningPower) {
         start += Math.ceil(miningPower / 20);
-        setAnimatedPower(start > miningPower ? miningPower : start);
+        setAnimatedPower(Math.min(start, miningPower));
         requestAnimationFrame(step);
       }
     };
@@ -75,9 +76,9 @@ const NFTCard: React.FC<NFTCardProps> = ({ nft }) => {
       <h2 className={cn("text-lg font-bold capitalize", rarityTextColor[nft.rarity])}>
         {nft.rarity} Miner
       </h2>
-      <p className="text-sm">Base Hashrate: {nft.baseHashrate}</p>
+      <p className="text-sm">Base Hashrate: {nft.baseHashrate ?? "N/A"}</p>
       <p className="text-sm">Level: {level}</p>
-      <p className="text-sm">EP: {nft.ep}/500</p>
+      <p className="text-sm">EP: {nft.ep ?? 0}/500</p>
       <p className="text-sm">
         Land Bonus: {typeof nft.landBonus === "number" ? nft.landBonus.toFixed(2) + "×" : "N/A"}
       </p>
@@ -88,11 +89,15 @@ const NFTCard: React.FC<NFTCardProps> = ({ nft }) => {
       <div className="mt-2">
         <p className="text-xs font-medium">Components:</p>
         <ul className="text-xs list-disc list-inside">
-          {nft.components?.map((comp) => (
-            <li key={comp.id}>
-              {comp.type} (+{comp.bonusPercent}%)
-            </li>
-          )) || <li className="text-gray-400">None</li>}
+          {nft.components?.length > 0 ? (
+            nft.components.map((comp) => (
+              <li key={comp.id}>
+                {comp.type} (+{comp.bonusPercent}%)
+              </li>
+            ))
+          ) : (
+            <li className="text-gray-400">None</li>
+          )}
         </ul>
       </div>
 
