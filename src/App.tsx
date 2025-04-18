@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Routes, Route, useNavigate } from 'react-router-dom';
+import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import './i18n/setup';
 
@@ -15,6 +15,7 @@ import { SessionProvider, useSession } from './context/SessionContext';
 function AppRoutes() {
   const { i18n } = useTranslation();
   const navigate = useNavigate();
+  const location = useLocation();
   const [loading, setLoading] = useState(false);
 
   const {
@@ -119,7 +120,7 @@ function AppRoutes() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/nft" element={<NFTPage />} />
       </Routes>
-      <BottomTab />
+      <BottomTab current={location.pathname.replace('/', '') || 'dashboard'} />
     </>
   );
 }
