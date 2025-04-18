@@ -1,6 +1,6 @@
-// 📄 src/components/NFTCard.tsx — v1.4.1
+// 📄 src/components/NFTCard.tsx — v1.5.0
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { NFTMiner } from "../types/nft";
 import { cn } from "../lib/utils";
 import UpgradePanel from "./UpgradePanel";
@@ -27,17 +27,23 @@ const rarityTextColor: Record<NFTMiner["rarity"], string> = {
 };
 
 const NFTCard: React.FC<NFTCardProps> = ({ nft }) => {
-  const [level, setLevel] = useState(nft.level);
+  const [level, setLevel] = useState(nft.level || 1);
   const [animatedPower, setAnimatedPower] = useState(0);
 
-  const componentBonus = nft.components.reduce((sum, c) => sum + c.bonusPercent, 0);
-  const miningPower = Math.floor(
-    (nft.baseHashrate || 0) *
-    (1 + componentBonus / 100) *
-    ((nft.ep || 0) / 500) *
-    (nft.landBonus || 1) *
-    (1 + level * 0.1)
+  const componentBonus = useMemo(
+    () => nft.components?.reduce((sum, c) => sum + c.bonusPercent, 0) || 0,
+    [nft.components]
   );
+
+  const miningPower = useMemo(() => {
+    const base = nft.baseHashrate || 0;
+    const ep = nft.ep || 0;
+    const landBonus = typeof nft.landBonus === "number" ? nft.landBonus : 1;
+
+    return Math.floor(
+      base * (1 + componentBonus / 100) * (ep / 500) * landBonus * (1 + level * 0.1)
+    );
+  }, [nft.baseHashrate, nft.ep, nft.landBonus, componentBonus, level]);
 
   useEffect(() => {
     let start = 0;
@@ -58,8 +64,12 @@ const NFTCard: React.FC<NFTCardProps> = ({ nft }) => {
         rarityColor[nft.rarity]
       )}
     >
-      <div className="absolute top-2 right-2 w-6 h-6 animate-spin-slow opacity-30">
-        <img src="/gear.svg" alt="gear" className="w-full h-full" />
+      <div className="absolute top-2 right-2 w-8 h-8 animate-spin-slow opacity-40">
+        <img
+          src="/gear.svg"
+          alt="gear"
+          className="w-full h-full drop-shadow-[0_0_6px_rgba(0,255,255,0.6)]"
+        />
       </div>
 
       <h2 className={cn("text-lg font-bold capitalize", rarityTextColor[nft.rarity])}>
@@ -78,9 +88,11 @@ const NFTCard: React.FC<NFTCardProps> = ({ nft }) => {
       <div className="mt-2">
         <p className="text-xs font-medium">Components:</p>
         <ul className="text-xs list-disc list-inside">
-          {nft.components.map((comp) => (
-            <li key={comp.id}>{comp.type} (+{comp.bonusPercent}%)</li>
-          ))}
+          {nft.components?.map((comp) => (
+            <li key={comp.id}>
+              {comp.type} (+{comp.bonusPercent}%)
+            </li>
+          )) || <li className="text-gray-400">None</li>}
         </ul>
       </div>
 
