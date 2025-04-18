@@ -1,11 +1,14 @@
-// 📄 /src/pages/Landing.tsx v2.0.1
+// 📄 /src/pages/Landing.tsx v2.1.0
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const Landing: React.FC = () => {
-  const navigate = useNavigate();
+interface LandingProps {
+  onStart: () => void;
+  loading: boolean;
+}
 
+const Landing: React.FC<LandingProps> = ({ onStart, loading }) => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-zinc-900 to-gray-950 text-white flex flex-col items-center justify-center px-6 relative overflow-hidden">
 
@@ -29,10 +32,11 @@ const Landing: React.FC = () => {
 
       {/* 🚀 Кнопка запуска */}
       <button
-        onClick={() => navigate('/dashboard')}
-        className="z-10 mt-4 bg-cyan-500 text-black font-semibold text-lg px-8 py-4 rounded-2xl ring-4 ring-cyan-700 shadow-[0_0_20px_rgba(0,255,255,0.7)] hover:scale-105 hover:bg-cyan-400 transition-all animate-pulse"
+        onClick={onStart}
+        disabled={loading}
+        className="z-10 mt-4 bg-cyan-500 text-black font-semibold text-lg px-8 py-4 rounded-2xl ring-4 ring-cyan-700 shadow-[0_0_20px_rgba(0,255,255,0.7)] hover:scale-105 hover:bg-cyan-400 transition-all animate-pulse disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        🚀 Start Now
+        {loading ? '⏳ Loading...' : '🚀 Start Now'}
       </button>
 
       {/* 🔗 Подключение платформ */}
