@@ -7,21 +7,27 @@ export function useLandInventory() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchLands = async () => {
-      try {
-        const { data } = await api.get("/land");
-        setLands(data);
-      } catch (err: any) {
-        console.error("❌ Ошибка загрузки земель:", err);
-        setError(err.message || "Failed to load lands");
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchLands = async () => {
+    try {
+      const { data } = await api.get("/land");
+      const mapped = data.map((land: any) => ({
+        ...land,
+        bonusMultiplier: land.bonus_multiplier,
+        connectedMinerIds: land.connected_miner_ids,
+        telegramId: land.telegram_id,
+      }));
+      setLands(mapped);
+    } catch (err: any) {
+      console.error("❌ Ошибка загрузки земель:", err);
+      setError(err.message || "Failed to load lands");
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchLands();
   }, []);
 
-  return { lands, loading, error };
+  return { lands, loading, error, refetch: fetchLands };
 }

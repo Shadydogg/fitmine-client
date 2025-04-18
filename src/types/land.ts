@@ -7,13 +7,13 @@ export type LandRarity =
 
 export interface LandNFT {
   id: string;
-  telegram_id: number; // Telegram ID
+  telegramId: number; // 🔄 адаптировано из telegram_id
   name: string;
   rarity: LandRarity;
-  bonus_multiplier: number;
+  bonusMultiplier: number; // 🔄 адаптировано из bonus_multiplier
   slots: number;
-  connected_miner_ids: string[];
+  connectedMinerIds: string[]; // 🔄 адаптировано из connected_miner_ids
   image?: string;
   description?: string;
-  created_at?: string;
+  createdAt?: string; // 🔄 адаптировано из created_at
 }
