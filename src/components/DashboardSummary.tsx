@@ -28,9 +28,9 @@ export default function DashboardSummary({ data }: Props) {
   } = data;
 
   return (
-    <div className="w-full flex flex-col items-center justify-center gap-8 py-6 px-4">
+    <div className="w-full flex flex-col items-center justify-center py-6 px-4">
       <motion.div
-        className="flex flex-col items-center gap-4"
+        className="flex flex-col items-center gap-6 w-full max-w-md"
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.3, duration: 0.4 }}
@@ -40,12 +40,15 @@ export default function DashboardSummary({ data }: Props) {
           stepsGoal={stepsGoal}
           calories={calories}
           caloriesGoal={caloriesGoal}
-          distance={Math.round((distance / 1000) * 100) / 100}
+          distance={distance / 1000} // ✅ в км без округления (toFixed внутри компонента)
           distanceGoal={distanceGoal}
         />
 
-        <div className="text-sm text-zinc-300 font-medium mt-4 text-center leading-snug">
-          {t("dashboard.ringHint", "Шаги, калории и дистанция объединены в одном кольце.\nОткрой все секции для бонуса!")}
+        <div className="text-sm text-zinc-300 font-medium text-center leading-snug px-2">
+          {t(
+            "dashboard.ringHint",
+            "Шаги, калории и дистанция объединены в одном кольце.\nОткрой все секции для бонуса!"
+          )}
         </div>
       </motion.div>
     </div>
