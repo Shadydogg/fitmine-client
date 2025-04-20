@@ -11,8 +11,8 @@ import ConnectGoogleFit from "../components/ConnectGoogleFit";
 
 import Ring from "../components/Ring";
 import { useUserEP } from "../hooks/useUserEP";
-import { useDailyReward } from "../hooks/useDailyReward"; // ✅
-import RewardModal from "../components/RewardModal"; // ✅
+import { useDailyReward } from "../hooks/useDailyReward";
+import RewardModal from "../components/RewardModal";
 
 export default function Dashboard() {
   const { t } = useTranslation();
@@ -27,7 +27,7 @@ export default function Dashboard() {
     alreadyClaimed,
     loading: rewardLoading,
     error: rewardError,
-  } = useDailyReward(); // ✅
+  } = useDailyReward();
 
   if (!sessionLoaded) {
     return (
@@ -132,12 +132,24 @@ export default function Dashboard() {
           </div>
         ) : (
           <motion.div
-            className="flex justify-center items-center mt-6"
+            className="flex flex-col items-center justify-center mt-6"
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.6 }}
           >
             <Ring ep={ep} dailyGoal={1000} />
+
+            {/* 🔄 Прогресс до награды */}
+            <motion.div
+              className="mt-2 text-center text-sm text-lime-400 font-semibold"
+              initial={{ opacity: 0, y: 4 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6 }}
+            >
+              {ep >= 1000
+                ? "🎉 Цель достигнута! Забери награду 🎁"
+                : `🧠 Осталось ${1000 - ep} EP до награды`}
+            </motion.div>
           </motion.div>
         )}
 
