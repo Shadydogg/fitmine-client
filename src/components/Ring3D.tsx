@@ -1,4 +1,4 @@
-// Ring3D.tsx — v1.0.0 (3D кольцо прогресса через react-three-fiber)
+// Ring3D.tsx — v1.1.0 (SSR check + WebGL fallback)
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import { useSpring, a } from "@react-spring/three";
@@ -13,6 +13,15 @@ interface Ring3DProps {
 
 export default function Ring3D({ ep, dailyGoal = 1000, color = "#00DBDE", label }: Ring3DProps) {
   const progress = Math.min(ep / dailyGoal, 1);
+
+  // SSR и WebGL fallback
+  if (typeof window === "undefined" || !window.WebGLRenderingContext) {
+    return (
+      <div className="w-32 h-32 flex items-center justify-center text-red-400 text-xs text-center">
+        WebGL не поддерживается
+      </div>
+    );
+  }
 
   const { scale } = useSpring({
     scale: progress,

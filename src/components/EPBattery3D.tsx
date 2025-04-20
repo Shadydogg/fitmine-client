@@ -1,4 +1,4 @@
-// EPBattery3D.tsx — v1.0.0 (3D батарейка для EP с анимацией)
+// EPBattery3D.tsx — v1.1.0 (SSR check + WebGL fallback)
 import { Canvas } from "@react-three/fiber";
 import { Html } from "@react-three/drei";
 import { useSpring, a } from "@react-spring/three";
@@ -11,6 +11,14 @@ interface Props {
 
 export default function EPBattery3D({ ep, dailyGoal = 1000, color = "#22c55e" }: Props) {
   const fill = Math.min(ep / dailyGoal, 1);
+
+  if (typeof window === "undefined" || !window.WebGLRenderingContext) {
+    return (
+      <div className="w-full h-20 max-w-md mx-auto flex items-center justify-center text-red-400 text-sm">
+        WebGL не поддерживается
+      </div>
+    );
+  }
 
   const { scaleX } = useSpring({
     scaleX: fill,
