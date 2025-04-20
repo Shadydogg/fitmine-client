@@ -39,7 +39,7 @@ export default function DashboardSummary({ data }: Props) {
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.4, duration: 0.3 }}
       >
-        <Tooltip content={t("tooltip.steps")}>
+        <Tooltip content={t("tooltip.steps")}> 
           <div className="flex flex-col items-center gap-2">
             <Suspense fallback={<div className="text-sm text-gray-400">Загрузка кольца...</div>}>
               <Ring3D ep={steps} dailyGoal={stepsGoal} color="#00DBDE" label={t("ring.steps", "Шаги")} />
@@ -47,7 +47,7 @@ export default function DashboardSummary({ data }: Props) {
           </div>
         </Tooltip>
 
-        <Tooltip content={t("tooltip.calories")}>
+        <Tooltip content={t("tooltip.calories")}> 
           <div className="flex flex-col items-center gap-2">
             <Suspense fallback={<div className="text-sm text-gray-400">Загрузка кольца...</div>}>
               <Ring3D ep={calories} dailyGoal={caloriesGoal} color="#FF5F6D" label={t("ring.calories", "Калории")} />
@@ -55,7 +55,7 @@ export default function DashboardSummary({ data }: Props) {
           </div>
         </Tooltip>
 
-        <Tooltip content={t("tooltip.energy")}>
+        <Tooltip content={t("tooltip.energy")}> 
           <div className="flex flex-col items-center gap-2">
             <Suspense fallback={<div className="text-sm text-gray-400">Загрузка кольца...</div>}>
               <Ring3D ep={energy} dailyGoal={energyGoal} color="#FCEE09" label={t("ring.energy", "Энергия")} />

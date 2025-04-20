@@ -1,4 +1,4 @@
-// Dashboard.tsx — v2.8.2 (React.lazy вместо next/dynamic для EPBattery3D)
+// Dashboard.tsx — v2.8.2 (React.lazy для EPBattery3D)
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
