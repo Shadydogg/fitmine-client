@@ -9,11 +9,25 @@ import BottomTab from "../components/BottomTab";
 import { useSession } from "../context/SessionContext";
 import ConnectGoogleFit from "../components/ConnectGoogleFit";
 
+import Ring from "../components/Ring";
+import { useUserEP } from "../hooks/useUserEP";
+import { useDailyReward } from "../hooks/useDailyReward"; // ✅
+import RewardModal from "../components/RewardModal"; // ✅
+
 export default function Dashboard() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { user, sessionLoaded, accessToken, setTokens } = useSession();
-  const activity = useSyncActivity(); // ✅ общий хук
+  const activity = useSyncActivity();
+  const { ep, loading: epLoading } = useUserEP();
+  const {
+    reward,
+    showModal,
+    setShowModal,
+    alreadyClaimed,
+    loading: rewardLoading,
+    error: rewardError,
+  } = useDailyReward(); // ✅
 
   if (!sessionLoaded) {
     return (
@@ -43,7 +57,6 @@ export default function Dashboard() {
       if (data.ok) {
         alert("📊 Активность синхронизирована!");
 
-        // 🔁 Обновляем user
         const profileRes = await fetch("https://api.fitmine.vip/api/profile", {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
@@ -58,8 +71,7 @@ export default function Dashboard() {
           );
         }
 
-        // 🔁 Обновляем активность
-        activity.refetch(); // ✅ важно
+        activity.refetch();
       } else {
         alert(`❌ Ошибка: ${data.error}`);
       }
@@ -77,7 +89,11 @@ export default function Dashboard() {
         onClick={() => navigate("/profile")}
         className="absolute top-4 right-4 w-10 h-10 rounded-full overflow-hidden border-2 border-white shadow-md hover:scale-105 transition-transform z-20"
       >
-        <img src={user?.photo_url || "/default-avatar.png"} alt="avatar" className="w-full h-full object-cover" />
+        <img
+          src={user?.photo_url || "/default-avatar.png"}
+          alt="avatar"
+          className="w-full h-full object-cover"
+        />
       </button>
 
       {/* 🎯 XP */}
@@ -100,7 +116,6 @@ export default function Dashboard() {
         {t("dashboard.title", "Твоя активность сегодня")}
       </motion.h1>
 
-      {/* 🔁 Контент */}
       <motion.div
         initial="hidden"
         animate="visible"
@@ -110,6 +125,23 @@ export default function Dashboard() {
         }}
         className="z-10"
       >
+        {/* 🔘 EP кольцо */}
+        {epLoading ? (
+          <div className="flex justify-center items-center mt-6 text-gray-500 animate-pulse">
+            {t("dashboard.loading", "Загрузка EP...")}
+          </div>
+        ) : (
+          <motion.div
+            className="flex justify-center items-center mt-6"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.6 }}
+          >
+            <Ring ep={ep} dailyGoal={1000} />
+          </motion.div>
+        )}
+
+        {/* 📊 Сводка активности */}
         {activity.loading ? (
           <div className="text-gray-500 mt-6 animate-pulse">
             {t("dashboard.loading", "Загрузка активности...")}
@@ -145,11 +177,18 @@ export default function Dashboard() {
           </button>
         ) : (
           <div className="mt-4 max-w-xs mx-auto">
-            <div className="text-sm text-yellow-300 mb-2">🔓 Google Fit не подключён</div>
+            <div className="text-sm text-yellow-300 mb-2">
+              🔓 Google Fit не подключён
+            </div>
             <ConnectGoogleFit />
           </div>
         )}
       </motion.div>
+
+      {/* 🎁 Reward Modal */}
+      {showModal && reward && (
+        <RewardModal rewardId={reward} onClose={() => setShowModal(false)} />
+      )}
 
       <BottomTab current="dashboard" />
     </div>

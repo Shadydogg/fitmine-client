@@ -1,24 +1,24 @@
-// Ring.tsx — v1.4.1 (🎉 confetti + 🔊 звук + 🟡 bounce при 100%)
+// Ring.tsx — v3.0.0 (EP прогресс + 🎉 конфетти + 🔊 звук + 🟡 bounce при 100%)
 import { motion, useMotionValue, useTransform, animate } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import confetti from "canvas-confetti";
 
 interface Props {
-  progress: number;
-  label: string;
+  ep: number; // текущий EP
+  dailyGoal?: number; // цель по умолчанию = 1000
   color?: string;
   onClick?: () => void;
 }
 
-export default function Ring({ progress, label, color = "#22c55e", onClick }: Props) {
+export default function Ring({ ep, dailyGoal = 1000, color = "#22c55e", onClick }: Props) {
   const radius = 45;
   const stroke = 6;
   const normalizedRadius = radius - stroke / 2;
   const circumference = normalizedRadius * 2 * Math.PI;
 
+  const progress = Math.min(ep / dailyGoal, 1);
   const progressValue = useMotionValue(0);
   const strokeOffset = useTransform(progressValue, v => circumference - (v / 100) * circumference);
-  const display = useTransform(progressValue, v => `${Math.round(v)}%`);
 
   const hasCelebrated = useRef(false);
   const [shouldBounce, setShouldBounce] = useState(false);
@@ -34,8 +34,8 @@ export default function Ring({ progress, label, color = "#22c55e", onClick }: Pr
 
       // 🎉 Конфетти
       confetti({
-        particleCount: 100,
-        spread: 80,
+        particleCount: 120,
+        spread: 90,
         origin: { y: 0.6 },
         colors: [color, "#ffffff"],
       });
@@ -67,7 +67,7 @@ export default function Ring({ progress, label, color = "#22c55e", onClick }: Pr
         duration: 0.6,
       }}
       onClick={onClick}
-      aria-label={`Кольцо ${label} заполнено на ${Math.round(progress * 100)}%`}
+      aria-label={`EP: ${ep} из ${dailyGoal}`}
     >
       <svg className="w-full h-full" viewBox="0 0 100 100">
         <circle
@@ -95,9 +95,9 @@ export default function Ring({ progress, label, color = "#22c55e", onClick }: Pr
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
         <motion.span className="text-lg sm:text-xl font-bold text-white">
-          {display}
+          {ep} / {dailyGoal}
         </motion.span>
-        <span className="text-xs text-gray-300 mt-1">{label}</span>
+        <span className="text-xs text-gray-300 mt-1">EP</span>
       </div>
     </motion.div>
   );
