@@ -1,4 +1,4 @@
-// src/components/ActivityRingLottie.tsx — v1.3.0 (анимация + подписи + адаптация)
+// src/components/ActivityRingLottie.tsx — v1.3.0 (анимация + key + minFrame + адаптация)
 import Lottie, { LottieRefCurrentProps } from "lottie-react";
 import ringAllAnimation from "../assets/lottie/ring-all.json";
 import { useEffect, useRef } from "react";
@@ -26,19 +26,20 @@ export default function ActivityRingLottie({
   const caloriesPercent = Math.min(calories / caloriesGoal, 1);
   const distancePercent = Math.min(distance / distanceGoal, 1);
 
-  // Средний прогресс (управление кадром)
   const avgPercent = (stepsPercent + caloriesPercent + distancePercent) / 3;
 
   useEffect(() => {
     if (lottieRef.current) {
-      const frame = Math.floor(avgPercent * 100); // 100 кадров
+      let frame = Math.floor(avgPercent * 100);
+      if (frame < 5) frame = 5; // минимальный кадр
       lottieRef.current.goToAndStop(frame, true);
     }
   }, [avgPercent]);
 
   return (
-    <div className="relative w-72 h-72 flex flex-col items-center justify-center transition-transform duration-300 hover:scale-105 active:scale-95">
+    <div className="relative w-72 h-72 max-w-xs flex flex-col items-center justify-center transition-transform duration-300 hover:scale-105 active:scale-95">
       <Lottie
+        key={avgPercent} // 🔁 форсирует обновление WebView
         lottieRef={lottieRef}
         animationData={ringAllAnimation}
         autoplay={false}
@@ -50,7 +51,7 @@ export default function ActivityRingLottie({
       <div className="absolute bottom-0 w-full text-sm text-center text-white leading-tight mt-2 px-2 pointer-events-none">
         <div>👟 {Math.round(steps)} / {stepsGoal} шагов</div>
         <div>🔥 {Math.round(calories)} / {caloriesGoal} ккал</div>
-        <div>📏 {(distance).toFixed(2)} / {distanceGoal} км</div>
+        <div>📏 {distance.toFixed(2)} / {distanceGoal} км</div>
       </div>
     </div>
   );
