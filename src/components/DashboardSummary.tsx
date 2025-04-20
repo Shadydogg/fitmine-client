@@ -1,4 +1,4 @@
-// DashboardSummary.tsx — v2.2.2 (React.lazy для Ring3D)
+// DashboardSummary.tsx — v2.3.0 (замена Energy на Distance по PROMPT 9.5)
 import { lazy, Suspense } from "react";
 import Tooltip from "./Tooltip";
 import { motion } from "framer-motion";
@@ -12,8 +12,8 @@ interface Props {
     stepsGoal: number;
     calories: number;
     caloriesGoal: number;
-    energy: number;
-    energyGoal: number;
+    distance: number;
+    distanceGoal: number;
     hasNFT: boolean;
     isPremium: boolean;
     loading: boolean;
@@ -27,8 +27,8 @@ export default function DashboardSummary({ data }: Props) {
     stepsGoal,
     calories,
     caloriesGoal,
-    energy,
-    energyGoal,
+    distance,
+    distanceGoal,
   } = data;
 
   return (
@@ -55,10 +55,10 @@ export default function DashboardSummary({ data }: Props) {
           </div>
         </Tooltip>
 
-        <Tooltip content={t("tooltip.energy")}> 
+        <Tooltip content={t("tooltip.distance")}> 
           <div className="flex flex-col items-center gap-2">
             <Suspense fallback={<div className="text-sm text-gray-400">Загрузка кольца...</div>}>
-              <Ring3D ep={energy} dailyGoal={energyGoal} color="#FCEE09" label={t("ring.energy", "Энергия")} />
+              <Ring3D ep={distance} dailyGoal={distanceGoal} color="#FCEE09" label={t("ring.distance", "Дистанция")} />
             </Suspense>
           </div>
         </Tooltip>

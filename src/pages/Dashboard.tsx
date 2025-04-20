@@ -1,4 +1,4 @@
-// Dashboard.tsx — v2.8.2 (React.lazy для EPBattery3D)
+// Dashboard.tsx — v2.9.0 (Lottie EPBattery вместо EPBattery3D)
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -15,7 +15,7 @@ import { useSession } from "../context/SessionContext";
 import { useUserEP } from "../hooks/useUserEP";
 import { useDailyReward } from "../hooks/useDailyReward";
 
-const EPBattery3D = lazy(() => import("../components/EPBattery3D"));
+import EPBatteryLottie from "../components/EPBatteryLottie";
 
 export default function Dashboard() {
   const { t } = useTranslation();
@@ -112,7 +112,7 @@ export default function Dashboard() {
         {t("dashboard.title", "Твоя активность сегодня")}
       </motion.h1>
 
-      {/* 🔋 EPBattery 3D */}
+      {/* 🔋 EPBattery Lottie */}
       {epLoading ? (
         <div className="text-gray-500 mt-6 animate-pulse">{t("dashboard.loading", "Загрузка EP...")}</div>
       ) : (
@@ -122,9 +122,7 @@ export default function Dashboard() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
         >
-          <Suspense fallback={<div className="text-sm text-gray-400">Загрузка батарейки EP...</div>}>
-            <EPBattery3D ep={ep} dailyGoal={1000} />
-          </Suspense>
+          <EPBatteryLottie ep={ep} dailyGoal={1000} />
           <div className="mt-2 text-center text-sm font-medium">
             {ep >= 1000
               ? "🎉 Цель достигнута! Забери награду"

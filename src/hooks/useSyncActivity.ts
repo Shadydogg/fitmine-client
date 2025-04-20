@@ -1,6 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
 import axios from "axios";
-import { calculateEnergy } from "../lib/calculateEnergy";
 import { useSession } from "../context/SessionContext";
 
 interface ActivityData {
@@ -8,8 +7,8 @@ interface ActivityData {
   stepsGoal: number;
   calories: number;
   caloriesGoal: number;
-  energy: number;
-  energyGoal: number;
+  distance: number;
+  distanceGoal: number;
   hasNFT: boolean;
   isPremium: boolean;
   loading: boolean;
@@ -18,15 +17,15 @@ interface ActivityData {
 
 export default function useSyncActivity(): ActivityData {
   const { accessToken, sessionLoaded, isAuthenticated } = useSession();
-  const [version, setVersion] = useState(0); // 🔁 триггер на обновление
+  const [version, setVersion] = useState(0);
 
   const [data, setData] = useState<Omit<ActivityData, "refetch">>({
     steps: 0,
     stepsGoal: 10000,
     calories: 0,
-    caloriesGoal: 2000, // ✅ новая цель по умолчанию
-    energy: 0,
-    energyGoal: 100,
+    caloriesGoal: 2000,
+    distance: 0,
+    distanceGoal: 5,
     hasNFT: false,
     isPremium: false,
     loading: true,
@@ -59,22 +58,13 @@ export default function useSyncActivity(): ActivityData {
 
         const d = res.data;
 
-        const energy = calculateEnergy({
-          steps: d.steps || 0,
-          calories: d.calories || 0,
-          activeMinutes: d.minutes || 0,
-          hasNFT: d.hasNFT || false,
-          isPremium: d.isPremium || false,
-          isEarlyAccess: d.isEarlyAccess || false,
-        });
-
         setData({
           steps: d.steps || 0,
           stepsGoal: d.stepsGoal || 10000,
           calories: d.calories || 0,
-          caloriesGoal: d.caloriesGoal || 2000, // ✅ теперь всегда 2000, даже если сервер ничего не прислал
-          energy,
-          energyGoal: 100,
+          caloriesGoal: d.caloriesGoal || 2000,
+          distance: d.distance || 0,
+          distanceGoal: d.distanceGoal || 5,
           hasNFT: d.hasNFT || false,
           isPremium: d.isPremium || false,
           loading: false,
