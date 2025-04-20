@@ -1,4 +1,4 @@
-// Ring.tsx — v3.0.0 (EP прогресс + 🎉 конфетти + 🔊 звук + 🟡 bounce при 100%)
+// Ring.tsx — v3.1.0 (EP прогресс + 🎉 конфетти + 🔊 звук + 🟡 bounce + label)
 import { motion, useMotionValue, useTransform, animate } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import confetti from "canvas-confetti";
@@ -7,10 +7,11 @@ interface Props {
   ep: number; // текущий EP
   dailyGoal?: number; // цель по умолчанию = 1000
   color?: string;
+  label?: string; // ✅ отображаемое имя кольца
   onClick?: () => void;
 }
 
-export default function Ring({ ep, dailyGoal = 1000, color = "#22c55e", onClick }: Props) {
+export default function Ring({ ep, dailyGoal = 1000, color = "#22c55e", label = "EP", onClick }: Props) {
   const radius = 45;
   const stroke = 6;
   const normalizedRadius = radius - stroke / 2;
@@ -97,7 +98,7 @@ export default function Ring({ ep, dailyGoal = 1000, color = "#22c55e", onClick 
         <motion.span className="text-lg sm:text-xl font-bold text-white">
           {ep} / {dailyGoal}
         </motion.span>
-        <span className="text-xs text-gray-300 mt-1">EP</span>
+        <span className="text-xs text-gray-300 mt-1">{label}</span> {/* ✅ теперь кастомный label */}
       </div>
     </motion.div>
   );
