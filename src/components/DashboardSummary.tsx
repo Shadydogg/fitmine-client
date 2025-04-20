@@ -1,3 +1,4 @@
+// DashboardSummary.tsx — v2.0.0 (совместим с Ring v3.0.0)
 import Ring from "./Ring";
 import Tooltip from "./Tooltip";
 import { motion } from "framer-motion";
@@ -36,23 +37,23 @@ export default function DashboardSummary({ data }: Props) {
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.4, duration: 0.3 }}
       >
-        <Tooltip content={t("tooltip.steps")}>
+        <Tooltip content={t("tooltip.steps")}> 
           <div className="flex flex-col items-center gap-1">
-            <Ring progress={stepsGoal ? steps / stepsGoal : 0} label={t("ring.steps", "Шаги")} color="#00DBDE" />
+            <Ring ep={steps} dailyGoal={stepsGoal} label={t("ring.steps", "Шаги")} color="#00DBDE" />
             <span className="text-xs text-gray-300 mt-1">{steps} / {stepsGoal}</span>
           </div>
         </Tooltip>
 
-        <Tooltip content={t("tooltip.calories")}>
+        <Tooltip content={t("tooltip.calories")}> 
           <div className="flex flex-col items-center gap-1">
-            <Ring progress={caloriesGoal ? calories / caloriesGoal : 0} label={t("ring.calories", "Калории")} color="#FF5F6D" />
+            <Ring ep={calories} dailyGoal={caloriesGoal} label={t("ring.calories", "Калории")} color="#FF5F6D" />
             <span className="text-xs text-gray-300 mt-1">{Math.round(calories)} / {caloriesGoal} ккал</span>
           </div>
         </Tooltip>
 
-        <Tooltip content={t("tooltip.energy")}>
+        <Tooltip content={t("tooltip.energy")}> 
           <div className="flex flex-col items-center gap-1">
-            <Ring progress={energyGoal ? energy / energyGoal : 0} label={t("ring.energy", "Энергия")} color="#FCEE09" />
+            <Ring ep={energy} dailyGoal={energyGoal} label={t("ring.energy", "Энергия")} color="#FCEE09" />
             <span className="text-xs text-gray-300 mt-1">{Math.round(energy)} / {energyGoal}</span>
           </div>
         </Tooltip>
