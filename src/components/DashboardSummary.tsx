@@ -1,5 +1,5 @@
-// DashboardSummary.tsx — v2.1.0 (Ring v3.0.0 совместимость + стили)
-import Ring from "./Ring";
+// DashboardSummary.tsx — v2.2.0 (замена Ring на Ring3D с 3D визуализацией)
+import Ring3D from "./Ring3D";
 import Tooltip from "./Tooltip";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
@@ -37,39 +37,21 @@ export default function DashboardSummary({ data }: Props) {
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.4, duration: 0.3 }}
       >
-        <Tooltip content={t("tooltip.steps")}>
+        <Tooltip content={t("tooltip.steps")}> 
           <div className="flex flex-col items-center gap-2">
-            <Ring ep={steps} dailyGoal={stepsGoal} color="#00DBDE" />
-            <div className="text-center">
-              <span className="text-xs text-gray-300">{t("ring.steps", "Шаги")}</span>
-              <div className="text-sm font-semibold text-white">
-                {steps} / {stepsGoal}
-              </div>
-            </div>
+            <Ring3D ep={steps} dailyGoal={stepsGoal} color="#00DBDE" label={t("ring.steps", "Шаги")} />
           </div>
         </Tooltip>
 
-        <Tooltip content={t("tooltip.calories")}>
+        <Tooltip content={t("tooltip.calories")}> 
           <div className="flex flex-col items-center gap-2">
-            <Ring ep={calories} dailyGoal={caloriesGoal} color="#FF5F6D" />
-            <div className="text-center">
-              <span className="text-xs text-gray-300">{t("ring.calories", "Калории")}</span>
-              <div className="text-sm font-semibold text-white">
-                {Math.round(calories)} / {caloriesGoal} ккал
-              </div>
-            </div>
+            <Ring3D ep={calories} dailyGoal={caloriesGoal} color="#FF5F6D" label={t("ring.calories", "Калории")} />
           </div>
         </Tooltip>
 
-        <Tooltip content={t("tooltip.energy")}>
+        <Tooltip content={t("tooltip.energy")}> 
           <div className="flex flex-col items-center gap-2">
-            <Ring ep={energy} dailyGoal={energyGoal} color="#FCEE09" />
-            <div className="text-center">
-              <span className="text-xs text-gray-300">{t("ring.energy", "Энергия")}</span>
-              <div className="text-sm font-semibold text-white">
-                {Math.round(energy)} / {energyGoal}
-              </div>
-            </div>
+            <Ring3D ep={energy} dailyGoal={energyGoal} color="#FCEE09" label={t("ring.energy", "Энергия")} />
           </div>
         </Tooltip>
       </motion.div>

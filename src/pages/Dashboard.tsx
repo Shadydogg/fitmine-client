@@ -1,4 +1,4 @@
-// Dashboard.tsx — v2.7.0 (EP + метрики + стилизация + награда)
+// Dashboard.tsx — v2.8.0 (EPBattery3D вместо кольца, 3D батарейка)
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -10,7 +10,7 @@ import DashboardSummary from "../components/DashboardSummary";
 import ConnectGoogleFit from "../components/ConnectGoogleFit";
 import RewardModal from "../components/RewardModal";
 
-import Ring from "../components/Ring";
+import EPBattery3D from "../components/EPBattery3D";
 import { useSession } from "../context/SessionContext";
 import { useUserEP } from "../hooks/useUserEP";
 import { useDailyReward } from "../hooks/useDailyReward";
@@ -110,27 +110,22 @@ export default function Dashboard() {
         {t("dashboard.title", "Твоя активность сегодня")}
       </motion.h1>
 
-      {/* 🔘 EP Кольцо */}
+      {/* 🔋 EPBattery 3D */}
       {epLoading ? (
         <div className="text-gray-500 mt-6 animate-pulse">{t("dashboard.loading", "Загрузка EP...")}</div>
       ) : (
         <motion.div
-          className="flex flex-col items-center justify-center mt-6"
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
+          className="w-full px-4 max-w-md mt-4"
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
         >
-          <Ring ep={ep} dailyGoal={1000} />
-          <motion.div
-            className="mt-3 text-center text-sm font-medium"
-            initial={{ opacity: 0, y: 4 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6 }}
-          >
+          <EPBattery3D ep={ep} dailyGoal={1000} />
+          <div className="mt-2 text-center text-sm font-medium">
             {ep >= 1000
               ? "🎉 Цель достигнута! Забери награду"
               : `🧠 Осталось ${1000 - ep} EP до награды`}
-          </motion.div>
+          </div>
         </motion.div>
       )}
 
