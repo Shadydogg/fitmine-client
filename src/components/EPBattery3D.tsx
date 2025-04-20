@@ -1,7 +1,7 @@
-// EPBattery3D.tsx — v1.2.0 (SSR + WebGL fallback с UI прогрессом)
 import { Canvas } from "@react-three/fiber";
 import { Html } from "@react-three/drei";
 import { useSpring, a } from "@react-spring/three";
+import { useEffect, useState } from "react";
 
 interface Props {
   ep: number;
@@ -11,15 +11,35 @@ interface Props {
 
 export default function EPBattery3D({ ep, dailyGoal = 1000, color = "#22c55e" }: Props) {
   const fill = Math.min(ep / dailyGoal, 1);
+  const [ready, setReady] = useState(false);
+  const canUseWebGL = typeof window !== "undefined" && !!window.WebGLRenderingContext;
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      if (window.Telegram?.WebApp?.ready) {
+        window.Telegram.WebApp.ready();
+        console.log("📱 Telegram WebApp ready (battery)");
+        setReady(true);
+      } else {
+        setTimeout(() => setReady(true), 400);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    const canvas = document.querySelector("canvas");
+    if (canvas) {
+      const gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
+      console.log("🔋 EPBattery Canvas context:", gl ? "✅ OK" : "❌ NULL");
+    }
+  }, [ready]);
 
   const { scaleX } = useSpring({
     scaleX: fill,
     config: { tension: 160, friction: 18 },
   });
 
-  const canUseWebGL = typeof window !== "undefined" && !!window.WebGLRenderingContext;
-
-  if (!canUseWebGL) {
+  if (!canUseWebGL || !ready) {
     return (
       <div className="w-full max-w-md mx-auto mt-4 px-4">
         <div className="relative w-full h-6 rounded-full bg-gray-700 overflow-hidden">

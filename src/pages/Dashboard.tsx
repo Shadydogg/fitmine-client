@@ -1,7 +1,8 @@
+// Dashboard.tsx — v2.8.2 (React.lazy вместо next/dynamic для EPBattery3D)
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import dynamic from "next/dynamic";
+import { lazy, Suspense } from "react";
 
 import useSyncActivity from "../hooks/useSyncActivity";
 import AnimatedBackground from "../components/AnimatedBackground";
@@ -14,15 +15,7 @@ import { useSession } from "../context/SessionContext";
 import { useUserEP } from "../hooks/useUserEP";
 import { useDailyReward } from "../hooks/useDailyReward";
 
-// ⛔ SSR отключён — безопасно для WebGL
-const EPBattery3D = dynamic(() => import("../components/EPBattery3D"), {
-  ssr: false,
-  loading: () => (
-    <div className="w-full h-24 flex items-center justify-center text-sm text-gray-500">
-      Loading EP Battery...
-    </div>
-  ),
-});
+const EPBattery3D = lazy(() => import("../components/EPBattery3D"));
 
 export default function Dashboard() {
   const { t } = useTranslation();
@@ -129,7 +122,9 @@ export default function Dashboard() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
         >
-          <EPBattery3D ep={ep} dailyGoal={1000} />
+          <Suspense fallback={<div className="text-sm text-gray-400">Загрузка батарейки EP...</div>}>
+            <EPBattery3D ep={ep} dailyGoal={1000} />
+          </Suspense>
           <div className="mt-2 text-center text-sm font-medium">
             {ep >= 1000
               ? "🎉 Цель достигнута! Забери награду"

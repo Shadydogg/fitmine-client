@@ -1,8 +1,7 @@
-// Ring3D.tsx — v1.2.0 (WebGL-aware 3D кольцо с fallback для Telegram)
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import { useSpring, a } from "@react-spring/three";
-import { useMemo, Suspense } from "react";
+import { useMemo, Suspense, useEffect, useState } from "react";
 
 interface Ring3DProps {
   ep: number;
@@ -13,13 +12,30 @@ interface Ring3DProps {
 
 export default function Ring3D({ ep, dailyGoal = 1000, color = "#00DBDE", label }: Ring3DProps) {
   const progress = Math.min(ep / dailyGoal, 1);
-
+  const [ready, setReady] = useState(false);
   const canUseWebGL = typeof window !== "undefined" && !!window.WebGLRenderingContext;
 
-  const { scale } = useSpring({
-    scale: progress,
-    config: { tension: 100, friction: 20 },
-  });
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      if (window.Telegram?.WebApp?.ready) {
+        window.Telegram.WebApp.ready();
+        console.log("📱 Telegram WebApp ready");
+        setReady(true);
+      } else {
+        setTimeout(() => setReady(true), 400);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    const canvas = document.querySelector("canvas");
+    if (canvas) {
+      const gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
+      console.log("🎨 Ring3D Canvas context:", gl ? "✅ OK" : "❌ NULL");
+    }
+  }, [ready]);
+
+  const { scale } = useSpring({ scale: progress, config: { tension: 100, friction: 20 } });
 
   const geometry = useMemo(() => {
     const segments = 64;
@@ -36,11 +52,10 @@ export default function Ring3D({ ep, dailyGoal = 1000, color = "#00DBDE", label 
 
   return (
     <div className="w-32 h-32 flex flex-col items-center justify-center">
-      {canUseWebGL ? (
+      {canUseWebGL && ready ? (
         <Canvas dpr={[1, 1.5]} camera={{ position: [0, 0, 4] }}>
           <ambientLight intensity={0.8} />
           <directionalLight position={[2, 2, 5]} intensity={1} />
-
           <Suspense fallback={null}>
             <a.group scale={scale.to((s) => [s, s, s])}>
               {geometry.map(([x, y, z], i) => (

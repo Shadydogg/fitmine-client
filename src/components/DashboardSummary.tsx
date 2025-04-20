@@ -1,17 +1,10 @@
-import dynamic from "next/dynamic";
+// DashboardSummary.tsx — v2.2.2 (React.lazy для Ring3D)
+import { lazy, Suspense } from "react";
 import Tooltip from "./Tooltip";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 
-// ⛔ SSR отключен — гарантирует рендер Canvas только на клиенте
-const Ring3D = dynamic(() => import("./Ring3D"), {
-  ssr: false,
-  loading: () => (
-    <div className="w-32 h-32 flex items-center justify-center text-sm text-gray-500">
-      Loading 3D Ring...
-    </div>
-  ),
-});
+const Ring3D = lazy(() => import("./Ring3D"));
 
 interface Props {
   data: {
@@ -48,34 +41,25 @@ export default function DashboardSummary({ data }: Props) {
       >
         <Tooltip content={t("tooltip.steps")}>
           <div className="flex flex-col items-center gap-2">
-            <Ring3D
-              ep={steps}
-              dailyGoal={stepsGoal}
-              color="#00DBDE"
-              label={t("ring.steps", "Шаги")}
-            />
+            <Suspense fallback={<div className="text-sm text-gray-400">Загрузка кольца...</div>}>
+              <Ring3D ep={steps} dailyGoal={stepsGoal} color="#00DBDE" label={t("ring.steps", "Шаги")} />
+            </Suspense>
           </div>
         </Tooltip>
 
         <Tooltip content={t("tooltip.calories")}>
           <div className="flex flex-col items-center gap-2">
-            <Ring3D
-              ep={calories}
-              dailyGoal={caloriesGoal}
-              color="#FF5F6D"
-              label={t("ring.calories", "Калории")}
-            />
+            <Suspense fallback={<div className="text-sm text-gray-400">Загрузка кольца...</div>}>
+              <Ring3D ep={calories} dailyGoal={caloriesGoal} color="#FF5F6D" label={t("ring.calories", "Калории")} />
+            </Suspense>
           </div>
         </Tooltip>
 
         <Tooltip content={t("tooltip.energy")}>
           <div className="flex flex-col items-center gap-2">
-            <Ring3D
-              ep={energy}
-              dailyGoal={energyGoal}
-              color="#FCEE09"
-              label={t("ring.energy", "Энергия")}
-            />
+            <Suspense fallback={<div className="text-sm text-gray-400">Загрузка кольца...</div>}>
+              <Ring3D ep={energy} dailyGoal={energyGoal} color="#FCEE09" label={t("ring.energy", "Энергия")} />
+            </Suspense>
           </div>
         </Tooltip>
       </motion.div>
