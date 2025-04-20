@@ -3,9 +3,10 @@ import Tooltip from "./Tooltip";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 
-import StepRingLottie from "./StepRingLottie";
-import CaloriesRingLottie from "./CaloriesRingLottie";
-import DistanceRingLottie from "./DistanceRingLottie";
+import ProgressRingLottie from "./ProgressRingLottie";
+import ringSteps from "../assets/lottie/ring-steps.json";
+import ringCalories from "../assets/lottie/ring-calories.json";
+import ringDistance from "../assets/lottie/ring-distance.json";
 
 interface Props {
   data: {
@@ -40,26 +41,47 @@ export default function DashboardSummary({ data }: Props) {
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.4, duration: 0.3 }}
       >
-        <Tooltip content={t("tooltip.steps")}>
+        <Tooltip content={t("tooltip.steps")}> 
           <div className="flex flex-col items-center gap-3">
             <Suspense fallback={<div className="text-sm text-gray-400">Загрузка кольца...</div>}>
-              <StepRingLottie ep={steps} dailyGoal={stepsGoal} />
+              <ProgressRingLottie
+                value={steps}
+                goal={stepsGoal}
+                label={t("ring.steps", "Шаги")}
+                unit={"шагов"}
+                color="#00DBDE"
+                animationData={ringSteps}
+              />
             </Suspense>
           </div>
         </Tooltip>
 
-        <Tooltip content={t("tooltip.calories")}>
+        <Tooltip content={t("tooltip.calories")}> 
           <div className="flex flex-col items-center gap-3">
             <Suspense fallback={<div className="text-sm text-gray-400">Загрузка кольца...</div>}>
-              <CaloriesRingLottie ep={calories} dailyGoal={caloriesGoal} />
+              <ProgressRingLottie
+                value={calories}
+                goal={caloriesGoal}
+                label={t("ring.calories", "Калории")}
+                unit={"ккал"}
+                color="#FF5F6D"
+                animationData={ringCalories}
+              />
             </Suspense>
           </div>
         </Tooltip>
 
-        <Tooltip content={t("tooltip.distance")}>
+        <Tooltip content={t("tooltip.distance")}> 
           <div className="flex flex-col items-center gap-3">
             <Suspense fallback={<div className="text-sm text-gray-400">Загрузка кольца...</div>}>
-              <DistanceRingLottie ep={distance} dailyGoal={distanceGoal} />
+              <ProgressRingLottie
+                value={Math.round((distance / 1000) * 100) / 100}
+                goal={distanceGoal}
+                label={t("ring.distance", "Дистанция")}
+                unit={"км"}
+                color="#FCEE09"
+                animationData={ringDistance}
+              />
             </Suspense>
           </div>
         </Tooltip>

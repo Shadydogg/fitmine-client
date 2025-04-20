@@ -1,8 +1,7 @@
-// Dashboard.tsx — v2.9.0 (Lottie EPBattery вместо EPBattery3D)
+// Dashboard.tsx — v2.9.1 (оптимизация, финальная сборка с EPBatteryLottie)
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { lazy, Suspense } from "react";
 
 import useSyncActivity from "../hooks/useSyncActivity";
 import AnimatedBackground from "../components/AnimatedBackground";
@@ -88,7 +87,11 @@ export default function Dashboard() {
         onClick={() => navigate("/profile")}
         className="absolute top-4 right-4 w-10 h-10 rounded-full overflow-hidden border-2 border-white shadow-md hover:scale-105 transition-transform z-20"
       >
-        <img src={user?.photo_url || "/default-avatar.png"} alt="avatar" className="w-full h-full object-cover" />
+        <img
+          src={user?.photo_url || "/default-avatar.png"}
+          alt="avatar"
+          className="w-full h-full object-cover"
+        />
       </button>
 
       {/* 🎯 XP */}
@@ -112,9 +115,11 @@ export default function Dashboard() {
         {t("dashboard.title", "Твоя активность сегодня")}
       </motion.h1>
 
-      {/* 🔋 EPBattery Lottie */}
+      {/* 🔋 EPBattery */}
       {epLoading ? (
-        <div className="text-gray-500 mt-6 animate-pulse">{t("dashboard.loading", "Загрузка EP...")}</div>
+        <div className="text-gray-500 mt-6 animate-pulse">
+          {t("dashboard.loading", "Загрузка EP...")}
+        </div>
       ) : (
         <motion.div
           className="w-full px-4 max-w-md mt-4"

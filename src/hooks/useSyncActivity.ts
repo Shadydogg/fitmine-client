@@ -58,12 +58,15 @@ export default function useSyncActivity(): ActivityData {
 
         const d = res.data;
 
+        const distanceRaw = d.distance || 0; // предполагаем в метрах
+        const distanceKm = Math.round((distanceRaw / 1000) * 100) / 100;
+
         setData({
           steps: d.steps || 0,
           stepsGoal: d.stepsGoal || 10000,
           calories: d.calories || 0,
           caloriesGoal: d.caloriesGoal || 2000,
-          distance: d.distance || 0,
+          distance: distanceKm,
           distanceGoal: d.distanceGoal || 5,
           hasNFT: d.hasNFT || false,
           isPremium: d.isPremium || false,
