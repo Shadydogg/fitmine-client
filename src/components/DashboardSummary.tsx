@@ -1,10 +1,12 @@
-// DashboardSummary.tsx — v2.3.0 (замена Energy на Distance по PROMPT 9.5)
-import { lazy, Suspense } from "react";
+// DashboardSummary.tsx — v2.4.0 (Lottie кольца вместо Ring3D)
+import { Suspense } from "react";
 import Tooltip from "./Tooltip";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 
-const Ring3D = lazy(() => import("./Ring3D"));
+import StepRingLottie from "./StepRingLottie";
+import CaloriesRingLottie from "./CaloriesRingLottie";
+import DistanceRingLottie from "./DistanceRingLottie";
 
 interface Props {
   data: {
@@ -42,7 +44,7 @@ export default function DashboardSummary({ data }: Props) {
         <Tooltip content={t("tooltip.steps")}> 
           <div className="flex flex-col items-center gap-2">
             <Suspense fallback={<div className="text-sm text-gray-400">Загрузка кольца...</div>}>
-              <Ring3D ep={steps} dailyGoal={stepsGoal} color="#00DBDE" label={t("ring.steps", "Шаги")} />
+              <StepRingLottie ep={steps} dailyGoal={stepsGoal} />
             </Suspense>
           </div>
         </Tooltip>
@@ -50,7 +52,7 @@ export default function DashboardSummary({ data }: Props) {
         <Tooltip content={t("tooltip.calories")}> 
           <div className="flex flex-col items-center gap-2">
             <Suspense fallback={<div className="text-sm text-gray-400">Загрузка кольца...</div>}>
-              <Ring3D ep={calories} dailyGoal={caloriesGoal} color="#FF5F6D" label={t("ring.calories", "Калории")} />
+              <CaloriesRingLottie ep={calories} dailyGoal={caloriesGoal} />
             </Suspense>
           </div>
         </Tooltip>
@@ -58,7 +60,7 @@ export default function DashboardSummary({ data }: Props) {
         <Tooltip content={t("tooltip.distance")}> 
           <div className="flex flex-col items-center gap-2">
             <Suspense fallback={<div className="text-sm text-gray-400">Загрузка кольца...</div>}>
-              <Ring3D ep={distance} dailyGoal={distanceGoal} color="#FCEE09" label={t("ring.distance", "Дистанция")} />
+              <DistanceRingLottie ep={distance} dailyGoal={distanceGoal} />
             </Suspense>
           </div>
         </Tooltip>
