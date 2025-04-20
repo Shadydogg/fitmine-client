@@ -1,4 +1,3 @@
-// DashboardSummary.tsx — v2.4.0 (Lottie кольца вместо Ring3D)
 import { Suspense } from "react";
 import Tooltip from "./Tooltip";
 import { motion } from "framer-motion";
@@ -36,29 +35,29 @@ export default function DashboardSummary({ data }: Props) {
   return (
     <div className="w-full flex flex-col items-center justify-center gap-8 py-6 px-4">
       <motion.div
-        className="grid grid-cols-1 sm:grid-cols-3 gap-6"
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-10 justify-items-center"
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.4, duration: 0.3 }}
       >
-        <Tooltip content={t("tooltip.steps")}> 
-          <div className="flex flex-col items-center gap-2">
+        <Tooltip content={t("tooltip.steps")}>
+          <div className="flex flex-col items-center gap-3">
             <Suspense fallback={<div className="text-sm text-gray-400">Загрузка кольца...</div>}>
               <StepRingLottie ep={steps} dailyGoal={stepsGoal} />
             </Suspense>
           </div>
         </Tooltip>
 
-        <Tooltip content={t("tooltip.calories")}> 
-          <div className="flex flex-col items-center gap-2">
+        <Tooltip content={t("tooltip.calories")}>
+          <div className="flex flex-col items-center gap-3">
             <Suspense fallback={<div className="text-sm text-gray-400">Загрузка кольца...</div>}>
               <CaloriesRingLottie ep={calories} dailyGoal={caloriesGoal} />
             </Suspense>
           </div>
         </Tooltip>
 
-        <Tooltip content={t("tooltip.distance")}> 
-          <div className="flex flex-col items-center gap-2">
+        <Tooltip content={t("tooltip.distance")}>
+          <div className="flex flex-col items-center gap-3">
             <Suspense fallback={<div className="text-sm text-gray-400">Загрузка кольца...</div>}>
               <DistanceRingLottie ep={distance} dailyGoal={distanceGoal} />
             </Suspense>
