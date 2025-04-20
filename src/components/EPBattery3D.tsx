@@ -1,4 +1,4 @@
-// EPBattery3D.tsx — v1.1.0 (SSR check + WebGL fallback)
+// EPBattery3D.tsx — v1.2.0 (SSR + WebGL fallback с UI прогрессом)
 import { Canvas } from "@react-three/fiber";
 import { Html } from "@react-three/drei";
 import { useSpring, a } from "@react-spring/three";
@@ -12,18 +12,28 @@ interface Props {
 export default function EPBattery3D({ ep, dailyGoal = 1000, color = "#22c55e" }: Props) {
   const fill = Math.min(ep / dailyGoal, 1);
 
-  if (typeof window === "undefined" || !window.WebGLRenderingContext) {
-    return (
-      <div className="w-full h-20 max-w-md mx-auto flex items-center justify-center text-red-400 text-sm">
-        WebGL не поддерживается
-      </div>
-    );
-  }
-
   const { scaleX } = useSpring({
     scaleX: fill,
     config: { tension: 160, friction: 18 },
   });
+
+  const canUseWebGL = typeof window !== "undefined" && !!window.WebGLRenderingContext;
+
+  if (!canUseWebGL) {
+    return (
+      <div className="w-full max-w-md mx-auto mt-4 px-4">
+        <div className="relative w-full h-6 rounded-full bg-gray-700 overflow-hidden">
+          <div
+            className="absolute top-0 left-0 h-full bg-lime-500 transition-all duration-500 ease-out"
+            style={{ width: `${fill * 100}%` }}
+          />
+        </div>
+        <div className="mt-2 text-center text-sm font-medium text-white">
+          {Math.round(ep)} / {dailyGoal} EP
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full h-20 max-w-md mx-auto">
@@ -46,7 +56,7 @@ export default function EPBattery3D({ ep, dailyGoal = 1000, color = "#22c55e" }:
         {/* Текст */}
         <Html center>
           <span className="text-white text-sm font-bold drop-shadow-md">
-            {ep} / {dailyGoal} EP
+            {Math.round(ep)} / {dailyGoal} EP
           </span>
         </Html>
       </Canvas>

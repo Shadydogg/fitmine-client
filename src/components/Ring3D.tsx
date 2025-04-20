@@ -1,8 +1,8 @@
-// Ring3D.tsx — v1.1.0 (SSR check + WebGL fallback)
+// Ring3D.tsx — v1.2.0 (WebGL-aware 3D кольцо с fallback для Telegram)
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import { useSpring, a } from "@react-spring/three";
-import { useMemo } from "react";
+import { useMemo, Suspense } from "react";
 
 interface Ring3DProps {
   ep: number;
@@ -14,14 +14,7 @@ interface Ring3DProps {
 export default function Ring3D({ ep, dailyGoal = 1000, color = "#00DBDE", label }: Ring3DProps) {
   const progress = Math.min(ep / dailyGoal, 1);
 
-  // SSR и WebGL fallback
-  if (typeof window === "undefined" || !window.WebGLRenderingContext) {
-    return (
-      <div className="w-32 h-32 flex items-center justify-center text-red-400 text-xs text-center">
-        WebGL не поддерживается
-      </div>
-    );
-  }
+  const canUseWebGL = typeof window !== "undefined" && !!window.WebGLRenderingContext;
 
   const { scale } = useSpring({
     scale: progress,
@@ -42,26 +35,33 @@ export default function Ring3D({ ep, dailyGoal = 1000, color = "#00DBDE", label 
   }, [progress]);
 
   return (
-    <div className="w-32 h-32">
-      <Canvas camera={{ position: [0, 0, 4] }}>
-        <ambientLight intensity={0.8} />
-        <directionalLight position={[2, 2, 5]} intensity={1} />
+    <div className="w-32 h-32 flex flex-col items-center justify-center">
+      {canUseWebGL ? (
+        <Canvas dpr={[1, 1.5]} camera={{ position: [0, 0, 4] }}>
+          <ambientLight intensity={0.8} />
+          <directionalLight position={[2, 2, 5]} intensity={1} />
 
-        <a.group scale={scale.to((s) => [s, s, s])}>
-          {geometry.map(([x, y, z], i) => (
-            <mesh key={i} position={[x, y, z]}>
-              <sphereGeometry args={[0.03, 8, 8]} />
-              <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.6} />
-            </mesh>
-          ))}
-        </a.group>
-
-        <OrbitControls enableZoom={false} enablePan={false} />
-      </Canvas>
+          <Suspense fallback={null}>
+            <a.group scale={scale.to((s) => [s, s, s])}>
+              {geometry.map(([x, y, z], i) => (
+                <mesh key={i} position={[x, y, z]}>
+                  <sphereGeometry args={[0.03, 8, 8]} />
+                  <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.6} />
+                </mesh>
+              ))}
+            </a.group>
+            <OrbitControls enableZoom={false} enablePan={false} />
+          </Suspense>
+        </Canvas>
+      ) : (
+        <div className="w-24 h-24 flex items-center justify-center border-2 border-white/20 rounded-full">
+          <span className="text-xs text-white">{Math.round(progress * 100)}%</span>
+        </div>
+      )}
 
       {label && (
         <div className="text-center text-sm text-white mt-2 font-medium">
-          {label}: {ep} / {dailyGoal}
+          {label}: {Math.round(ep)} / {dailyGoal}
         </div>
       )}
     </div>
