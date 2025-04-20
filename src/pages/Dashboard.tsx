@@ -1,7 +1,7 @@
-// Dashboard.tsx — v2.8.0 (EPBattery3D вместо кольца, 3D батарейка)
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import dynamic from "next/dynamic";
 
 import useSyncActivity from "../hooks/useSyncActivity";
 import AnimatedBackground from "../components/AnimatedBackground";
@@ -10,10 +10,19 @@ import DashboardSummary from "../components/DashboardSummary";
 import ConnectGoogleFit from "../components/ConnectGoogleFit";
 import RewardModal from "../components/RewardModal";
 
-import EPBattery3D from "../components/EPBattery3D";
 import { useSession } from "../context/SessionContext";
 import { useUserEP } from "../hooks/useUserEP";
 import { useDailyReward } from "../hooks/useDailyReward";
+
+// ⛔ SSR отключён — безопасно для WebGL
+const EPBattery3D = dynamic(() => import("../components/EPBattery3D"), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-24 flex items-center justify-center text-sm text-gray-500">
+      Loading EP Battery...
+    </div>
+  ),
+});
 
 export default function Dashboard() {
   const { t } = useTranslation();
@@ -129,7 +138,7 @@ export default function Dashboard() {
         </motion.div>
       )}
 
-      {/* 📊 Прогресс по метрикам */}
+      {/* 📊 Метрики */}
       {!activity.loading && (
         <motion.div
           className="mt-8"
