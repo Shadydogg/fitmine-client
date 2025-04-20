@@ -1,4 +1,4 @@
-// src/types/telegram.d.ts — v1.1.0
+// src/types/telegram.d.ts — v1.2.0 (полная поддержка Telegram WebApp SDK)
 
 interface TelegramWebAppUser {
   id: number
@@ -33,6 +33,25 @@ interface TelegramWebApp {
     show: () => void
     hide: () => void
     onClick: (cb: () => void) => void
+    text: string
+    setText: (text: string) => void
+    setParams: (params: {
+      text?: string
+      color?: string
+      text_color?: string
+      is_active?: boolean
+      is_visible?: boolean
+    }) => void
+  }
+  BackButton?: {
+    show: () => void
+    hide: () => void
+    onClick: (cb: () => void) => void
+  }
+  HapticFeedback?: {
+    impactOccurred: (style: "light" | "medium" | "heavy" | "rigid" | "soft") => void
+    notificationOccurred: (type: "error" | "success" | "warning") => void
+    selectionChanged: () => void
   }
 }
 
