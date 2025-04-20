@@ -1,9 +1,6 @@
-// useDailyReward.ts — v1.0.0
+// useDailyReward.ts — v2.0.0 (переведён на JWT + axios)
 import { useEffect, useState } from "react";
-
-function getTelegramInitDataRaw() {
-  return typeof window !== "undefined" ? window.Telegram?.WebApp?.initData || "" : "";
-}
+import { api } from "../api/apiClient";
 
 export function useDailyReward() {
   const [reward, setReward] = useState<string | null>(null);
@@ -13,39 +10,22 @@ export function useDailyReward() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const initData = getTelegramInitDataRaw();
-    if (!initData) {
-      setError("initData not found");
-      setLoading(false);
-      return;
-    }
-
     const claimReward = async () => {
       try {
-        const res = await fetch("/api/ep/claim", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ initData }),
-        });
-
-        const json = await res.json();
-
-        if (!res.ok) {
-          if (json.error === "EP goal not reached yet") {
-            // silently ignore
-            setLoading(false);
-            return;
-          }
-          throw new Error(json.error || "Unknown error");
-        }
+        const res = await api.post("/ep/claim");
+        const json = res.data;
 
         if (json.alreadyClaimed) {
           setAlreadyClaimed(true);
         } else {
           setReward(json.reward || "reward_box");
-          setShowModal(true); // 🎉 показываем модалку
+          setShowModal(true);
         }
       } catch (err: any) {
+        if (err.response?.data?.error === "EP goal not reached yet") {
+          setLoading(false);
+          return; // не показываем ошибку
+        }
         setError(err.message);
       } finally {
         setLoading(false);

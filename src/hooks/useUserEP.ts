@@ -1,9 +1,6 @@
-// useUserEP.ts — v1.0.1 (встроенная функция получения initData)
+// useUserEP.ts — v2.0.0 (переведён на JWT + axios)
 import { useEffect, useState } from "react";
-
-function getTelegramInitDataRaw() {
-  return typeof window !== "undefined" ? window.Telegram?.WebApp?.initData || "" : "";
-}
+import { api } from "../api/apiClient";
 
 export function useUserEP() {
   const [ep, setEp] = useState<number>(0);
@@ -11,27 +8,10 @@ export function useUserEP() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const initData = getTelegramInitDataRaw();
-    if (!initData) {
-      setError("initData not found");
-      setLoading(false);
-      return;
-    }
-
     const fetchEP = async () => {
       try {
-        const res = await fetch("/api/ep", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ initData }),
-        });
-
-        const json = await res.json();
-        if (!res.ok) {
-          throw new Error(json.error || "Unknown error");
-        }
-
-        setEp(Math.round(json.ep));
+        const res = await api.get("/ep");
+        setEp(Math.round(res.data.ep || 0));
       } catch (err: any) {
         setError(err.message);
       } finally {
