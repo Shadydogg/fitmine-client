@@ -1,3 +1,4 @@
+// src/components/EPBatterySVG.tsx — v2.2.0 (поэтапная заливка сегментов с glow)
 import { motion } from "framer-motion";
 
 interface Props {
@@ -10,19 +11,16 @@ export default function EPBatterySVG({ ep, dailyGoal = 1000 }: Props) {
   const totalSegments = 5;
   const filledSegments = Math.floor(percentage * totalSegments);
 
-  // Градиентные цвета прогресса от красного к бирюзовому
-  const colors = ["#FF4E50", "#FFA95D", "#FFE981", "#9EFFA5", "#00FFC6"];
-
   return (
-    <div className="flex flex-col items-center justify-center text-white text-sm w-full max-w-[260px] px-2">
+    <div className="flex flex-col items-center justify-center text-white text-sm w-full px-4 max-w-md">
       <svg
         viewBox="0 0 240 80"
-        className="w-full h-[64px]"
+        className="w-full max-w-xs sm:max-w-sm h-auto"
         xmlns="http://www.w3.org/2000/svg"
       >
         <defs>
           <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-            <feDropShadow dx="0" dy="0" stdDeviation="3" floodColor="#00FFC6" />
+            <feDropShadow dx="0" dy="0" stdDeviation="4" floodColor="#00FFC6" />
             <feDropShadow dx="0" dy="0" stdDeviation="6" floodColor="#00FFC6" />
           </filter>
         </defs>
@@ -39,11 +37,10 @@ export default function EPBatterySVG({ ep, dailyGoal = 1000 }: Props) {
           stroke="#444"
           strokeWidth="2"
         />
-
         {/* Носик */}
         <rect x="212" y="28" width="10" height="24" rx="2" fill="#444" />
 
-        {/* Сегменты */}
+        {/* Анимированные сегменты */}
         {Array.from({ length: totalSegments }).map((_, i) => {
           const x = 8 + i * 40;
           const isFilled = i < filledSegments;
@@ -55,29 +52,26 @@ export default function EPBatterySVG({ ep, dailyGoal = 1000 }: Props) {
               width={32}
               height={44}
               rx={4}
-              fill={isFilled ? colors[i] : "#1f1f1f"}
+              fill={isFilled ? "#00FFC6" : "#1f1f1f"}
               filter={isFilled ? "url(#glow)" : "none"}
-              initial={{ width: 0 }}
-              animate={{ width: 32 }}
+              initial={{ scaleY: 0 }}
+              animate={{ scaleY: 1 }}
+              transformOrigin="center bottom"
               transition={{
-                delay: 0.08 * i,
+                delay: 0.1 * i,
                 type: "spring",
-                stiffness: 180,
-                damping: 16,
+                stiffness: 160,
+                damping: 20,
               }}
+              transform={`translate(0, 18)`}
             />
           );
         })}
       </svg>
 
-      {/* Подпись */}
-      <div className="mt-2 text-center">
-        <div className="text-sm font-semibold">
-          {Math.round(ep)} / {dailyGoal} <span className="text-zinc-400">EP</span>
-        </div>
-        <div className="text-xs text-pink-300">
-          Осталось {dailyGoal - Math.round(ep)} EP до награды
-        </div>
+      {/* Подпись EP */}
+      <div className="mt-2 text-sm font-semibold text-center">
+        {Math.round(ep)} / {dailyGoal} <span className="text-zinc-400">EP</span>
       </div>
     </div>
   );
