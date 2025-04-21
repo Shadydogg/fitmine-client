@@ -77,6 +77,12 @@ export default function Dashboard() {
     }
   };
 
+  const nearComplete = ep >= 900 && ep < 1000;
+  const epProgressText =
+    ep >= 1000
+      ? "🎉 Цель достигнута! Забери награду"
+      : `🧠 Осталось ${1000 - ep} EP до награды`;
+
   return (
     <div className="relative w-full min-h-screen flex flex-col items-center bg-gradient-to-br from-black via-zinc-900 to-black text-white overflow-x-hidden pb-24">
       <AnimatedBackground />
@@ -127,11 +133,17 @@ export default function Dashboard() {
           transition={{ delay: 0.5 }}
         >
           <EPBatterySVG ep={ep} dailyGoal={1000} />
-          <div className="mt-2 text-center text-sm font-medium">
-            {ep >= 1000
-              ? "🎉 Цель достигнута! Забери награду"
-              : `🧠 Осталось ${1000 - ep} EP до награды`}
-          </div>
+
+          <motion.div
+            className={`mt-2 text-center text-sm font-medium ${
+              nearComplete ? "text-lime-300" : ""
+            }`}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.9 }}
+          >
+            {epProgressText}
+          </motion.div>
         </motion.div>
       )}
 
@@ -155,12 +167,14 @@ export default function Dashboard() {
         className="mt-6"
       >
         {user.google_connected ? (
-          <button
+          <motion.button
             onClick={syncGoogleAndUpdate}
-            className="px-6 py-2 bg-lime-500 text-white font-medium rounded-full shadow hover:scale-105 transition-transform"
+            className="px-6 py-2 bg-lime-500 text-white font-medium rounded-full shadow hover:scale-105 active:scale-95 transition-transform"
+            whileTap={{ scale: 0.96 }}
+            whileHover={{ scale: 1.05 }}
           >
             🔄 Синхронизировать Google Fit
-          </button>
+          </motion.button>
         ) : (
           <div className="mt-4 text-yellow-300">
             🔓 Google Fit не подключён

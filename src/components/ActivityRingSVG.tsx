@@ -1,3 +1,4 @@
+// src/components/ActivityRingSVG.tsx — v2.5.0
 import { motion } from "framer-motion";
 
 interface Props {
@@ -39,7 +40,6 @@ export default function ActivityRingSVG({
 
     return (
       <>
-        {/* Glow filter — отдельный ID для каждого кольца */}
         <defs>
           <filter id={glowId} x="-50%" y="-50%" width="200%" height="200%">
             <feDropShadow dx="0" dy="0" stdDeviation="2" floodColor={glowColor} />
@@ -47,7 +47,6 @@ export default function ActivityRingSVG({
           </filter>
         </defs>
 
-        {/* Бэкграунд кольца */}
         <circle
           cx="100"
           cy="100"
@@ -57,7 +56,6 @@ export default function ActivityRingSVG({
           fill="transparent"
         />
 
-        {/* Анимированное кольцо */}
         <motion.circle
           cx="100"
           cy="100"
@@ -68,12 +66,10 @@ export default function ActivityRingSVG({
           strokeDasharray={circumference}
           strokeDashoffset={dashOffset}
           strokeLinecap="round"
-          style={{
-            filter: `url(#${glowId})`,
-          }}
+          style={{ filter: `url(#${glowId})` }}
           initial={{ strokeDashoffset: circumference }}
           animate={{ strokeDashoffset: dashOffset }}
-          transition={{ duration: 1.2, delay }}
+          transition={{ duration: 1.1, delay }}
         />
       </>
     );
@@ -92,7 +88,6 @@ export default function ActivityRingSVG({
         {renderRing("#FCEE09", distancePercent, 20, 0.9, "#FCEE09")} {/* Distance */}
       </svg>
 
-      {/* Подписи под кольцами */}
       <div className="absolute bottom-0 w-full text-sm text-center text-white leading-tight mt-2 px-2 pointer-events-none">
         <div>👟 {Math.round(steps)} / {stepsGoal} шагов</div>
         <div>🔥 {Math.round(calories)} / {caloriesGoal} ккал</div>

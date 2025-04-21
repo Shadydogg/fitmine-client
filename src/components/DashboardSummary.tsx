@@ -1,3 +1,4 @@
+// src/components/DashboardSummary.tsx — v2.6.0
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import ActivityRingSVG from "./ActivityRingSVG";
@@ -30,10 +31,10 @@ export default function DashboardSummary({ data }: Props) {
   return (
     <div className="w-full flex flex-col items-center justify-center py-6 px-4">
       <motion.div
-        className="flex flex-col items-center gap-5 w-full max-w-md"
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: 0.3, duration: 0.4 }}
+        className="flex flex-col items-center w-full max-w-md gap-6"
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
       >
         <ActivityRingSVG
           steps={steps}
@@ -44,12 +45,17 @@ export default function DashboardSummary({ data }: Props) {
           distanceGoal={distanceGoal}
         />
 
-        <div className="text-sm text-zinc-300 font-medium text-center leading-snug px-3 whitespace-pre-line">
+        <motion.div
+          className="text-sm text-zinc-300 font-medium text-center leading-relaxed px-4 whitespace-pre-line text-balance"
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+        >
           {t(
             "dashboard.ringHint",
             "Шаги, калории и дистанция объединены в одном кольце.\nОткрой все секции для бонуса!"
           )}
-        </div>
+        </motion.div>
       </motion.div>
     </div>
   );

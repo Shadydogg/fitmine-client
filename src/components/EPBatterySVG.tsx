@@ -13,7 +13,7 @@ export default function EPBatterySVG({ ep, dailyGoal = 1000 }: Props) {
   const isEmpty = ep <= 0;
 
   return (
-    <div className="flex flex-col items-center justify-center text-white text-sm w-full max-w-xs px-4 relative">
+    <div className="flex flex-col items-center justify-center text-white text-sm w-full max-w-xs px-4">
       <div className="relative w-full max-w-[280px] aspect-[4/1]">
         <svg
           viewBox="0 0 220 80"
@@ -56,22 +56,22 @@ export default function EPBatterySVG({ ep, dailyGoal = 1000 }: Props) {
                 rx={4}
                 fill={isFilled ? "#00FFC6" : "#1f1f1f"}
                 filter={isFilled ? "url(#glow)" : "none"}
-                initial={{ scaleY: 0 }}
-                animate={{ scaleY: 1 }}
+                initial={{ scaleY: 0, opacity: 0 }}
+                animate={{ scaleY: 1, opacity: 1 }}
                 style={{ transformOrigin: "center bottom" }}
                 transition={{
                   delay: 0.1 * i,
                   duration: 0.4,
                   type: "spring",
-                  stiffness: 180,
-                  damping: 18,
+                  stiffness: 200,
+                  damping: 20,
                 }}
               />
             );
           })}
         </svg>
 
-        {/* 💀 Пусто: ⚡ внутри */}
+        {/* ⚡ Пусто */}
         <AnimatePresence>
           {isEmpty && (
             <motion.div
@@ -86,7 +86,7 @@ export default function EPBatterySVG({ ep, dailyGoal = 1000 }: Props) {
           )}
         </AnimatePresence>
 
-        {/* 🎉 Полная зарядка: пульсация */}
+        {/* 🎉 Полная зарядка */}
         <AnimatePresence>
           {isFull && (
             <motion.div
