@@ -1,4 +1,3 @@
-// src/components/EPBatterySVG.tsx — v2.2.0 (поэтапная заливка сегментов с glow)
 import { motion } from "framer-motion";
 
 interface Props {
@@ -12,7 +11,7 @@ export default function EPBatterySVG({ ep, dailyGoal = 1000 }: Props) {
   const filledSegments = Math.floor(percentage * totalSegments);
 
   return (
-    <div className="flex flex-col items-center justify-center text-white text-sm w-full px-4 max-w-md">
+    <div className="flex flex-col items-center justify-center text-white text-sm w-full max-w-md px-4">
       <svg
         viewBox="0 0 240 80"
         className="w-full max-w-xs sm:max-w-sm h-auto"
@@ -37,7 +36,8 @@ export default function EPBatterySVG({ ep, dailyGoal = 1000 }: Props) {
           stroke="#444"
           strokeWidth="2"
         />
-        {/* Носик */}
+
+        {/* Носик батареи */}
         <rect x="212" y="28" width="10" height="24" rx="2" fill="#444" />
 
         {/* Анимированные сегменты */}
@@ -56,20 +56,20 @@ export default function EPBatterySVG({ ep, dailyGoal = 1000 }: Props) {
               filter={isFilled ? "url(#glow)" : "none"}
               initial={{ scaleY: 0 }}
               animate={{ scaleY: 1 }}
-              transformOrigin="center bottom"
+              style={{ transformOrigin: "center bottom" }}
               transition={{
                 delay: 0.1 * i,
                 type: "spring",
                 stiffness: 160,
-                damping: 20,
+                damping: 18,
               }}
-              transform={`translate(0, 18)`}
+              transform="translate(0, 0)"
             />
           );
         })}
       </svg>
 
-      {/* Подпись EP */}
+      {/* Подпись под батарейкой */}
       <div className="mt-2 text-sm font-semibold text-center">
         {Math.round(ep)} / {dailyGoal} <span className="text-zinc-400">EP</span>
       </div>
