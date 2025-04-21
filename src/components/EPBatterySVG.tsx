@@ -2,11 +2,11 @@ import { motion } from "framer-motion";
 
 interface Props {
   ep: number;
-  goal?: number;
+  dailyGoal?: number;
 }
 
 export default function EPBatterySVG({ ep, dailyGoal = 1000 }: Props) {
-  const percentage = Math.min(ep / goal, 1);
+  const percentage = Math.min(ep / dailyGoal, 1);
   const filledSegments = Math.round(percentage * 5);
 
   return (
@@ -39,7 +39,7 @@ export default function EPBatterySVG({ ep, dailyGoal = 1000 }: Props) {
         {/* Носик батареи */}
         <rect x="240" y="35" width="12" height="30" rx="3" fill="#444" />
 
-        {/* Сегменты */}
+        {/* Анимированные сегменты */}
         {Array.from({ length: 5 }).map((_, i) => {
           const isFilled = i < filledSegments;
           return (
@@ -65,9 +65,9 @@ export default function EPBatterySVG({ ep, dailyGoal = 1000 }: Props) {
         })}
       </svg>
 
-      {/* Подпись с данными */}
+      {/* Подпись */}
       <div className="mt-2 text-sm font-semibold text-center">
-        {Math.round(ep)} / {goal} <span className="text-zinc-400">EP</span>
+        {Math.round(ep)} / {dailyGoal} <span className="text-zinc-400">EP</span>
       </div>
     </div>
   );
