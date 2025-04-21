@@ -5,7 +5,7 @@ interface Props {
   goal?: number;
 }
 
-export default function EPBatterySVG({ ep, goal = 1000 }: Props) {
+export default function EPBatterySVG({ ep, dailyGoal = 1000 }: Props) {
   const percentage = Math.min(ep / goal, 1);
   const filledSegments = Math.round(percentage * 5);
 
