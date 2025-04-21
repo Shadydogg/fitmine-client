@@ -41,7 +41,7 @@ export default function useSyncActivity(): ActivityData {
     const fetchData = async () => {
       try {
         if (!accessToken || !isAuthenticated) {
-          console.warn("❌ accessToken отсутствует или пользователь не авторизован");
+          console.warn("❌ Нет accessToken или пользователь не авторизован");
           setData((prev) => ({ ...prev, loading: false }));
           return;
         }
@@ -58,22 +58,22 @@ export default function useSyncActivity(): ActivityData {
 
         const d = res.data;
 
-        const distanceRaw = d.distance || 0; // предполагаем в метрах
-        const distanceKm = Math.round((distanceRaw / 1000) * 100) / 100;
+        const distanceMeters = d.distance || 0;
+        const distanceKm = parseFloat((distanceMeters / 1000).toFixed(2)); // точность до сотых
 
         setData({
-          steps: d.steps || 0,
-          stepsGoal: d.stepsGoal || 10000,
-          calories: d.calories || 0,
-          caloriesGoal: d.caloriesGoal || 2000,
+          steps: d.steps ?? 0,
+          stepsGoal: d.stepsGoal ?? 10000,
+          calories: d.calories ?? 0,
+          caloriesGoal: d.caloriesGoal ?? 2000,
           distance: distanceKm,
-          distanceGoal: d.distanceGoal || 5,
-          hasNFT: d.hasNFT || false,
-          isPremium: d.isPremium || false,
+          distanceGoal: d.distanceGoal ?? 5,
+          hasNFT: Boolean(d.hasNFT),
+          isPremium: Boolean(d.isPremium),
           loading: false,
         });
       } catch (err) {
-        console.error("❌ Ошибка синхронизации активности:", err);
+        console.error("❌ Ошибка при синхронизации данных:", err);
         setData((prev) => ({ ...prev, loading: false }));
       }
     };

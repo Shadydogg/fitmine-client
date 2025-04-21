@@ -1,7 +1,6 @@
-// src/components/DashboardSummary.tsx — v2.3.0
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
-import ActivityRingLottie from "./ActivityRingLottie";
+import ActivityRingSVG from "./ActivityRingSVG";
 
 interface Props {
   data: {
@@ -36,7 +35,7 @@ export default function DashboardSummary({ data }: Props) {
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.3, duration: 0.4 }}
       >
-        <ActivityRingLottie
+        <ActivityRingSVG
           steps={steps}
           stepsGoal={stepsGoal}
           calories={calories}
