@@ -13,8 +13,8 @@ export default function EPBatterySVG({ ep, dailyGoal = 1000 }: Props) {
   const isEmpty = ep <= 0;
 
   return (
-    <div className="flex flex-col items-center justify-center text-white text-sm w-full max-w-xs px-4">
-      <div className="relative w-full max-w-[280px] aspect-[4/1]">
+    <div className="flex flex-col items-center justify-center text-white text-sm w-full px-4 max-w-[260px] mx-auto relative">
+      <div className="relative w-full aspect-[4/1]">
         <svg
           viewBox="0 0 220 80"
           className="w-full h-full"

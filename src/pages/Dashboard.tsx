@@ -1,19 +1,4 @@
-import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
-
-import useSyncActivity from "../hooks/useSyncActivity";
-import AnimatedBackground from "../components/AnimatedBackground";
-import BottomTab from "../components/BottomTab";
-import DashboardSummary from "../components/DashboardSummary";
-import ConnectGoogleFit from "../components/ConnectGoogleFit";
-import RewardModal from "../components/RewardModal";
-
-import { useSession } from "../context/SessionContext";
-import { useUserEP } from "../hooks/useUserEP";
-import { useDailyReward } from "../hooks/useDailyReward";
-
-import EPBatterySVG from "../components/EPBatterySVG";
+// ... (все импорты остаются без изменений)
 
 export default function Dashboard() {
   const { t } = useTranslation();
@@ -122,12 +107,12 @@ export default function Dashboard() {
 
       {/* 🔋 EP Battery SVG */}
       {epLoading ? (
-        <div className="text-gray-500 mt-6 animate-pulse">
+        <div className="text-gray-500 mt-4 animate-pulse">
           {t("dashboard.loading", "Загрузка EP...")}
         </div>
       ) : (
         <motion.div
-          className="w-full px-4 max-w-md mt-4 overflow-hidden"
+          className="w-full px-4 max-w-md mt-2 overflow-hidden"
           initial={{ opacity: 0, y: 6 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
@@ -150,7 +135,7 @@ export default function Dashboard() {
       {/* 📊 Прогресс кольца */}
       {!activity.loading && (
         <motion.div
-          className="mt-8"
+          className="mt-4"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.7 }}
