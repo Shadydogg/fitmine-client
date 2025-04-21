@@ -1,4 +1,3 @@
-// src/components/EPBatterySVG.tsx — v1.0.0 (батарейка через SVG + деления)
 import { motion } from "framer-motion";
 
 interface Props {
@@ -17,6 +16,13 @@ export default function EPBatterySVG({ ep, dailyGoal = 1000 }: Props) {
         className="w-full h-auto"
         xmlns="http://www.w3.org/2000/svg"
       >
+        <defs>
+          <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+            <feDropShadow dx="0" dy="0" stdDeviation="4" floodColor="#00FFC6" />
+            <feDropShadow dx="0" dy="0" stdDeviation="6" floodColor="#00FFC6" />
+          </filter>
+        </defs>
+
         {/* Контур батареи */}
         <rect
           x="5"
@@ -26,31 +32,41 @@ export default function EPBatterySVG({ ep, dailyGoal = 1000 }: Props) {
           rx="12"
           ry="12"
           fill="none"
-          stroke="#ccc"
+          stroke="#444"
           strokeWidth="3"
         />
 
-        {/* "Носик" батареи */}
-        <rect x="240" y="35" width="12" height="30" rx="3" fill="#ccc" />
+        {/* Носик батареи */}
+        <rect x="240" y="35" width="12" height="30" rx="3" fill="#444" />
 
-        {/* Деления */}
-        {Array.from({ length: 5 }).map((_, i) => (
-          <motion.rect
-            key={i}
-            x={10 + i * 45}
-            y={25}
-            width={35}
-            height={50}
-            rx={6}
-            fill={i < filledSegments ? "#00FFC6" : "#333"}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.1 * i }}
-          />
-        ))}
+        {/* Сегменты батареи */}
+        {Array.from({ length: 5 }).map((_, i) => {
+          const isFilled = i < filledSegments;
+          return (
+            <motion.rect
+              key={i}
+              x={10 + i * 45}
+              y={25}
+              width={35}
+              height={50}
+              rx={6}
+              fill={isFilled ? "#00FFC6" : "#222"}
+              filter={isFilled ? "url(#glow)" : "none"}
+              initial={{ scale: 0.5, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{
+                delay: 0.06 * i,
+                type: "spring",
+                stiffness: 200,
+                damping: 15,
+              }}
+            />
+          );
+        })}
       </svg>
 
-      <div className="mt-2 font-semibold">
+      {/* Подпись */}
+      <div className="mt-2 font-semibold text-center">
         {Math.round(ep)} / {dailyGoal} <span className="text-zinc-400">EP</span>
       </div>
     </div>

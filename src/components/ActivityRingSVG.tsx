@@ -5,7 +5,7 @@ interface Props {
   stepsGoal: number;
   calories: number;
   caloriesGoal: number;
-  distance: number; // в КМ
+  distance: number; // в км
   distanceGoal: number;
 }
 
@@ -23,53 +23,73 @@ export default function ActivityRingSVG({
 
   const radius = 60;
   const stroke = 10;
-  const normalizedRadius = radius - stroke / 2;
-  const circumference = normalizedRadius * 2 * Math.PI;
 
   const renderRing = (
     color: string,
     percent: number,
     offset: number,
-    strokeWidth = 10
+    delay: number,
+    glowColor: string
   ) => {
-    const progress = circumference * (1 - percent);
+    const currentRadius = radius - stroke / 2 - offset;
+    const circumference = 2 * Math.PI * currentRadius;
+    const dashOffset = circumference * (1 - percent);
+
     return (
       <>
+        {/* Glow filter */}
+        <defs>
+          <filter id={`glow-${offset}`} x="-50%" y="-50%" width="200%" height="200%">
+            <feDropShadow dx="0" dy="0" stdDeviation="4" floodColor={glowColor} />
+            <feDropShadow dx="0" dy="0" stdDeviation="6" floodColor={glowColor} />
+          </filter>
+        </defs>
+
+        {/* Фон круга */}
         <circle
           cx="100"
           cy="100"
-          r={normalizedRadius - offset}
+          r={currentRadius}
           stroke="#1f1f1f"
-          strokeWidth={strokeWidth}
+          strokeWidth={stroke}
           fill="transparent"
         />
+
+        {/* Анимированный прогресс с glow */}
         <motion.circle
           cx="100"
           cy="100"
-          r={normalizedRadius - offset}
+          r={currentRadius}
           stroke={color}
-          strokeWidth={strokeWidth}
+          strokeWidth={stroke}
           fill="transparent"
           strokeDasharray={circumference}
-          strokeDashoffset={progress}
+          strokeDashoffset={dashOffset}
           strokeLinecap="round"
+          style={{
+            filter: `url(#glow-${offset})`,
+          }}
           initial={{ strokeDashoffset: circumference }}
-          animate={{ strokeDashoffset: progress }}
-          transition={{ duration: 1 }}
+          animate={{ strokeDashoffset: dashOffset }}
+          transition={{ duration: 1.2, delay }}
         />
       </>
     );
   };
 
   return (
-    <div className="relative w-72 h-72 flex flex-col items-center justify-center">
-      <svg width="200" height="200" className="rotate-[-90deg]">
-        {renderRing("#00DBDE", stepsPercent, 0)}
-        {renderRing("#FF5F6D", caloriesPercent, 10)}
-        {renderRing("#FCEE09", distancePercent, 20)}
+    <div className="relative w-72 h-72 flex flex-col items-center justify-center transition-transform duration-300 hover:scale-105 active:scale-95">
+      <svg
+        width="200"
+        height="200"
+        className="-rotate-90"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        {renderRing("#00DBDE", stepsPercent, 0, 0.2, "#00FFFF")}        {/* Steps */}
+        {renderRing("#FF5F6D", caloriesPercent, 10, 0.6, "#FF5F6D")}     {/* Calories */}
+        {renderRing("#FCEE09", distancePercent, 20, 1.0, "#FCEE09")}     {/* Distance */}
       </svg>
 
-      {/* Подписи */}
       <div className="absolute bottom-0 w-full text-sm text-center text-white leading-tight mt-2 px-2 pointer-events-none">
         <div>👟 {Math.round(steps)} / {stepsGoal} шагов</div>
         <div>🔥 {Math.round(calories)} / {caloriesGoal} ккал</div>
