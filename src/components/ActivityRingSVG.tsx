@@ -1,4 +1,4 @@
-// src/components/ActivityRingSVG.tsx — v2.5.0
+// src/components/ActivityRingSVG.tsx — v2.6.0 (добавлено кольцо active_minutes)
 import { motion } from "framer-motion";
 
 interface Props {
@@ -8,6 +8,8 @@ interface Props {
   caloriesGoal: number;
   distance: number; // в км
   distanceGoal: number;
+  activeMinutes: number;
+  activeMinutesGoal: number;
 }
 
 export default function ActivityRingSVG({
@@ -17,10 +19,13 @@ export default function ActivityRingSVG({
   caloriesGoal,
   distance,
   distanceGoal,
+  activeMinutes,
+  activeMinutesGoal,
 }: Props) {
   const stepsPercent = Math.min(steps / stepsGoal, 1);
   const caloriesPercent = Math.min(calories / caloriesGoal, 1);
   const distancePercent = Math.min(distance / distanceGoal, 1);
+  const minutesPercent = Math.min(activeMinutes / activeMinutesGoal, 1);
 
   const radius = 60;
   const stroke = 10;
@@ -35,7 +40,6 @@ export default function ActivityRingSVG({
     const currentRadius = radius - stroke / 2 - offset;
     const circumference = 2 * Math.PI * currentRadius;
     const dashOffset = circumference * (1 - percent);
-
     const glowId = `glow-${color.replace("#", "")}-${offset}`;
 
     return (
@@ -83,15 +87,17 @@ export default function ActivityRingSVG({
         className="-rotate-90"
         xmlns="http://www.w3.org/2000/svg"
       >
-        {renderRing("#00DBDE", stepsPercent, 0, 0.1, "#00FFFF")}     {/* Steps */}
-        {renderRing("#FF5F6D", caloriesPercent, 10, 0.5, "#FF5F6D")}  {/* Calories */}
-        {renderRing("#FCEE09", distancePercent, 20, 0.9, "#FCEE09")} {/* Distance */}
+        {renderRing("#00DBDE", stepsPercent, 0, 0.1, "#00FFFF")}       {/* Steps */}
+        {renderRing("#FF5F6D", caloriesPercent, 10, 0.5, "#FF5F6D")}    {/* Calories */}
+        {renderRing("#FCEE09", distancePercent, 20, 0.9, "#FCEE09")}   {/* Distance */}
+        {renderRing("#9F7AEA", minutesPercent, 30, 1.3, "#B794F4")}     {/* Active Minutes */}
       </svg>
 
       <div className="absolute bottom-0 w-full text-sm text-center text-white leading-tight mt-2 px-2 pointer-events-none">
         <div>👟 {Math.round(steps)} / {stepsGoal} шагов</div>
         <div>🔥 {Math.round(calories)} / {caloriesGoal} ккал</div>
         <div>📏 {distance.toFixed(2)} / {distanceGoal} км</div>
+        <div>⏱ {Math.round(activeMinutes)} / {activeMinutesGoal} мин</div>
       </div>
     </div>
   );

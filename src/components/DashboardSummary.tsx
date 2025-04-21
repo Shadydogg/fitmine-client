@@ -1,5 +1,4 @@
-// src/components/DashboardSummary.tsx — v2.6.1 (фикс повторного деления distance)
-
+// src/components/DashboardSummary.tsx — v2.7.0 (добавлено active_minutes и обновлено описание)
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import ActivityRingSVG from "./ActivityRingSVG";
@@ -12,6 +11,8 @@ interface Props {
     caloriesGoal: number;
     distance: number; // в метрах
     distanceGoal: number; // в километрах
+    activeMinutes: number;
+    activeMinutesGoal: number;
     hasNFT: boolean;
     isPremium: boolean;
     loading: boolean;
@@ -27,6 +28,8 @@ export default function DashboardSummary({ data }: Props) {
     caloriesGoal,
     distance,
     distanceGoal,
+    activeMinutes,
+    activeMinutesGoal,
   } = data;
 
   return (
@@ -42,8 +45,10 @@ export default function DashboardSummary({ data }: Props) {
           stepsGoal={stepsGoal}
           calories={calories}
           caloriesGoal={caloriesGoal}
-          distance={distance} // ✅ передаём в метрах, деление внутри компонента
-          distanceGoal={distanceGoal}
+          distance={distance} // в метрах
+          distanceGoal={distanceGoal} // в км
+          activeMinutes={activeMinutes}
+          activeMinutesGoal={activeMinutesGoal}
         />
 
         <motion.div
@@ -54,7 +59,7 @@ export default function DashboardSummary({ data }: Props) {
         >
           {t(
             "dashboard.ringHint",
-            "Шаги, калории и дистанция объединены в одном кольце.\nОткрой все секции для бонуса!"
+            "Все 4 цели: шаги, калории, дистанция и активные минуты объединены в кольцо.\nЗаполни каждую секцию — получи бонус!"
           )}
         </motion.div>
       </motion.div>

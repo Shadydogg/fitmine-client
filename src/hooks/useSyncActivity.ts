@@ -7,8 +7,10 @@ interface ActivityData {
   stepsGoal: number;
   calories: number;
   caloriesGoal: number;
-  distance: number;
-  distanceGoal: number;
+  distance: number; // в км
+  distanceGoal: number; // в км
+  activeMinutes: number;
+  activeMinutesGoal: number;
   hasNFT: boolean;
   isPremium: boolean;
   loading: boolean;
@@ -26,6 +28,8 @@ export default function useSyncActivity(): ActivityData {
     caloriesGoal: 2000,
     distance: 0,
     distanceGoal: 5,
+    activeMinutes: 0,
+    activeMinutesGoal: 45,
     hasNFT: false,
     isPremium: false,
     loading: true,
@@ -59,7 +63,7 @@ export default function useSyncActivity(): ActivityData {
         const d = res.data;
 
         const distanceMeters = d.distance || 0;
-        const distanceKm = parseFloat((distanceMeters / 1000).toFixed(2)); // точность до сотых
+        const distanceKm = parseFloat((distanceMeters / 1000).toFixed(2));
 
         setData({
           steps: d.steps ?? 0,
@@ -68,6 +72,8 @@ export default function useSyncActivity(): ActivityData {
           caloriesGoal: d.caloriesGoal ?? 2000,
           distance: distanceKm,
           distanceGoal: d.distanceGoal ?? 5,
+          activeMinutes: d.minutes ?? 0,
+          activeMinutesGoal: d.minutesGoal ?? 45,
           hasNFT: Boolean(d.hasNFT),
           isPremium: Boolean(d.isPremium),
           loading: false,
