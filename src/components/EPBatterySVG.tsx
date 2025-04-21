@@ -55,8 +55,7 @@ export default function EPBatterySVG({ ep, dailyGoal = 1000 }: Props) {
               filter={isFilled ? "url(#glow)" : "none"}
               initial={{ scaleY: 0 }}
               animate={{ scaleY: 1 }}
-              transform="translate(0,18) scale(1, 0)"
-              animateTransform="translate(0,18) scale(1, 1)"
+              style={{ transformOrigin: "center bottom" }} // 👈 добавлено
               transition={{
                 delay: 0.1 * i,
                 duration: 0.4,
