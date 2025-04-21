@@ -1,4 +1,4 @@
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 
 interface Props {
   ep: number;
@@ -11,10 +11,10 @@ export default function EPBatterySVG({ ep, dailyGoal = 1000 }: Props) {
   const filledSegments = Math.floor(percentage * totalSegments);
 
   return (
-    <div className="flex flex-col items-center justify-center text-white text-sm w-full max-w-md px-4">
+    <div className="flex flex-col items-center justify-center text-white text-sm w-full max-w-xs px-4">
       <svg
-        viewBox="0 0 240 80"
-        className="w-full max-w-xs sm:max-w-sm h-auto"
+        viewBox="0 0 220 80"
+        className="w-full h-auto"
         xmlns="http://www.w3.org/2000/svg"
       >
         <defs>
@@ -28,7 +28,7 @@ export default function EPBatterySVG({ ep, dailyGoal = 1000 }: Props) {
         <rect
           x="4"
           y="14"
-          width="205"
+          width="195"
           height="52"
           rx="10"
           ry="10"
@@ -37,31 +37,33 @@ export default function EPBatterySVG({ ep, dailyGoal = 1000 }: Props) {
           strokeWidth="2"
         />
         {/* Носик */}
-        <rect x="212" y="28" width="10" height="24" rx="2" fill="#444" />
+        <rect x="202" y="28" width="10" height="24" rx="2" fill="#444" />
 
         {/* Анимированные сегменты */}
         {Array.from({ length: totalSegments }).map((_, i) => {
-          const x = 8 + i * 40;
+          const x = 8 + i * 38;
           const isFilled = i < filledSegments;
           return (
             <motion.rect
               key={i}
               x={x}
               y={18}
-              width={32}
+              width={30}
               height={44}
               rx={4}
               fill={isFilled ? "#00FFC6" : "#1f1f1f"}
               filter={isFilled ? "url(#glow)" : "none"}
               initial={{ scaleY: 0 }}
               animate={{ scaleY: 1 }}
+              transform="translate(0,18) scale(1, 0)"
+              animateTransform="translate(0,18) scale(1, 1)"
               transition={{
                 delay: 0.1 * i,
+                duration: 0.4,
                 type: "spring",
-                stiffness: 150,
-                damping: 15,
+                stiffness: 180,
+                damping: 18,
               }}
-              transform={`translate(0 18) scale(1, 1)`}
             />
           );
         })}
