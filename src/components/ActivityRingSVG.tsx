@@ -35,27 +35,29 @@ export default function ActivityRingSVG({
     const circumference = 2 * Math.PI * currentRadius;
     const dashOffset = circumference * (1 - percent);
 
+    const glowId = `glow-${color.replace("#", "")}-${offset}`;
+
     return (
       <>
-        {/* Glow filter */}
+        {/* Glow filter — отдельный ID для каждого кольца */}
         <defs>
-          <filter id={`glow-${offset}`} x="-50%" y="-50%" width="200%" height="200%">
+          <filter id={glowId} x="-50%" y="-50%" width="200%" height="200%">
+            <feDropShadow dx="0" dy="0" stdDeviation="2" floodColor={glowColor} />
             <feDropShadow dx="0" dy="0" stdDeviation="4" floodColor={glowColor} />
-            <feDropShadow dx="0" dy="0" stdDeviation="6" floodColor={glowColor} />
           </filter>
         </defs>
 
-        {/* Фон круга */}
+        {/* Бэкграунд кольца */}
         <circle
           cx="100"
           cy="100"
           r={currentRadius}
-          stroke="#1f1f1f"
+          stroke="#2a2a2a"
           strokeWidth={stroke}
           fill="transparent"
         />
 
-        {/* Анимированный прогресс с glow */}
+        {/* Анимированное кольцо */}
         <motion.circle
           cx="100"
           cy="100"
@@ -67,7 +69,7 @@ export default function ActivityRingSVG({
           strokeDashoffset={dashOffset}
           strokeLinecap="round"
           style={{
-            filter: `url(#glow-${offset})`,
+            filter: `url(#${glowId})`,
           }}
           initial={{ strokeDashoffset: circumference }}
           animate={{ strokeDashoffset: dashOffset }}
@@ -85,11 +87,12 @@ export default function ActivityRingSVG({
         className="-rotate-90"
         xmlns="http://www.w3.org/2000/svg"
       >
-        {renderRing("#00DBDE", stepsPercent, 0, 0.2, "#00FFFF")}        {/* Steps */}
-        {renderRing("#FF5F6D", caloriesPercent, 10, 0.6, "#FF5F6D")}     {/* Calories */}
-        {renderRing("#FCEE09", distancePercent, 20, 1.0, "#FCEE09")}     {/* Distance */}
+        {renderRing("#00DBDE", stepsPercent, 0, 0.1, "#00FFFF")}     {/* Steps */}
+        {renderRing("#FF5F6D", caloriesPercent, 10, 0.5, "#FF5F6D")}  {/* Calories */}
+        {renderRing("#FCEE09", distancePercent, 20, 0.9, "#FCEE09")} {/* Distance */}
       </svg>
 
+      {/* Подписи под кольцами */}
       <div className="absolute bottom-0 w-full text-sm text-center text-white leading-tight mt-2 px-2 pointer-events-none">
         <div>👟 {Math.round(steps)} / {stepsGoal} шагов</div>
         <div>🔥 {Math.round(calories)} / {caloriesGoal} ккал</div>

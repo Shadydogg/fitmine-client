@@ -13,7 +13,7 @@ import { useSession } from "../context/SessionContext";
 import { useUserEP } from "../hooks/useUserEP";
 import { useDailyReward } from "../hooks/useDailyReward";
 
-import EPBatterySVG from "../components/EPBatterySVG"; // ✅ SVG вместо Lottie
+import EPBatterySVG from "../components/EPBatterySVG";
 
 export default function Dashboard() {
   const { t } = useTranslation();
@@ -114,19 +114,19 @@ export default function Dashboard() {
         {t("dashboard.title", "Твоя активность сегодня")}
       </motion.h1>
 
-      {/* 🔋 EPBatterySVG */}
+      {/* 🔋 EP Battery SVG */}
       {epLoading ? (
         <div className="text-gray-500 mt-6 animate-pulse">
           {t("dashboard.loading", "Загрузка EP...")}
         </div>
       ) : (
         <motion.div
-          className="w-full px-4 max-w-md mt-4"
+          className="w-full px-4 max-w-md mt-4 overflow-hidden"
           initial={{ opacity: 0, y: 6 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
         >
-          <EPBatterySVG ep={ep} goal={1000} />
+          <EPBatterySVG ep={ep} dailyGoal={1000} />
           <div className="mt-2 text-center text-sm font-medium">
             {ep >= 1000
               ? "🎉 Цель достигнута! Забери награду"
@@ -135,7 +135,7 @@ export default function Dashboard() {
         </motion.div>
       )}
 
-      {/* 📊 Кольцо прогресса */}
+      {/* 📊 Прогресс кольца */}
       {!activity.loading && (
         <motion.div
           className="mt-8"

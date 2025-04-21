@@ -10,7 +10,7 @@ export default function EPBatterySVG({ ep, goal = 1000 }: Props) {
   const filledSegments = Math.round(percentage * 5);
 
   return (
-    <div className="flex flex-col items-center justify-center text-white text-sm w-full max-w-xs sm:max-w-sm">
+    <div className="flex flex-col items-center justify-center text-white text-sm w-full px-4 max-w-xs sm:max-w-sm">
       <svg
         viewBox="0 0 260 100"
         className="w-full h-auto"
@@ -18,7 +18,7 @@ export default function EPBatterySVG({ ep, goal = 1000 }: Props) {
       >
         <defs>
           <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-            <feDropShadow dx="0" dy="0" stdDeviation="4" floodColor="#00FFC6" />
+            <feDropShadow dx="0" dy="0" stdDeviation="3" floodColor="#00FFC6" />
             <feDropShadow dx="0" dy="0" stdDeviation="6" floodColor="#00FFC6" />
           </filter>
         </defs>
@@ -33,13 +33,13 @@ export default function EPBatterySVG({ ep, goal = 1000 }: Props) {
           ry="12"
           fill="none"
           stroke="#444"
-          strokeWidth="3"
+          strokeWidth="2"
         />
 
         {/* Носик батареи */}
         <rect x="240" y="35" width="12" height="30" rx="3" fill="#444" />
 
-        {/* Сегменты батареи */}
+        {/* Сегменты */}
         {Array.from({ length: 5 }).map((_, i) => {
           const isFilled = i < filledSegments;
           return (
@@ -50,23 +50,23 @@ export default function EPBatterySVG({ ep, goal = 1000 }: Props) {
               width={35}
               height={50}
               rx={6}
-              fill={isFilled ? "#00FFC6" : "#222"}
+              fill={isFilled ? "#00FFC6" : "#1f1f1f"}
               filter={isFilled ? "url(#glow)" : "none"}
-              initial={{ scale: 0.5, opacity: 0 }}
+              initial={{ scale: 0.6, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{
-                delay: 0.06 * i,
+                delay: 0.05 * i,
                 type: "spring",
-                stiffness: 200,
-                damping: 15,
+                stiffness: 180,
+                damping: 16,
               }}
             />
           );
         })}
       </svg>
 
-      {/* Подпись */}
-      <div className="mt-2 font-semibold text-center">
+      {/* Подпись с данными */}
+      <div className="mt-2 text-sm font-semibold text-center">
         {Math.round(ep)} / {goal} <span className="text-zinc-400">EP</span>
       </div>
     </div>
