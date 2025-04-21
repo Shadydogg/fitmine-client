@@ -1,4 +1,4 @@
-import { useTranslation } from "react-i18next"; // ✅ Добавить эту строку
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 
@@ -20,7 +20,7 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const { user, sessionLoaded, accessToken, setTokens } = useSession();
   const activity = useSyncActivity();
-  const { ep, loading: epLoading } = useUserEP();
+  const { ep, loading: epLoading, refetch: refetchEP } = useUserEP(); // ✅ добавили refetch
   const {
     reward,
     showModal,
@@ -69,6 +69,7 @@ export default function Dashboard() {
         }
 
         activity.refetch();
+        refetchEP(); // ✅ обновляем EP после синхронизации
       } else {
         alert(`❌ Ошибка: ${data.error}`);
       }
