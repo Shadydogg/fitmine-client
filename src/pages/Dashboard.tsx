@@ -1,4 +1,19 @@
-// ... (все импорты остаются без изменений)
+import { useTranslation } from "react-i18next"; // ✅ Добавить эту строку
+import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+
+import useSyncActivity from "../hooks/useSyncActivity";
+import AnimatedBackground from "../components/AnimatedBackground";
+import BottomTab from "../components/BottomTab";
+import DashboardSummary from "../components/DashboardSummary";
+import ConnectGoogleFit from "../components/ConnectGoogleFit";
+import RewardModal from "../components/RewardModal";
+
+import { useSession } from "../context/SessionContext";
+import { useUserEP } from "../hooks/useUserEP";
+import { useDailyReward } from "../hooks/useDailyReward";
+
+import EPBatterySVG from "../components/EPBatterySVG";
 
 export default function Dashboard() {
   const { t } = useTranslation();
