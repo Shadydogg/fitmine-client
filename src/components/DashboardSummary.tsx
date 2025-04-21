@@ -1,4 +1,5 @@
-// src/components/DashboardSummary.tsx — v2.6.0
+// src/components/DashboardSummary.tsx — v2.6.1 (фикс повторного деления distance)
+
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import ActivityRingSVG from "./ActivityRingSVG";
@@ -9,8 +10,8 @@ interface Props {
     stepsGoal: number;
     calories: number;
     caloriesGoal: number;
-    distance: number;
-    distanceGoal: number;
+    distance: number; // в метрах
+    distanceGoal: number; // в километрах
     hasNFT: boolean;
     isPremium: boolean;
     loading: boolean;
@@ -41,7 +42,7 @@ export default function DashboardSummary({ data }: Props) {
           stepsGoal={stepsGoal}
           calories={calories}
           caloriesGoal={caloriesGoal}
-          distance={distance / 1000}
+          distance={distance} // ✅ передаём в метрах, деление внутри компонента
           distanceGoal={distanceGoal}
         />
 
