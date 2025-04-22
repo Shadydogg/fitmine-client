@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { NFTMiner } from "../types/nft";
 import { cn } from "../lib/utils";
@@ -28,19 +28,8 @@ const rarityBadge: Record<NFTMiner["rarity"], string> = {
 const NFTCard: React.FC<NFTCardProps> = ({ nft }) => {
   const [level, setLevel] = useState(typeof nft.level === "number" ? nft.level : 1);
   const [animatedPower, setAnimatedPower] = useState(0);
-
-  const componentBonus = useMemo(
-    () => nft.components?.reduce((sum, c) => sum + c.bonusPercent, 0) || 0,
-    [nft.components]
-  );
-
-  const miningPower = useMemo(() => {
-    const base = typeof nft.baseHashrate === "number" ? nft.baseHashrate : 0;
-    const ep = typeof nft.ep === "number" ? nft.ep : 0;
-    const landBonus = typeof nft.landBonus === "number" ? nft.landBonus : 1;
-
-    return Math.floor(base * (1 + componentBonus / 100) * (ep / 500) * landBonus * (1 + level * 0.1));
-  }, [nft.baseHashrate, nft.ep, nft.landBonus, componentBonus, level]);
+  const miningPower = nft.miningPower ?? 0;
+  const ep = Math.min(nft.ep ?? 0, 1000);
 
   useEffect(() => {
     if (miningPower <= 0) {
@@ -48,16 +37,18 @@ const NFTCard: React.FC<NFTCardProps> = ({ nft }) => {
       return;
     }
 
-    let start = 0;
+    let current = 0;
     const step = () => {
-      if (start < miningPower) {
-        start += Math.ceil(miningPower / 20);
-        setAnimatedPower(Math.min(start, miningPower));
+      if (current < miningPower) {
+        current += Math.ceil(miningPower / 20);
+        setAnimatedPower(Math.min(current, miningPower));
         requestAnimationFrame(step);
       }
     };
     step();
   }, [miningPower]);
+
+  const epPercent = ep / 1000;
 
   return (
     <motion.div
@@ -92,10 +83,31 @@ const NFTCard: React.FC<NFTCardProps> = ({ nft }) => {
       {/* 📊 Статы */}
       <div className="mt-6 text-sm space-y-1">
         <p className="text-gray-300">Base Hashrate: <span className="text-white">{nft.baseHashrate ?? "N/A"}</span></p>
-        <p className="text-gray-300">Level: <span className="text-white">{level}</span></p>
-        <p className="text-gray-300">EP: <span className="text-white">{nft.ep ?? 0}/500</span></p>
-        <p className="text-gray-300">Land Bonus: <span className="text-white">{typeof nft.landBonus === "number" ? nft.landBonus.toFixed(2) + "×" : "N/A"}</span></p>
-        <p className="text-fit-primary font-semibold">Mining Power: {isNaN(miningPower) ? "N/A" : animatedPower}</p>
+        <p className="text-gray-300">Level: <span className="text-white">{nft.level ?? 1}</span></p>
+        <p className="text-gray-300">EP: <span className="text-white">{ep}/1000</span></p>
+
+        {/* 🔋 Индикатор EP */}
+        <div className="relative h-2 w-full bg-zinc-700 rounded mt-1 overflow-hidden">
+          <motion.div
+            className="absolute top-0 left-0 h-full bg-emerald-400"
+            initial={{ width: "0%" }}
+            animate={{ width: `${epPercent * 100}%` }}
+            transition={{ duration: 0.7, ease: "easeOut" }}
+          />
+        </div>
+
+        <p className="text-gray-300">Effective EP: <span className="text-white">{nft.effectiveEP?.toFixed(2) ?? "0.00"}</span></p>
+        <p className="text-gray-300">Land Bonus: <span className="text-white">{nft.landBonus?.toFixed(2) ?? "1.0"}×</span></p>
+        <p className="text-fit-primary font-semibold">
+          Mining Power: {miningPower === 0 ? "⛔" : animatedPower}
+        </p>
+
+        {!nft.isPremium && ep === 0 && (
+          <p className="text-xs text-yellow-400">🔒 Нет активности — 0 EP</p>
+        )}
+        {nft.isPremium && ep === 0 && (
+          <p className="text-xs text-emerald-300">⚡ Премиум бонус — 50% мощности</p>
+        )}
       </div>
 
       {/* ⚙️ Компоненты */}
