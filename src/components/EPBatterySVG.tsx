@@ -1,4 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
+import { useEffect, useState } from "react";
 
 interface Props {
   ep: number;
@@ -6,11 +7,33 @@ interface Props {
 }
 
 export default function EPBatterySVG({ ep, dailyGoal = 1000 }: Props) {
-  const percentage = Math.min(ep / dailyGoal, 1);
+  const [animatedEP, setAnimatedEP] = useState(0);
+  const percentage = Math.min(animatedEP / dailyGoal, 1);
   const totalSegments = 5;
   const filledSegments = Math.floor(percentage * totalSegments);
-  const isFull = ep >= dailyGoal;
-  const isEmpty = ep <= 0;
+  const isFull = animatedEP >= dailyGoal;
+  const isEmpty = animatedEP <= 0;
+
+  // 🔁 Анимация накопления EP
+  useEffect(() => {
+    let frameId: number;
+    const duration = 1000; // ms
+    const start = performance.now();
+    const initial = animatedEP;
+    const delta = ep - initial;
+
+    const animate = (time: number) => {
+      const progress = Math.min((time - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3); // easeOutCubic
+      setAnimatedEP(Math.round(initial + delta * eased));
+      if (progress < 1) {
+        frameId = requestAnimationFrame(animate);
+      }
+    };
+
+    frameId = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(frameId);
+  }, [ep]);
 
   return (
     <div className="flex flex-col items-center justify-center text-white text-sm w-full px-4 max-w-[260px] mx-auto relative">
@@ -39,13 +62,14 @@ export default function EPBatterySVG({ ep, dailyGoal = 1000 }: Props) {
             stroke="#444"
             strokeWidth="2"
           />
-          {/* Носик */}
           <rect x="202" y="28" width="10" height="24" rx="2" fill="#444" />
 
-          {/* Анимированные сегменты */}
+          {/* Сегменты */}
           {Array.from({ length: totalSegments }).map((_, i) => {
             const x = 8 + i * 38;
             const isFilled = i < filledSegments;
+            const isChargingSegment = i === filledSegments && percentage < 1;
+
             return (
               <motion.rect
                 key={i}
@@ -54,8 +78,8 @@ export default function EPBatterySVG({ ep, dailyGoal = 1000 }: Props) {
                 width={30}
                 height={44}
                 rx={4}
-                fill={isFilled ? "#00FFC6" : "#1f1f1f"}
-                filter={isFilled ? "url(#glow)" : "none"}
+                fill={isFilled || isChargingSegment ? "#00FFC6" : "#1f1f1f"}
+                filter={(isFilled || isChargingSegment) ? "url(#glow)" : "none"}
                 initial={{ scaleY: 0, opacity: 0 }}
                 animate={{ scaleY: 1, opacity: 1 }}
                 style={{ transformOrigin: "center bottom" }}
@@ -109,7 +133,7 @@ export default function EPBatterySVG({ ep, dailyGoal = 1000 }: Props) {
 
       {/* Подпись */}
       <div className="mt-2 text-sm font-semibold text-center">
-        {Math.round(ep)} / {dailyGoal} <span className="text-zinc-400">EP</span>
+        {Math.round(animatedEP)} / {dailyGoal} <span className="text-zinc-400">EP</span>
       </div>
     </div>
   );
