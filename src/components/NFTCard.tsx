@@ -30,13 +30,13 @@ const NFTCard: React.FC<NFTCardProps> = ({ nft }) => {
   const [animatedPower, setAnimatedPower] = useState(0);
   const miningPower = nft.miningPower ?? 0;
   const ep = Math.min(nft.ep ?? 0, 1000);
+  const epPercent = ep / 1000;
 
   useEffect(() => {
     if (miningPower <= 0) {
       setAnimatedPower(0);
       return;
     }
-
     let current = 0;
     const step = () => {
       if (current < miningPower) {
@@ -47,8 +47,6 @@ const NFTCard: React.FC<NFTCardProps> = ({ nft }) => {
     };
     step();
   }, [miningPower]);
-
-  const epPercent = ep / 1000;
 
   return (
     <motion.div
@@ -61,10 +59,19 @@ const NFTCard: React.FC<NFTCardProps> = ({ nft }) => {
         rarityColor[nft.rarity]
       )}
     >
+      {/* 🌟 Glow-анимация при активном майнинге */}
+      {miningPower > 0 && (
+        <motion.div
+          className="absolute -inset-1 rounded-2xl z-0 bg-emerald-400 blur-xl opacity-10 pointer-events-none"
+          animate={{ opacity: [0.08, 0.2, 0.08] }}
+          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+        />
+      )}
+
       {/* 🏷️ Бейдж редкости */}
       <span
         className={cn(
-          "absolute top-2 left-2 text-xs px-2 py-0.5 rounded-full font-semibold shadow",
+          "absolute top-2 left-2 text-xs px-2 py-0.5 rounded-full font-semibold shadow z-10",
           rarityBadge[nft.rarity]
         )}
       >
@@ -72,7 +79,7 @@ const NFTCard: React.FC<NFTCardProps> = ({ nft }) => {
       </span>
 
       {/* ⚙️ Иконка */}
-      <div className="absolute top-2 right-2 w-7 h-7 animate-spin-slow opacity-30">
+      <div className="absolute top-2 right-2 w-7 h-7 animate-spin-slow opacity-30 z-10">
         <img
           src="/gear.svg"
           alt="gear"
@@ -81,7 +88,7 @@ const NFTCard: React.FC<NFTCardProps> = ({ nft }) => {
       </div>
 
       {/* 📊 Статы */}
-      <div className="mt-6 text-sm space-y-1">
+      <div className="mt-6 text-sm space-y-1 relative z-10">
         <p className="text-gray-300">Base Hashrate: <span className="text-white">{nft.baseHashrate ?? "N/A"}</span></p>
         <p className="text-gray-300">Level: <span className="text-white">{nft.level ?? 1}</span></p>
         <p className="text-gray-300">EP: <span className="text-white">{ep}/1000</span></p>
@@ -89,10 +96,10 @@ const NFTCard: React.FC<NFTCardProps> = ({ nft }) => {
         {/* 🔋 Индикатор EP */}
         <div className="relative h-2 w-full bg-zinc-700 rounded mt-1 overflow-hidden">
           <motion.div
-            className="absolute top-0 left-0 h-full bg-emerald-400"
+            className="absolute top-0 left-0 h-full bg-gradient-to-r from-lime-400 to-emerald-500"
             initial={{ width: "0%" }}
             animate={{ width: `${epPercent * 100}%` }}
-            transition={{ duration: 0.7, ease: "easeOut" }}
+            transition={{ duration: 1.1, ease: "easeOut" }}
           />
         </div>
 
