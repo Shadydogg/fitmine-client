@@ -10,10 +10,11 @@ import NFTPage from './pages/NFTPage';
 import LandPage from './pages/LandPage';
 import LandProfile from './pages/LandProfile';
 import ManageLandPanel from './pages/ManageLandPanel';
+import Boosters from './pages/Boosters'; // ✅ добавлен импорт Boosters
 
 import BottomTab from './components/BottomTab';
 import useTokenRefresher from './hooks/useTokenRefresher';
-import useProfileSync from './hooks/useProfileSync'; // ✅ новое подключение
+import useProfileSync from './hooks/useProfileSync';
 import { SessionProvider, useSession } from './context/SessionContext';
 
 function AppRoutes() {
@@ -21,12 +22,11 @@ function AppRoutes() {
   const navigate = useNavigate();
   const location = useLocation();
   const [loading, setLoading] = useState(false);
-  const { setTokens, sessionLoaded, accessToken } = useSession();
+  const { setTokens, sessionLoaded } = useSession();
 
-  useTokenRefresher();     // 🔁 автоматическое обновление токенов
-  useProfileSync();        // ✅ один вызов API /api/profile при необходимости
+  useTokenRefresher();
+  useProfileSync();
 
-  // Telegram initData
   React.useEffect(() => {
     const tg = window.Telegram?.WebApp;
     if (tg) {
@@ -92,6 +92,7 @@ function AppRoutes() {
         <Route path="/lands" element={<LandPage />} />
         <Route path="/land/:landId" element={<LandProfile />} />
         <Route path="/land/:landId/manage" element={<ManageLandPanel />} />
+        <Route path="/boosters" element={<Boosters />} /> {/* ✅ Новый маршрут */}
       </Routes>
       <BottomTab current={location.pathname.replace('/', '') || 'dashboard'} />
     </>
