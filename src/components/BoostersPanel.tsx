@@ -36,7 +36,7 @@ function getRemainingMinutes(activatedAt: string, duration: number) {
 
 export default function BoostersPanel() {
   const [boosters, setBoosters] = useState<Booster[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loadingType, setLoadingType] = useState<string | null>(null);
 
   const fetchBoosters = async () => {
     try {
@@ -49,7 +49,7 @@ export default function BoostersPanel() {
 
   const activateBooster = async (type: string) => {
     try {
-      setLoading(true);
+      setLoadingType(type);
       const res = await api.post("/boosters", { type });
       if (res.data.ok) {
         await fetchBoosters();
@@ -57,13 +57,13 @@ export default function BoostersPanel() {
     } catch (err) {
       console.error("❌ Ошибка активации бустера:", err);
     } finally {
-      setLoading(false);
+      setLoadingType(null);
     }
   };
 
   useEffect(() => {
     fetchBoosters();
-    const interval = setInterval(fetchBoosters, 30_000); // 🔁 каждые 30 сек
+    const interval = setInterval(fetchBoosters, 30_000); // автообновление
     return () => clearInterval(interval);
   }, []);
 
@@ -72,19 +72,28 @@ export default function BoostersPanel() {
       <h2 className="text-xl font-bold">🚀 Доступные Бустеры</h2>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {Object.keys(BOOSTER_LABELS).map((type) => (
-          <motion.button
-            key={type}
-            disabled={loading}
-            onClick={() => activateBooster(type)}
-            whileTap={{ scale: 0.97 }}
-            className={`px-4 py-3 rounded-xl text-sm font-medium bg-gradient-to-br ${
-              BOOSTER_COLORS[type]
-            } shadow-md hover:opacity-90 transition-all duration-300 disabled:opacity-50`}
-          >
-            {BOOSTER_LABELS[type]}
-          </motion.button>
-        ))}
+        {Object.keys(BOOSTER_LABELS).map((type) => {
+          const isLoading = loadingType === type;
+          return (
+            <motion.button
+              key={type}
+              disabled={!!loadingType}
+              onClick={() => activateBooster(type)}
+              whileTap={{ scale: 0.97 }}
+              className={`px-4 py-3 rounded-xl text-sm font-medium bg-gradient-to-br ${BOOSTER_COLORS[type]} shadow-md hover:opacity-90 transition-all duration-300 disabled:opacity-50 flex items-center justify-center`}
+            >
+              {isLoading ? (
+                <motion.div
+                  className="w-3 h-3 rounded-full bg-white"
+                  animate={{ scale: [1, 1.4, 1] }}
+                  transition={{ duration: 0.6, repeat: Infinity }}
+                />
+              ) : (
+                BOOSTER_LABELS[type]
+              )}
+            </motion.button>
+          );
+        })}
       </div>
 
       <div className="mt-6">
@@ -110,11 +119,9 @@ export default function BoostersPanel() {
                     animate={{ opacity: [0.1, 0.2, 0.1] }}
                     transition={{ duration: 3, repeat: Infinity }}
                   />
-
                   <div className="text-sm font-semibold text-white">
                     {BOOSTER_LABELS[b.type] || b.type}
                   </div>
-
                   <div className="text-xs text-zinc-400">
                     Эффект:{" "}
                     <span className="text-emerald-400 font-medium">{b.boost}×</span> •{" "}
