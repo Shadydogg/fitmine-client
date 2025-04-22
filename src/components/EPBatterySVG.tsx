@@ -14,17 +14,16 @@ export default function EPBatterySVG({ ep, dailyGoal = 1000 }: Props) {
   const isFull = animatedEP >= dailyGoal;
   const isEmpty = animatedEP <= 0;
 
-  // 🔁 Анимация накопления EP
   useEffect(() => {
     let frameId: number;
-    const duration = 1000; // ms
+    const duration = 1000;
     const start = performance.now();
     const initial = animatedEP;
     const delta = ep - initial;
 
     const animate = (time: number) => {
       const progress = Math.min((time - start) / duration, 1);
-      const eased = 1 - Math.pow(1 - progress, 3); // easeOutCubic
+      const eased = 1 - Math.pow(1 - progress, 3);
       setAnimatedEP(Math.round(initial + delta * eased));
       if (progress < 1) {
         frameId = requestAnimationFrame(animate);
@@ -50,7 +49,7 @@ export default function EPBatterySVG({ ep, dailyGoal = 1000 }: Props) {
             </filter>
           </defs>
 
-          {/* Контур батареи */}
+          {/* Контур */}
           <rect
             x="4"
             y="14"
@@ -68,7 +67,30 @@ export default function EPBatterySVG({ ep, dailyGoal = 1000 }: Props) {
           {Array.from({ length: totalSegments }).map((_, i) => {
             const x = 8 + i * 38;
             const isFilled = i < filledSegments;
-            const isChargingSegment = i === filledSegments && percentage < 1;
+            const isCharging = i === filledSegments && percentage < 1;
+
+            if (isCharging) {
+              return (
+                <motion.rect
+                  key={i}
+                  x={x}
+                  y={18}
+                  width={30}
+                  height={44}
+                  rx={4}
+                  initial={{ opacity: 0.2 }}
+                  animate={{
+                    opacity: [0.2, 1, 0.2],
+                  }}
+                  transition={{
+                    duration: 1,
+                    repeat: Infinity,
+                  }}
+                  fill="#00FFC6"
+                  filter="url(#glow)"
+                />
+              );
+            }
 
             return (
               <motion.rect
@@ -78,8 +100,8 @@ export default function EPBatterySVG({ ep, dailyGoal = 1000 }: Props) {
                 width={30}
                 height={44}
                 rx={4}
-                fill={isFilled || isChargingSegment ? "#00FFC6" : "#1f1f1f"}
-                filter={(isFilled || isChargingSegment) ? "url(#glow)" : "none"}
+                fill={isFilled ? "#00FFC6" : "#1f1f1f"}
+                filter={isFilled ? "url(#glow)" : "none"}
                 initial={{ scaleY: 0, opacity: 0 }}
                 animate={{ scaleY: 1, opacity: 1 }}
                 style={{ transformOrigin: "center bottom" }}
