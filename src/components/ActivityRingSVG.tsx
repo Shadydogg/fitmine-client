@@ -1,4 +1,3 @@
-// src/components/ActivityRingSVG.tsx — v2.6.0 (добавлено кольцо active_minutes)
 import { motion } from "framer-motion";
 
 interface Props {
@@ -41,6 +40,7 @@ export default function ActivityRingSVG({
     const circumference = 2 * Math.PI * currentRadius;
     const dashOffset = circumference * (1 - percent);
     const glowId = `glow-${color.replace("#", "")}-${offset}`;
+    const isFull = percent >= 1;
 
     return (
       <>
@@ -51,6 +51,7 @@ export default function ActivityRingSVG({
           </filter>
         </defs>
 
+        {/* Базовый фон */}
         <circle
           cx="100"
           cy="100"
@@ -60,6 +61,7 @@ export default function ActivityRingSVG({
           fill="transparent"
         />
 
+        {/* Активное кольцо */}
         <motion.circle
           cx="100"
           cy="100"
@@ -70,10 +72,22 @@ export default function ActivityRingSVG({
           strokeDasharray={circumference}
           strokeDashoffset={dashOffset}
           strokeLinecap="round"
-          style={{ filter: `url(#${glowId})` }}
+          style={{
+            filter: `url(#${glowId})`,
+            transformOrigin: "center center",
+          }}
           initial={{ strokeDashoffset: circumference }}
-          animate={{ strokeDashoffset: dashOffset }}
-          transition={{ duration: 1.1, delay }}
+          animate={{
+            strokeDashoffset: dashOffset,
+            scale: isFull ? [1, 1.05, 1] : 1,
+            opacity: isFull ? [1, 0.8, 1] : 1,
+          }}
+          transition={{
+            duration: isFull ? 1.5 : 1.1,
+            delay,
+            repeat: isFull ? Infinity : 0,
+            ease: "easeInOut",
+          }}
         />
       </>
     );
@@ -81,16 +95,11 @@ export default function ActivityRingSVG({
 
   return (
     <div className="relative w-72 h-72 flex flex-col items-center justify-center transition-transform duration-300 hover:scale-105 active:scale-95">
-      <svg
-        width="200"
-        height="200"
-        className="-rotate-90"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        {renderRing("#00DBDE", stepsPercent, 0, 0.1, "#00FFFF")}       {/* Steps */}
-        {renderRing("#FF5F6D", caloriesPercent, 10, 0.5, "#FF5F6D")}    {/* Calories */}
-        {renderRing("#FCEE09", distancePercent, 20, 0.9, "#FCEE09")}   {/* Distance */}
-        {renderRing("#9F7AEA", minutesPercent, 30, 1.3, "#B794F4")}     {/* Active Minutes */}
+      <svg width="200" height="200" className="-rotate-90" xmlns="http://www.w3.org/2000/svg">
+        {renderRing("#00DBDE", stepsPercent, 0, 0.1, "#00FFFF")}
+        {renderRing("#FF5F6D", caloriesPercent, 10, 0.5, "#FF5F6D")}
+        {renderRing("#FCEE09", distancePercent, 20, 0.9, "#FCEE09")}
+        {renderRing("#9F7AEA", minutesPercent, 30, 1.3, "#B794F4")}
       </svg>
 
       <div className="absolute bottom-0 w-full text-sm text-center text-white leading-tight mt-2 px-2 pointer-events-none">
