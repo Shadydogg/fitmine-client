@@ -51,11 +51,15 @@ export default function BoostersPanel() {
     try {
       setLoadingType(type);
       const res = await api.post("/boosters", { type });
+
       if (res.data.ok) {
         await fetchBoosters();
+      } else if (res.data.error) {
+        alert(`❌ ${res.data.error}`); // 🔔 заменить на toast при необходимости
       }
-    } catch (err) {
-      console.error("❌ Ошибка активации бустера:", err);
+    } catch (err: any) {
+      const msg = err?.response?.data?.error || err.message;
+      alert(`❌ ${msg}`);
     } finally {
       setLoadingType(null);
     }
@@ -63,7 +67,7 @@ export default function BoostersPanel() {
 
   useEffect(() => {
     fetchBoosters();
-    const interval = setInterval(fetchBoosters, 30_000); // автообновление
+    const interval = setInterval(fetchBoosters, 30_000); // 🔁 автообновление
     return () => clearInterval(interval);
   }, []);
 
@@ -124,8 +128,7 @@ export default function BoostersPanel() {
                   </div>
                   <div className="text-xs text-zinc-400">
                     Эффект:{" "}
-                    <span className="text-emerald-400 font-medium">{b.boost}×</span> •{" "}
-                    Осталось:{" "}
+                    <span className="text-emerald-400 font-medium">{b.boost}×</span> • Осталось:{" "}
                     <span className={remaining <= 5 ? "text-yellow-400" : ""}>
                       {remaining} мин
                     </span>
