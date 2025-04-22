@@ -1,4 +1,4 @@
-// types/nft.ts — v2.2.0 (добавлено miningPower)
+// types/nft.ts — v2.3.0 (добавлено поле effectiveEP)
 export type NFTRarity = "common" | "rare" | "epic" | "legendary" | "mythical";
 
 export interface NFTComponent {
@@ -17,5 +17,6 @@ export interface NFTMiner {
   landBonus: number; // 1.0 - 1.4
   ep: number; // 0 - 1000
   isPremium?: boolean;
-  miningPower?: number; // ✅ добавлено поле
+  miningPower?: number;
+  effectiveEP?: number; // ✅ добавлено это поле
 }
