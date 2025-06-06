@@ -1,3 +1,4 @@
+// /src/pages/Dashboard.tsx — v2.9.0
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -13,7 +14,6 @@ import { useSession } from "../context/SessionContext";
 import { useUserEP } from "../hooks/useUserEP";
 import { useDailyReward } from "../hooks/useDailyReward";
 import { usePowerBanks } from "../hooks/usePowerBanks";
-import { PowerBankInventory } from "../components/PowerBankInventory";
 
 import EPBatterySVG from "../components/EPBatterySVG";
 
@@ -157,6 +157,7 @@ export default function Dashboard() {
             {epProgressText}
           </motion.div>
 
+          {/* 🎁 Кнопка получения PowerBank */}
           {ep >= goal && !alreadyClaimed && (
             <motion.button
               onClick={async () => {
@@ -191,13 +192,12 @@ export default function Dashboard() {
 
           {/* ✅ PowerBank Индикатор */}
           <motion.div
+            className="text-sm text-emerald-400 text-center mt-2 mb-3"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 1.2 }}
           >
-            <div className="text-sm text-emerald-400 text-center mt-2 mb-3">
-              ⚡ PowerBank: {powerbankCount}
-            </div>
+            ⚡ PowerBank: {powerbankCount}
           </motion.div>
         </motion.div>
       )}
@@ -213,16 +213,6 @@ export default function Dashboard() {
           <DashboardSummary data={activity} />
         </motion.div>
       )}
-
-      {/* 🧰 Инвентарь PowerBank */}
-      <motion.div
-        className="w-full max-w-md px-4 mt-4"
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1.4 }}
-      >
-        <PowerBankInventory />
-      </motion.div>
 
       {/* 🟩 Google Fit */}
       <motion.div
@@ -248,6 +238,7 @@ export default function Dashboard() {
         )}
       </motion.div>
 
+      {/* 🎁 Reward Modal */}
       {showModal && reward && (
         <RewardModal rewardId={reward} onClose={() => setShowModal(false)} />
       )}
