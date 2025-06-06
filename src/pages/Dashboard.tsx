@@ -143,7 +143,8 @@ export default function Dashboard() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
         >
-          <EPBatterySVG ep={ep} dailyGoal={goal} />
+          {/* ✅ Исправлено: пропс goal */}
+          <EPBatterySVG ep={ep} goal={goal} />
 
           <motion.div
             className={`mt-2 text-center text-sm font-medium ${
