@@ -34,6 +34,7 @@ export default function Dashboard() {
     setShowModal,
     alreadyClaimed,
     loading: rewardLoading,
+    claim,
   } = useDailyReward();
   const { count: powerbankCount, refetch: refetchPowerBanks } = usePowerBanks();
 
@@ -159,36 +160,22 @@ export default function Dashboard() {
 
           {/* 🎁 Кнопка Claim */}
           {ep >= goal && !alreadyClaimed && (
-            <motion.button
-              onClick={async () => {
-                try {
-                  const res = await fetch("https://api.fitmine.vip/api/ep/claim", {
-                    method: "POST",
-                    headers: {
-                      Authorization: `Bearer ${accessToken}`,
-                    },
-                  });
-                  const data = await res.json();
-                  if (data.ok && data.reward) {
-                    setShowModal(true);
-                    refetchEP();
-                    refetchPowerBanks();
-                  } else if (data.error === "Reward already claimed") {
-                    alert("❌ PowerBank уже получен");
-                  } else {
-                    alert(`❌ ${data.error || "Ошибка получения PowerBank"}`);
-                  }
-                } catch (err) {
-                  alert("❌ Ошибка соединения");
-                }
-              }}
-              className="mt-3 px-6 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-full shadow transition"
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 1.2 }}
+              transition={{ delay: 1.1 }}
             >
-              🎁 Забрать PowerBank
-            </motion.button>
+              <button
+                onClick={async () => {
+                  await claim();
+                  refetchEP();
+                  refetchPowerBanks();
+                }}
+                className="mt-3 px-6 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-full shadow transition"
+              >
+                🎁 Забрать PowerBank
+              </button>
+            </motion.div>
           )}
 
           {/* ⚡ PowerBank Индикатор */}
@@ -198,7 +185,7 @@ export default function Dashboard() {
             animate={{ opacity: 1 }}
             transition={{ delay: 1.2 }}
           >
-            {`⚡ PowerBank: ${powerbankCount}`}
+            ⚡ PowerBank: {powerbankCount}
           </motion.div>
         </motion.div>
       )}
