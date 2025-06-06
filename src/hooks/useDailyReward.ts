@@ -1,4 +1,4 @@
-// useDailyReward.ts — v2.2.0 (ручной вызов claim, нет автозапроса)
+// /src/hooks/useDailyReward.ts — v2.2.1
 import { useState } from "react";
 import { api } from "../api/apiClient";
 
@@ -18,18 +18,15 @@ export function useDailyReward() {
 
       if (json.alreadyClaimed || json.error === "Reward already claimed") {
         setAlreadyClaimed(true);
-      } else if (json.rewardId) {
-        setReward(json.rewardId);
+      } else if (json.reward) {
+        setReward(json.reward);
         setShowModal(true);
       }
     } catch (err: any) {
-      if (err.response?.data?.error === "EP goal not reached yet") {
-        return;
-      }
-      if (err.response?.data?.error === "Reward already claimed") {
-        setAlreadyClaimed(true);
-      }
-      setError(err.message);
+      const msg = err.response?.data?.error;
+      if (msg === "EP goal not reached yet") return;
+      if (msg === "Reward already claimed") setAlreadyClaimed(true);
+      setError(err.message || "Unknown error");
     } finally {
       setLoading(false);
     }
