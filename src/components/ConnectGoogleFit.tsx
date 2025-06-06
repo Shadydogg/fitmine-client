@@ -1,4 +1,6 @@
+// /src/components/ConnectGoogleFit.tsx — v2.2.0
 import { usePlatform } from '../hooks/usePlatform';
+import { useSession } from '../context/SessionContext';
 import { useEffect, useState } from 'react';
 
 const CLIENT_ID = '913307768705-78gti3vn7gkjrjk1nemvrqopknqm0ieb.apps.googleusercontent.com';
@@ -11,9 +13,10 @@ const SCOPES = [
 
 export default function ConnectGoogleFit() {
   const { isTelegramIOS } = usePlatform();
-  const [needReauth, setNeedReauth] = useState(false);
+  const { refreshUser } = useSession();
+  const [connecting, setConnecting] = useState(false);
 
-  const openAuthWindow = () => {
+  const handleGoogleConnect = () => {
     const initData = localStorage.getItem('initData') || '';
     if (!initData || initData.length < 20) {
       alert('❌ Ошибка: Telegram initData не найден.');
@@ -30,36 +33,26 @@ export default function ConnectGoogleFit() {
     url.searchParams.set('prompt', 'consent');
     url.searchParams.set('state', state);
 
-    window.open(url.toString(), '_blank');
+    setConnecting(true);
+
+    const authWindow = window.open(url.toString(), '_blank');
+
+    const interval = setInterval(() => {
+      if (authWindow?.closed) {
+        clearInterval(interval);
+        console.log('🔄 Окно авторизации закрыто, обновляем пользователя...');
+        refreshUser(); // ⚡️ вот ключевой вызов
+        setConnecting(false);
+      }
+    }, 1000);
   };
 
-  const handleGoogleConnect = () => openAuthWindow();
   const handleIOSShortcut = () => {
     window.location.href = 'shortcuts://run-shortcut?name=FitMineGoogleFit';
   };
 
-  useEffect(() => {
-    if (window?.needGoogleReauth === true) {
-      setNeedReauth(true);
-      // ⏱ Автоподключение через 2 сек
-      setTimeout(() => {
-        if (!isTelegramIOS) {
-          openAuthWindow();
-        } else {
-          handleIOSShortcut();
-        }
-      }, 2000);
-    }
-  }, [isTelegramIOS]);
-
   return (
-    <div className="mt-4 text-center space-y-2">
-      {needReauth && (
-        <div className="text-yellow-300 text-sm font-medium animate-pulse">
-          ⚠️ Требуется повторная авторизация Google Fit...
-        </div>
-      )}
-
+    <div className="mt-6 text-center">
       {isTelegramIOS ? (
         <button
           onClick={handleIOSShortcut}
@@ -70,9 +63,12 @@ export default function ConnectGoogleFit() {
       ) : (
         <button
           onClick={handleGoogleConnect}
-          className="px-6 py-2 bg-green-500 text-white font-bold rounded-full shadow hover:scale-105 transition-transform"
+          disabled={connecting}
+          className={`px-6 py-2 text-white font-bold rounded-full shadow transition-transform ${
+            connecting ? 'bg-gray-500 cursor-not-allowed' : 'bg-green-500 hover:scale-105'
+          }`}
         >
-          🔓 Подключить Google Fit
+          {connecting ? '⏳ Подключение...' : '🔓 Подключить Google Fit'}
         </button>
       )}
     </div>
