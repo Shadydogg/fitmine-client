@@ -1,3 +1,4 @@
+// /src/pages/Dashboard.tsx — v2.8.2
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -13,9 +14,9 @@ import { useSession } from "../context/SessionContext";
 import { useUserEP } from "../hooks/useUserEP";
 import { useDailyReward } from "../hooks/useDailyReward";
 import { usePowerBanks } from "../hooks/usePowerBanks";
+import { PowerBankInventory } from "../components/PowerBankInventory";
 
 import EPBatterySVG from "../components/EPBatterySVG";
-import { PowerBankInventory } from "../components/PowerBankInventory";
 
 export default function Dashboard() {
   const { t } = useTranslation();
@@ -157,6 +158,7 @@ export default function Dashboard() {
             {epProgressText}
           </motion.div>
 
+          {/* 🎁 Кнопка получения PowerBank */}
           {ep >= goal && !alreadyClaimed && (
             <motion.button
               onClick={async () => {
@@ -189,15 +191,19 @@ export default function Dashboard() {
             </motion.button>
           )}
 
-          {/* ✅ заменили p на div */}
+          {/* ✅ PowerBank Индикатор */}
           <div className="text-sm text-emerald-400 text-center mt-2 mb-3">
-            ⚡ PowerBank: {powerbankCount}
+            <span>⚡ PowerBank: {powerbankCount}</span>
           </div>
-
-          <PowerBankInventory />
         </motion.div>
       )}
 
+      {/* 📦 Инвентарь PowerBanks */}
+      <div className="w-full max-w-md px-4">
+        <PowerBankInventory />
+      </div>
+
+      {/* 📊 Прогресс кольца */}
       {!activity.loading && (
         <motion.div
           className="mt-4"
@@ -209,6 +215,7 @@ export default function Dashboard() {
         </motion.div>
       )}
 
+      {/* 🟩 Google Fit */}
       <motion.div
         initial={{ opacity: 0, y: 6 }}
         animate={{ opacity: 1, y: 0 }}
@@ -232,6 +239,7 @@ export default function Dashboard() {
         )}
       </motion.div>
 
+      {/* 🎁 Reward Modal */}
       {showModal && reward && (
         <RewardModal rewardId={reward} onClose={() => setShowModal(false)} />
       )}
