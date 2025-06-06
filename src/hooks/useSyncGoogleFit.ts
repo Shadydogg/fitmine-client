@@ -11,12 +11,11 @@ interface GoogleActivityData {
 }
 
 export default function useSyncGoogleFit() {
-  const { accessToken, sessionLoaded, setTokens, user } = useSession();
+  const { accessToken, sessionLoaded } = useSession();
 
   const [data, setData] = useState<GoogleActivityData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [needReauth, setNeedReauth] = useState(false);
 
   useEffect(() => {
     if (!sessionLoaded || !accessToken) return;
@@ -47,16 +46,17 @@ export default function useSyncGoogleFit() {
             distance: res.data.distance || 0,
             date: res.data.date || new Date().toISOString()
           });
-          setError(null);
-        } else if (res.data.need_reauth) {
-          setNeedReauth(true);
-          setError("⛔ Требуется повторное подключение Google Fit");
+
+          window.needGoogleReauth = false;
         } else {
-          setError(res.data.error || '❌ Ошибка при синхронизации');
+          setError(res.data.error || 'Ошибка при синхронизации');
+          if (res.data.need_reauth) {
+            window.needGoogleReauth = true;
+          }
         }
 
       } catch (err: any) {
-        setError(err?.message || '❌ Ошибка подключения к серверу');
+        setError(err?.message || 'Ошибка подключения');
       } finally {
         setLoading(false);
       }
@@ -65,5 +65,5 @@ export default function useSyncGoogleFit() {
     fetchGoogleFit();
   }, [accessToken, sessionLoaded]);
 
-  return { data, loading, error, needReauth };
+  return { data, loading, error };
 }
