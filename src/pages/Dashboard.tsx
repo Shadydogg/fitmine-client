@@ -1,4 +1,3 @@
-// /src/pages/Dashboard.tsx — v2.8.2
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -14,7 +13,6 @@ import { useSession } from "../context/SessionContext";
 import { useUserEP } from "../hooks/useUserEP";
 import { useDailyReward } from "../hooks/useDailyReward";
 import { usePowerBanks } from "../hooks/usePowerBanks";
-import { PowerBankInventory } from "../components/PowerBankInventory";
 
 import EPBatterySVG from "../components/EPBatterySVG";
 
@@ -192,16 +190,16 @@ export default function Dashboard() {
           )}
 
           {/* ✅ PowerBank Индикатор */}
-          <div className="text-sm text-emerald-400 text-center mt-2 mb-3">
-            <span>⚡ PowerBank: {powerbankCount}</span>
-          </div>
+          <motion.div
+            className="text-sm text-emerald-400 text-center mt-2 mb-3"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.2 }}
+          >
+            ⚡ PowerBank: {powerbankCount}
+          </motion.div>
         </motion.div>
       )}
-
-      {/* 📦 Инвентарь PowerBanks */}
-      <div className="w-full max-w-md px-4">
-        <PowerBankInventory />
-      </div>
 
       {/* 📊 Прогресс кольца */}
       {!activity.loading && (
