@@ -167,9 +167,15 @@ export default function Dashboard() {
             >
               <button
                 onClick={async () => {
-                  await claim();
-                  refetchEP();
-                  refetchPowerBanks();
+                  try {
+                    const result = await claim();
+                    if (result?.ok && result.rewardId) {
+                      refetchEP();
+                      refetchPowerBanks();
+                    }
+                  } catch (err) {
+                    alert("❌ Не удалось забрать PowerBank");
+                  }
                 }}
                 className="mt-3 px-6 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-full shadow transition"
               >
