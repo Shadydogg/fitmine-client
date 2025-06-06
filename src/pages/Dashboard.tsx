@@ -12,6 +12,7 @@ import RewardModal from "../components/RewardModal";
 import { useSession } from "../context/SessionContext";
 import { useUserEP } from "../hooks/useUserEP";
 import { useDailyReward } from "../hooks/useDailyReward";
+import { usePowerBanks } from "../hooks/usePowerBanks";
 
 import EPBatterySVG from "../components/EPBatterySVG";
 
@@ -20,7 +21,13 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const { user, sessionLoaded, accessToken, setTokens } = useSession();
   const activity = useSyncActivity();
-  const { ep, loading: epLoading, refetch: refetchEP } = useUserEP(); // ✅ добавили refetch
+  const {
+    ep,
+    goal,
+    doubleGoal,
+    loading: epLoading,
+    refetch: refetchEP,
+  } = useUserEP();
   const {
     reward,
     showModal,
@@ -28,6 +35,7 @@ export default function Dashboard() {
     alreadyClaimed,
     loading: rewardLoading,
   } = useDailyReward();
+  const powerbankCount = usePowerBanks();
 
   if (!sessionLoaded) {
     return (
@@ -69,7 +77,7 @@ export default function Dashboard() {
         }
 
         activity.refetch();
-        refetchEP(); // ✅ обновляем EP после синхронизации
+        refetchEP();
       } else {
         alert(`❌ Ошибка: ${data.error}`);
       }
@@ -78,11 +86,13 @@ export default function Dashboard() {
     }
   };
 
-  const nearComplete = ep >= 900 && ep < 1000;
+  const nearComplete = ep >= goal * 0.9 && ep < goal;
   const epProgressText =
-    ep >= 1000
-      ? "🎉 Цель достигнута! Забери награду"
-      : `🧠 Осталось ${1000 - ep} EP до награды`;
+    ep >= goal
+      ? doubleGoal
+        ? "✅ Цель 2000 EP выполнена!"
+        : "🎉 Цель достигнута! Забери PowerBank"
+      : `🧠 Осталось ${goal - ep} EP до цели`;
 
   return (
     <div className="relative w-full min-h-screen flex flex-col items-center bg-gradient-to-br from-black via-zinc-900 to-black text-white overflow-x-hidden pb-24">
@@ -133,7 +143,7 @@ export default function Dashboard() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
         >
-          <EPBatterySVG ep={ep} dailyGoal={1000} />
+          <EPBatterySVG ep={ep} dailyGoal={goal} />
 
           <motion.div
             className={`mt-2 text-center text-sm font-medium ${
@@ -145,6 +155,10 @@ export default function Dashboard() {
           >
             {epProgressText}
           </motion.div>
+
+          <p className="text-sm text-emerald-400 text-center mt-1">
+            ⚡ PowerBank: {powerbankCount}
+          </p>
         </motion.div>
       )}
 

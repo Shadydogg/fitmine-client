@@ -1,22 +1,18 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
+
 import { useSession } from '../context/SessionContext';
 import BottomTab from '../components/BottomTab';
 import ConnectGoogleFit from '../components/ConnectGoogleFit';
+import { usePowerbankStats } from '../hooks/usePowerbankStats';
 
 export default function Profile() {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { accessToken, isAuthenticated, sessionLoaded, user } = useSession();
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    if (sessionLoaded) {
-      setLoading(false);
-    }
-  }, [sessionLoaded]);
+  const { usedCount, lastUsedAt, usedToday, loading } = usePowerbankStats();
 
   if (loading || !sessionLoaded) {
     return (
@@ -44,7 +40,7 @@ export default function Profile() {
         ← {t('profile.back', 'Назад')}
       </button>
 
-      {/* 🧩 Заголовок */}
+      {/* 🦩 Заголовок */}
       <h1 className="text-3xl font-extrabold mt-20 mb-6 tracking-wide drop-shadow text-center">
         {t('profile.title')} • FitMine
       </h1>
@@ -68,7 +64,7 @@ export default function Profile() {
 
         {user.is_premium && (
           <div className="mt-2 inline-flex items-center gap-2 px-3 py-1 text-xs bg-purple-600/80 text-white rounded-full shadow shadow-purple-500/50">
-            💎 {t('profile.premium', 'Премиум-пользователь')}
+            💫 {t('profile.premium', 'Премиум-пользователь')}
           </div>
         )}
 
@@ -85,29 +81,38 @@ export default function Profile() {
         >
           {t('profile.goDashboard', 'Назад к активности')}
         </button>
+
+        {/* ⚡ PowerBank статистика */}
+        {typeof usedCount === 'number' && (
+          <div className="mt-4 text-sm text-emerald-300">
+            ⚡ Использовано PowerBank: {usedCount}
+            <br />
+            {usedToday
+              ? 'Сегодня уже использован'
+              : `Последнее использование: ${lastUsedAt ? new Date(lastUsedAt).toLocaleDateString() : '—'}`}
+          </div>
+        )}
       </motion.div>
 
       {/* ⚙️ Google Fit статус */}
-      {user && (
-        <div className="mt-6 max-w-sm w-full text-center">
-          {user.google_connected ? (
-            <div className="text-sm text-green-400 mb-2">
-              ✅ Google Fit подключён
+      <div className="mt-6 max-w-sm w-full text-center">
+        {user.google_connected ? (
+          <div className="text-sm text-green-400 mb-2">
+            ✅ Google Fit подключён
+          </div>
+        ) : (
+          <>
+            <div className="text-sm text-yellow-300 mb-2">
+              🔓 Google Fit не подключён
             </div>
-          ) : (
-            <>
-              <div className="text-sm text-yellow-300 mb-2">
-                🔓 Google Fit не подключён
+            <div className="flex justify-center">
+              <div className="w-full max-w-xs">
+                <ConnectGoogleFit />
               </div>
-              <div className="flex justify-center">
-                <div className="w-full max-w-xs">
-                  <ConnectGoogleFit />
-                </div>
-              </div>
-            </>
-          )}
-        </div>
-      )}
+            </div>
+          </>
+        )}
+      </div>
 
       {/* 🔻 BottomTab */}
       <BottomTab current="profile" />

@@ -3,15 +3,15 @@ import { useEffect, useState } from "react";
 
 interface Props {
   ep: number;
-  dailyGoal?: number;
+  goal?: number;
 }
 
-export default function EPBatterySVG({ ep, dailyGoal = 1000 }: Props) {
+export default function EPBatterySVG({ ep, goal = 1000 }: Props) {
   const [animatedEP, setAnimatedEP] = useState(0);
-  const percentage = Math.min(animatedEP / dailyGoal, 1);
+  const percentage = Math.min(animatedEP / goal, 1);
   const totalSegments = 5;
   const filledSegments = Math.floor(percentage * totalSegments);
-  const isFull = animatedEP >= dailyGoal;
+  const isFull = animatedEP >= goal;
   const isEmpty = animatedEP <= 0;
 
   useEffect(() => {
@@ -155,7 +155,7 @@ export default function EPBatterySVG({ ep, dailyGoal = 1000 }: Props) {
 
       {/* Подпись */}
       <div className="mt-2 text-sm font-semibold text-center">
-        {Math.round(animatedEP)} / {dailyGoal} <span className="text-zinc-400">EP</span>
+        {Math.round(animatedEP)} / {goal} <span className="text-zinc-400">EP</span>
       </div>
     </div>
   );
