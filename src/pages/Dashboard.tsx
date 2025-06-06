@@ -1,3 +1,4 @@
+// /src/pages/Dashboard.tsx — v2.6.0
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -36,7 +37,10 @@ export default function Dashboard() {
     loading: rewardLoading,
     claim,
   } = useDailyReward();
-  const { count: powerbankCount, refetch: refetchPowerBanks } = usePowerBanks();
+  const {
+    count: powerbankCount,
+    refetch: refetchPowerBanks,
+  } = usePowerBanks();
 
   if (!sessionLoaded) {
     return (
@@ -170,10 +174,13 @@ export default function Dashboard() {
                   try {
                     const result = await claim();
                     if (result?.ok && result.rewardId) {
-                      refetchEP();
-                      refetchPowerBanks();
+                      await Promise.all([
+                        refetchEP(),
+                        refetchPowerBanks(),
+                        activity.refetch()
+                      ]);
                     }
-                  } catch (err) {
+                  } catch {
                     alert("❌ Не удалось забрать PowerBank");
                   }
                 }}
