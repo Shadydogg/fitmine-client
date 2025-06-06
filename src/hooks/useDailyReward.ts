@@ -1,4 +1,3 @@
-// /src/hooks/useDailyReward.ts — v2.3.0
 import { useState } from "react";
 import { api } from "../api/apiClient";
 
@@ -9,7 +8,11 @@ export function useDailyReward() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const claim = async () => {
+  const claim = async (): Promise<{
+    ok: boolean;
+    rewardId?: string;
+    error?: string;
+  }> => {
     setLoading(true);
     setError(null);
     try {
@@ -18,19 +21,39 @@ export function useDailyReward() {
 
       if (json.error === "Reward already claimed") {
         setAlreadyClaimed(true);
-      } else if (json.ok && json.rewardId) {
+        return { ok: false, error: json.error };
+      }
+
+      if (json.ok && json.rewardId) {
         setReward(json.rewardId);
         setShowModal(true);
+        return { ok: true, rewardId: json.rewardId };
       }
+
+      return { ok: false, error: json.error || "Unknown error" };
     } catch (err: any) {
       const msg = err.response?.data?.error;
-      if (msg === "EP goal not reached yet") return;
-      if (msg === "Reward already claimed") setAlreadyClaimed(true);
+
+      if (msg === "EP goal not reached yet") return { ok: false, error: msg };
+      if (msg === "Reward already claimed") {
+        setAlreadyClaimed(true);
+        return { ok: false, error: msg };
+      }
+
       setError(err.message || "Unknown error");
+      return { ok: false, error: err.message || "Unknown error" };
     } finally {
       setLoading(false);
     }
   };
 
-  return { reward, alreadyClaimed, showModal, setShowModal, loading, error, claim };
+  return {
+    reward,
+    alreadyClaimed,
+    showModal,
+    setShowModal,
+    loading,
+    error,
+    claim,
+  };
 }
