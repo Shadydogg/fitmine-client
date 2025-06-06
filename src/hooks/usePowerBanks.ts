@@ -1,29 +1,29 @@
-// hooks/usePowerBanks.ts — v2.0.0 (расширен: возвращает список, рефетч и загрузку)
-import { useEffect, useState } from 'react';
-import axios from 'axios';
+// /src/hooks/usePowerBanks.ts — v2.1.0
+import { useCallback, useEffect, useState } from "react";
+import axios from "axios";
 
 export function usePowerBanks() {
-  const [powerbanks, setPowerbanks] = useState<any[]>([]);
+  const [count, setCount] = useState(0);
   const [loading, setLoading] = useState(true);
 
-  const load = async () => {
+  const fetch = useCallback(async () => {
+    setLoading(true);
     try {
-      const { data } = await axios.get('/api/powerbanks');
-      setPowerbanks(data.powerbanks || []);
+      const { data } = await axios.get("/api/powerbanks");
+      const available = Array.isArray(data.powerbanks)
+        ? data.powerbanks.filter((pb: any) => !pb.used).length
+        : 0;
+      setCount(available);
     } catch {
-      setPowerbanks([]);
+      setCount(0);
     } finally {
       setLoading(false);
     }
-  };
-
-  useEffect(() => {
-    load();
   }, []);
 
-  return {
-    powerbanks,
-    refetch: load,
-    loading,
-  };
+  useEffect(() => {
+    fetch();
+  }, [fetch]);
+
+  return { count, loading, refetch: fetch };
 }
