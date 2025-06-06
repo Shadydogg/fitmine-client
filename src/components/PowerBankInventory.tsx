@@ -1,3 +1,4 @@
+// src/components/PowerBankInventory.tsx — v1.1.0
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useUserEP } from '../hooks/useUserEP';
@@ -15,6 +16,7 @@ export const PowerBankInventory: React.FC = () => {
   const [powerbanks, setPowerbanks] = useState<PowerBank[]>([]);
   const [loading, setLoading] = useState(true);
   const [usingId, setUsingId] = useState<string | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
 
   const { ep, refetch: refetchEP, loading: epLoading } = useUserEP();
 
@@ -40,8 +42,9 @@ export const PowerBankInventory: React.FC = () => {
 
     try {
       setUsingId(id);
+      setMessage(null);
       const res = await axios.post('/api/powerbanks/use', { id });
-      alert(res.data.message || '✅ PowerBank использован!');
+      setMessage(res.data.message || '✅ PowerBank использован!');
       setPowerbanks(prev =>
         prev.map(pb =>
           pb.id === id ? { ...pb, used: true, used_at: new Date().toISOString() } : pb
@@ -49,30 +52,47 @@ export const PowerBankInventory: React.FC = () => {
       );
       refetchEP();
     } catch (err: any) {
-      alert(err.response?.data?.error || '❌ Ошибка использования PowerBank');
+      const errorText = err.response?.data?.error || '❌ Ошибка использования PowerBank';
+      setMessage(errorText);
+      alert(errorText);
     } finally {
       setUsingId(null);
     }
   };
 
-  if (loading || epLoading) return <div className="text-white">🔄 Загрузка PowerBank...</div>;
+  if (loading || epLoading) {
+    return <div className="text-white text-center py-4">🔄 Загрузка PowerBank...</div>;
+  }
 
-  if (powerbanks.length === 0) return <div className="text-white">😕 У вас пока нет PowerBank.</div>;
+  if (powerbanks.length === 0) {
+    return <div className="text-white text-center py-4">😕 У вас пока нет PowerBank'ов.</div>;
+  }
 
   return (
-    <div className="space-y-4">
+    <div className="w-full max-w-md mx-auto px-4 py-2 space-y-4">
+      <h2 className="text-xl font-bold text-center text-white mb-2">⚡ Инвентарь PowerBank'ов</h2>
+
+      {message && (
+        <div className="text-center text-emerald-400 font-medium">{message}</div>
+      )}
+
       {powerbanks.map(pb => (
         <div
           key={pb.id}
           className="bg-zinc-900 rounded-xl p-4 flex items-center justify-between shadow-md border border-zinc-700"
         >
           <div>
-            <p className="text-lg font-semibold text-white">
-              {pb.powerbank_type.toUpperCase()} PowerBank
+            <p className="text-lg font-semibold text-white capitalize">
+              {pb.powerbank_type} PowerBank
             </p>
             <p className="text-sm text-gray-400">
               Получен: {new Date(pb.claimed_at).toLocaleDateString()} • EP: {pb.ep_amount}
             </p>
+            {pb.used && pb.used_at && (
+              <p className="text-xs text-yellow-400 mt-1">
+                ✅ Использован: {new Date(pb.used_at).toLocaleString()}
+              </p>
+            )}
           </div>
           <button
             onClick={() => handleUse(pb.id)}
