@@ -1,4 +1,3 @@
-// /src/components/PowerBankInventory.tsx — v1.2.0
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useUserEP } from "../hooks/useUserEP";
@@ -7,9 +6,9 @@ import { usePowerBanks } from "../hooks/usePowerBanks";
 type PowerBank = {
   id: string;
   ep_amount: number;
-  claimed_at: string;
+  claimed_at?: string;
   used: boolean;
-  used_at: string | null;
+  used_at?: string | null;
   powerbank_type: "basic" | "rare" | "epic" | "event";
   source?: string;
 };
@@ -73,7 +72,8 @@ export const PowerBankInventory: React.FC = () => {
               {pb.powerbank_type} PowerBank
             </p>
             <p className="text-sm text-gray-400">
-              Получен: {new Date(pb.claimed_at).toLocaleDateString()} • EP: {pb.ep_amount}
+              Получен:{" "}
+              {pb.claimed_at ? new Date(pb.claimed_at).toLocaleDateString() : "—"} • EP: {pb.ep_amount}
             </p>
             {pb.used && pb.used_at && (
               <p className="text-xs text-yellow-400 mt-1">
