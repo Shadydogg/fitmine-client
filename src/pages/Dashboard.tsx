@@ -35,7 +35,7 @@ export default function Dashboard() {
     alreadyClaimed,
     loading: rewardLoading,
   } = useDailyReward();
-  const powerbankCount = usePowerBanks();
+  const { count: powerbankCount, refetch: refetchPowerBanks } = usePowerBanks();
 
   if (!sessionLoaded) {
     return (
@@ -78,6 +78,7 @@ export default function Dashboard() {
 
         activity.refetch();
         refetchEP();
+        refetchPowerBanks();
       } else {
         alert(`❌ Ошибка: ${data.error}`);
       }
@@ -131,7 +132,7 @@ export default function Dashboard() {
         {t("dashboard.title", "Твоя активность сегодня")}
       </motion.h1>
 
-      {/* 🔋 EP Battery SVG */}
+      {/* 🔋 EP Battery */}
       {epLoading ? (
         <div className="text-gray-500 mt-4 animate-pulse">
           {t("dashboard.loading", "Загрузка EP...")}
@@ -156,7 +157,7 @@ export default function Dashboard() {
             {epProgressText}
           </motion.div>
 
-          {/* 🎁 Кнопка получения PowerBank */}
+          {/* 🎁 Кнопка Claim */}
           {ep >= goal && !alreadyClaimed && (
             <motion.button
               onClick={async () => {
@@ -171,6 +172,7 @@ export default function Dashboard() {
                   if (data.ok && data.reward) {
                     setShowModal(true);
                     refetchEP();
+                    refetchPowerBanks();
                   } else if (data.error === "Reward already claimed") {
                     alert("❌ PowerBank уже получен");
                   } else {
@@ -189,7 +191,7 @@ export default function Dashboard() {
             </motion.button>
           )}
 
-          {/* ✅ PowerBank Индикатор */}
+          {/* ⚡ PowerBank Индикатор */}
           <motion.div
             className="text-sm text-emerald-400 text-center mt-2 mb-3"
             initial={{ opacity: 0 }}
