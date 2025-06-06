@@ -1,3 +1,4 @@
+// /src/pages/Profile.tsx — v2.4.0
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -7,6 +8,7 @@ import { useSession } from '../context/SessionContext';
 import BottomTab from '../components/BottomTab';
 import ConnectGoogleFit from '../components/ConnectGoogleFit';
 import { usePowerbankStats } from '../hooks/usePowerbankStats';
+import { PowerBankInventory } from '../components/PowerBankInventory'; // ✅
 
 export default function Profile() {
   const navigate = useNavigate();
@@ -93,6 +95,11 @@ export default function Profile() {
           </div>
         )}
       </motion.div>
+
+      {/* ⚡ Инвентарь PowerBank */}
+      <div className="w-full mt-6">
+        <PowerBankInventory />
+      </div>
 
       {/* ⚙️ Google Fit статус */}
       <div className="mt-6 max-w-sm w-full text-center">
