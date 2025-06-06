@@ -1,4 +1,4 @@
-// /src/hooks/useDailyReward.ts — v2.2.1
+// /src/hooks/useDailyReward.ts — v2.2.2
 import { useState } from "react";
 import { api } from "../api/apiClient";
 
@@ -18,8 +18,8 @@ export function useDailyReward() {
 
       if (json.alreadyClaimed || json.error === "Reward already claimed") {
         setAlreadyClaimed(true);
-      } else if (json.reward) {
-        setReward(json.reward);
+      } else if (json.rewardId) {
+        setReward(json.rewardId); // ✅ Используем rewardId, как на backend
         setShowModal(true);
       }
     } catch (err: any) {
