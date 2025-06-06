@@ -1,4 +1,3 @@
-// /src/pages/Dashboard.tsx — v2.8.0
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -99,6 +98,7 @@ export default function Dashboard() {
     <div className="relative w-full min-h-screen flex flex-col items-center bg-gradient-to-br from-black via-zinc-900 to-black text-white overflow-x-hidden pb-24">
       <AnimatedBackground />
 
+      {/* 👤 Аватар */}
       <button
         onClick={() => navigate("/profile")}
         className="absolute top-4 right-4 w-10 h-10 rounded-full overflow-hidden border-2 border-white shadow-md hover:scale-105 transition-transform z-20"
@@ -110,6 +110,7 @@ export default function Dashboard() {
         />
       </button>
 
+      {/* 🎯 XP */}
       <motion.button
         onClick={() => navigate("/xp")}
         className="absolute top-4 left-4 px-3 py-1 rounded-full text-sm bg-fit-gradient shadow-glow hover:scale-105 transition-glow z-20"
@@ -120,6 +121,7 @@ export default function Dashboard() {
         🎯 XP и Уровень
       </motion.button>
 
+      {/* 🏷️ Заголовок */}
       <motion.h1
         className="text-3xl font-extrabold mt-20 mb-4 text-center tracking-wide z-10"
         initial={{ opacity: 0, y: 10 }}
@@ -129,6 +131,7 @@ export default function Dashboard() {
         {t("dashboard.title", "Твоя активность сегодня")}
       </motion.h1>
 
+      {/* 🔋 EP Battery SVG */}
       {epLoading ? (
         <div className="text-gray-500 mt-4 animate-pulse">
           {t("dashboard.loading", "Загрузка EP...")}
@@ -165,9 +168,11 @@ export default function Dashboard() {
                     },
                   });
                   const data = await res.json();
-                  if (data.ok && data.rewardId) {
+                  if (data.ok && data.reward) {
                     setShowModal(true);
                     refetchEP();
+                  } else if (data.error === "Reward already claimed") {
+                    alert("❌ PowerBank уже получен");
                   } else {
                     alert(`❌ ${data.error || "Ошибка получения PowerBank"}`);
                   }
@@ -190,6 +195,7 @@ export default function Dashboard() {
         </motion.div>
       )}
 
+      {/* 📊 Прогресс кольца */}
       {!activity.loading && (
         <motion.div
           className="mt-4"
@@ -201,6 +207,7 @@ export default function Dashboard() {
         </motion.div>
       )}
 
+      {/* 🟩 Google Fit */}
       <motion.div
         initial={{ opacity: 0, y: 6 }}
         animate={{ opacity: 1, y: 0 }}
@@ -224,6 +231,7 @@ export default function Dashboard() {
         )}
       </motion.div>
 
+      {/* 🎁 Reward Modal */}
       {showModal && reward && (
         <RewardModal rewardId={reward} onClose={() => setShowModal(false)} />
       )}
