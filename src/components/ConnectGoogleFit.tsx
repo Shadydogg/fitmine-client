@@ -1,4 +1,5 @@
 import { usePlatform } from '../hooks/usePlatform';
+import { useEffect, useState } from 'react';
 
 const CLIENT_ID = '913307768705-78gti3vn7gkjrjk1nemvrqopknqm0ieb.apps.googleusercontent.com';
 const REDIRECT_URI = 'https://www.fitmine.vip/api/oauth/callback';
@@ -10,6 +11,14 @@ const SCOPES = [
 
 export default function ConnectGoogleFit() {
   const { isTelegramIOS } = usePlatform();
+  const [needReauth, setNeedReauth] = useState(false);
+
+  useEffect(() => {
+    // 💡 Можно также получать через props, но здесь из window
+    if (window?.needGoogleReauth === true) {
+      setNeedReauth(true);
+    }
+  }, []);
 
   const handleGoogleConnect = () => {
     const initData = localStorage.getItem('initData') || '';
@@ -27,20 +36,24 @@ export default function ConnectGoogleFit() {
     url.searchParams.set('response_type', 'code');
     url.searchParams.set('access_type', 'offline');
     url.searchParams.set('scope', SCOPES);
-    url.searchParams.set('prompt', 'consent');
+    url.searchParams.set('prompt', 'consent'); // 🔄 повторное подтверждение
     url.searchParams.set('state', state);
 
-    // 🚀 Открываем в новой вкладке
     window.open(url.toString(), '_blank');
   };
 
   const handleIOSShortcut = () => {
-    // 📱 Открывает ярлык на iOS через Shortcuts
     window.location.href = 'shortcuts://run-shortcut?name=FitMineGoogleFit';
   };
 
   return (
-    <div className="mt-6 text-center">
+    <div className="mt-4 text-center space-y-2">
+      {needReauth && (
+        <div className="text-yellow-300 text-sm font-medium">
+          ⚠️ Требуется повторная авторизация Google Fit
+        </div>
+      )}
+
       {isTelegramIOS ? (
         <button
           onClick={handleIOSShortcut}
