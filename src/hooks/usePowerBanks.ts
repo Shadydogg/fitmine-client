@@ -1,6 +1,6 @@
-// /src/hooks/usePowerBanks.ts — v2.2.0
 import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
+import { useSession } from "../context/SessionContext"; // ✅ получаем accessToken
 
 type PowerBank = {
   id: string;
@@ -13,14 +13,22 @@ type PowerBank = {
 };
 
 export function usePowerBanks() {
+  const { accessToken } = useSession(); // ✅ доступ к токену
   const [count, setCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [powerbanks, setPowerbanks] = useState<PowerBank[]>([]);
 
   const fetch = useCallback(async () => {
+    if (!accessToken) return;
+
     setLoading(true);
     try {
-      const { data } = await axios.get("/api/powerbanks");
+      const { data } = await axios.get("/api/powerbanks", {
+        headers: {
+          Authorization: `Bearer ${accessToken}`, // ✅ добавлен Authorization
+        },
+      });
+
       if (Array.isArray(data.powerbanks)) {
         const cleanList: PowerBank[] = data.powerbanks.map((pb: any) => ({
           ...pb,
@@ -41,7 +49,7 @@ export function usePowerBanks() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [accessToken]);
 
   useEffect(() => {
     fetch();
