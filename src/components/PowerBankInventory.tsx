@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import { useUserEP } from "../hooks/useUserEP";
 import { usePowerBanks } from "../hooks/usePowerBanks";
@@ -33,10 +33,19 @@ export const PowerBankInventory: React.FC = () => {
     try {
       setUsingId(id);
       setMessage(null);
-      const res = await axios.post("/api/powerbanks/use", { id });
+
+      const res = await axios.post("/api/powerbanks/use", { id }, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+        },
+      });
+
       setMessage(res.data.message || "✅ PowerBank активирован");
 
-      await Promise.all([refetchPowerbanks(), refetchEP()]);
+      await Promise.all([
+        refetchPowerbanks(),
+        refetchEP(),
+      ]);
     } catch (err: any) {
       const msg = err.response?.data?.error || "❌ Ошибка применения PowerBank";
       alert(msg);
@@ -60,7 +69,11 @@ export const PowerBankInventory: React.FC = () => {
         ⚡ Инвентарь PowerBank'ов
       </h2>
 
-      {message && <div className="text-center text-emerald-400 font-medium">{message}</div>}
+      {message && (
+        <div className="text-center text-emerald-400 font-medium">
+          {message}
+        </div>
+      )}
 
       {powerbanks.map((pb) => (
         <div
@@ -73,7 +86,10 @@ export const PowerBankInventory: React.FC = () => {
             </p>
             <p className="text-sm text-gray-400">
               Получен:{" "}
-              {pb.claimed_at ? new Date(pb.claimed_at).toLocaleDateString() : "—"} • EP: {pb.ep_amount}
+              {pb.claimed_at
+                ? new Date(pb.claimed_at).toLocaleDateString()
+                : "—"}{" "}
+              • EP: {pb.ep_amount}
             </p>
             {pb.used && pb.used_at && (
               <p className="text-xs text-yellow-400 mt-1">
