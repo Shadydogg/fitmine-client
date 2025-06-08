@@ -28,6 +28,7 @@ export default function Dashboard() {
     showModal,
     setShowModal,
     alreadyClaimed,
+    loading: rewardLoading,
     claim,
   } = useDailyReward();
   const {
@@ -155,8 +156,8 @@ export default function Dashboard() {
             {epProgressText}
           </motion.div>
 
-          {/* 🎁 Кнопка Claim + PowerBank */}
-          {ep >= goal && !alreadyClaimed && (
+          {/* 🎁 Кнопка Claim + Индикатор */}
+          {ep >= goal && !alreadyClaimed ? (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -165,17 +166,19 @@ export default function Dashboard() {
             >
               <button
                 onClick={async () => {
-                  try {
-                    const result = await claim();
-                    if (result?.ok && result.rewardId) {
-                      toast.success("🎁 PowerBank получен!");
-                      await Promise.all([
-                        refetchEP(),
-                        refetchPowerBanks(),
-                        activity.refetch()
-                      ]);
-                    }
-                  } catch {
+                  const result = await claim();
+                  if (result.ok && result.rewardId) {
+                    toast.success("🎁 PowerBank получен!");
+                    await Promise.all([
+                      refetchEP(),
+                      refetchPowerBanks(),
+                      activity.refetch()
+                    ]);
+                  } else if (result.error === "Reward already claimed") {
+                    toast.info("⚡ PowerBank уже получен сегодня");
+                  } else if (result.error === "EP goal not reached yet") {
+                    toast.warning("🧠 Сначала нужно достичь 1000 EP");
+                  } else {
                     toast.error("❌ Не удалось забрать PowerBank");
                   }
                 }}
@@ -187,10 +190,7 @@ export default function Dashboard() {
                 ⚡ PowerBank: {powerbankCount}
               </div>
             </motion.div>
-          )}
-
-          {/* ⚡ PowerBank Индикатор (если нет кнопки) */}
-          {(!ep >= goal || alreadyClaimed) && (
+          ) : (
             <motion.div
               className="text-sm text-emerald-400 text-center mt-2 mb-3"
               initial={{ opacity: 0 }}
