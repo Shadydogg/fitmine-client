@@ -15,18 +15,22 @@ export function useDailyReward() {
   }> => {
     setLoading(true);
     setError(null);
+
     try {
       const res = await api.post("/ep/claim");
       const json = res.data;
 
-      if (json.error === "Reward already claimed") {
+      // 🛑 Уже получено
+      if (json.alreadyClaimed || json.error === "Reward already claimed") {
         setAlreadyClaimed(true);
-        return { ok: false, error: json.error };
+        return { ok: false, error: "Reward already claimed" };
       }
 
+      // ✅ Успешно
       if (json.ok && json.rewardId) {
         setReward(json.rewardId);
         setShowModal(true);
+        setAlreadyClaimed(true); // гарантированно, даже если сразу нажал повторно
         return { ok: true, rewardId: json.rewardId };
       }
 
