@@ -21,6 +21,7 @@ export default function Dashboard() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { user, sessionLoaded, accessToken, setTokens } = useSession();
+
   const activity = useSyncActivity();
   const { ep, goal, doubleGoal, loading: epLoading, refetch: refetchEP } = useUserEP();
   const {
@@ -86,13 +87,33 @@ export default function Dashboard() {
     }
   };
 
-  const nearComplete = ep >= goal * 0.9 && ep < goal;
   const epProgressText =
     ep >= goal
       ? doubleGoal
         ? "✅ Цель 2000 EP выполнена!"
         : "🎉 Цель достигнута! Забери PowerBank"
       : `🧠 Осталось ${goal - ep} EP до цели`;
+
+  const nearComplete = ep >= goal * 0.9 && ep < goal;
+
+  const handleClaim = async () => {
+    const result = await claim();
+
+    if (result.ok && result.rewardId) {
+      toast.success("🎁 PowerBank получен!");
+      await Promise.all([
+        refetchEP(),
+        refetchPowerBanks(),
+        activity.refetch(),
+      ]);
+    } else if (result.error === "Reward already claimed") {
+      toast.info("⚡ PowerBank уже получен сегодня");
+    } else if (result.error === "EP goal not reached yet") {
+      toast.warning("🧠 Сначала нужно достичь 1000 EP");
+    } else {
+      toast.error("❌ Не удалось забрать PowerBank");
+    }
+  };
 
   return (
     <div className="relative w-full min-h-screen flex flex-col items-center bg-gradient-to-br from-black via-zinc-900 to-black text-white overflow-x-hidden pb-24">
@@ -131,7 +152,7 @@ export default function Dashboard() {
         {t("dashboard.title", "Твоя активность сегодня")}
       </motion.h1>
 
-      {/* 🔋 EP Battery */}
+      {/* 🔋 EP Battery и состояние */}
       {epLoading ? (
         <div className="text-gray-500 mt-4 animate-pulse">
           {t("dashboard.loading", "Загрузка EP...")}
@@ -156,7 +177,7 @@ export default function Dashboard() {
             {epProgressText}
           </motion.div>
 
-          {/* 🎁 Кнопка Claim + Индикатор */}
+          {/* 🎁 Кнопка или просто индикатор PowerBank */}
           {ep >= goal && !alreadyClaimed ? (
             <motion.div
               initial={{ opacity: 0 }}
@@ -165,26 +186,11 @@ export default function Dashboard() {
               className="flex flex-col items-center mt-2"
             >
               <button
-                onClick={async () => {
-                  const result = await claim();
-                  if (result.ok && result.rewardId) {
-                    toast.success("🎁 PowerBank получен!");
-                    await Promise.all([
-                      refetchEP(),
-                      refetchPowerBanks(),
-                      activity.refetch()
-                    ]);
-                  } else if (result.error === "Reward already claimed") {
-                    toast.info("⚡ PowerBank уже получен сегодня");
-                  } else if (result.error === "EP goal not reached yet") {
-                    toast.warning("🧠 Сначала нужно достичь 1000 EP");
-                  } else {
-                    toast.error("❌ Не удалось забрать PowerBank");
-                  }
-                }}
-                className="px-6 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-full shadow transition mb-2"
+                onClick={handleClaim}
+                disabled={rewardLoading}
+                className="px-6 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-full shadow transition mb-2 disabled:opacity-50"
               >
-                🎁 Забрать PowerBank
+                {rewardLoading ? "⏳ Забираем..." : "🎁 Забрать PowerBank"}
               </button>
               <div className="text-sm text-emerald-400 text-center">
                 ⚡ PowerBank: {powerbankCount}
