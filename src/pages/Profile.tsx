@@ -1,14 +1,14 @@
-// /src/pages/Profile.tsx — v2.4.0
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-import { motion } from 'framer-motion';
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import { motion, AnimatePresence } from "framer-motion";
+import { toast } from "react-toastify";
 
-import { useSession } from '../context/SessionContext';
-import BottomTab from '../components/BottomTab';
-import ConnectGoogleFit from '../components/ConnectGoogleFit';
-import { usePowerbankStats } from '../hooks/usePowerbankStats';
-import { PowerBankInventory } from '../components/PowerBankInventory'; // ✅
+import { useSession } from "../context/SessionContext";
+import BottomTab from "../components/BottomTab";
+import ConnectGoogleFit from "../components/ConnectGoogleFit";
+import { usePowerbankStats } from "../hooks/usePowerbankStats";
+import { PowerBankInventory } from "../components/PowerBankInventory";
 
 export default function Profile() {
   const navigate = useNavigate();
@@ -19,15 +19,16 @@ export default function Profile() {
   if (loading || !sessionLoaded) {
     return (
       <div className="flex items-center justify-center min-h-screen text-gray-600 text-center">
-        {t('profile.loading', 'Загрузка профиля...')}
+        {t("profile.loading", "Загрузка профиля...")}
       </div>
     );
   }
 
   if (!user || !isAuthenticated || !accessToken) {
+    toast.error("❌ Ошибка авторизации профиля");
     return (
       <div className="flex items-center justify-center min-h-screen text-gray-500 text-center">
-        {t('profile.notFound', 'Профиль не найден')}
+        {t("profile.notFound", "Профиль не найден")}
       </div>
     );
   }
@@ -36,15 +37,15 @@ export default function Profile() {
     <div className="flex flex-col items-center justify-start min-h-screen px-4 pb-24 bg-gradient-to-br from-black via-zinc-900 to-black text-white">
       {/* 🔙 Назад */}
       <button
-        onClick={() => navigate('/dashboard')}
+        onClick={() => navigate("/dashboard")}
         className="absolute top-4 left-4 text-sm text-gray-400 hover:text-white"
       >
-        ← {t('profile.back', 'Назад')}
+        ← {t("profile.back", "Назад")}
       </button>
 
       {/* 🦩 Заголовок */}
       <h1 className="text-3xl font-extrabold mt-20 mb-6 tracking-wide drop-shadow text-center">
-        {t('profile.title')} • FitMine
+        {t("profile.title", "Профиль")} • FitMine
       </h1>
 
       {/* 🧊 Карточка */}
@@ -55,7 +56,7 @@ export default function Profile() {
         className="bg-white/10 backdrop-blur-sm border border-white/10 rounded-2xl shadow-lg p-6 max-w-sm w-full text-center"
       >
         <img
-          src={user.photo_url || '/default-avatar.png'}
+          src={user.photo_url || "/default-avatar.png"}
           alt="avatar"
           className="w-24 h-24 rounded-full mx-auto mb-4 shadow-md border border-white/20"
         />
@@ -66,40 +67,51 @@ export default function Profile() {
 
         {user.is_premium && (
           <div className="mt-2 inline-flex items-center gap-2 px-3 py-1 text-xs bg-purple-600/80 text-white rounded-full shadow shadow-purple-500/50">
-            💫 {t('profile.premium', 'Премиум-пользователь')}
+            💫 {t("profile.premium", "Премиум-пользователь")}
           </div>
         )}
 
         <div className="mt-4 text-xs text-gray-400 space-y-1">
-          <div>🆔 {t('profile.id')}: {user.telegram_id}</div>
+          <div>🆔 ID: {user.telegram_id}</div>
           <div>🌐 Язык: {user.language_code}</div>
-          <div>💬 ЛС: {user.allows_write_to_pm ? '✅ Да' : '❌ Нет'}</div>
+          <div>💬 ЛС: {user.allows_write_to_pm ? "✅ Да" : "❌ Нет"}</div>
         </div>
 
         {/* 🚀 Кнопка перехода */}
         <button
-          onClick={() => navigate('/dashboard')}
+          onClick={() => navigate("/dashboard")}
           className="mt-6 px-4 py-2 bg-gradient-to-r from-lime-400 to-emerald-500 text-white rounded-full shadow hover:scale-105 transition-transform font-semibold"
         >
-          {t('profile.goDashboard', 'Назад к активности')}
+          {t("profile.goDashboard", "Назад к активности")}
         </button>
 
         {/* ⚡ PowerBank статистика */}
-        {typeof usedCount === 'number' && (
+        {typeof usedCount === "number" && (
           <div className="mt-4 text-sm text-emerald-300">
             ⚡ Использовано PowerBank: {usedCount}
             <br />
             {usedToday
-              ? 'Сегодня уже использован'
-              : `Последнее использование: ${lastUsedAt ? new Date(lastUsedAt).toLocaleDateString() : '—'}`}
+              ? "Сегодня уже использован"
+              : `Последнее использование: ${
+                  lastUsedAt
+                    ? new Date(lastUsedAt).toLocaleString()
+                    : "—"
+                }`}
           </div>
         )}
       </motion.div>
 
       {/* ⚡ Инвентарь PowerBank */}
-      <div className="w-full mt-6">
-        <PowerBankInventory />
-      </div>
+      <AnimatePresence>
+        <motion.div
+          className="w-full mt-6"
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0 }}
+        >
+          <PowerBankInventory />
+        </motion.div>
+      </AnimatePresence>
 
       {/* ⚙️ Google Fit статус */}
       <div className="mt-6 max-w-sm w-full text-center">
@@ -121,7 +133,6 @@ export default function Profile() {
         )}
       </div>
 
-      {/* 🔻 BottomTab */}
       <BottomTab current="profile" />
     </div>
   );
