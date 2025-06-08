@@ -1,7 +1,7 @@
-// /src/pages/Dashboard.tsx — v2.6.0
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { toast } from "react-toastify";
 
 import useSyncActivity from "../hooks/useSyncActivity";
 import AnimatedBackground from "../components/AnimatedBackground";
@@ -22,19 +22,12 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const { user, sessionLoaded, accessToken, setTokens } = useSession();
   const activity = useSyncActivity();
-  const {
-    ep,
-    goal,
-    doubleGoal,
-    loading: epLoading,
-    refetch: refetchEP,
-  } = useUserEP();
+  const { ep, goal, doubleGoal, loading: epLoading, refetch: refetchEP } = useUserEP();
   const {
     reward,
     showModal,
     setShowModal,
     alreadyClaimed,
-    loading: rewardLoading,
     claim,
   } = useDailyReward();
   const {
@@ -85,10 +78,10 @@ export default function Dashboard() {
         refetchEP();
         refetchPowerBanks();
       } else {
-        alert(`❌ Ошибка: ${data.error}`);
+        toast.error(`❌ Ошибка: ${data.error}`);
       }
     } catch {
-      alert("❌ Ошибка соединения");
+      toast.error("❌ Ошибка соединения");
     }
   };
 
@@ -162,18 +155,20 @@ export default function Dashboard() {
             {epProgressText}
           </motion.div>
 
-          {/* 🎁 Кнопка Claim */}
+          {/* 🎁 Кнопка Claim + PowerBank */}
           {ep >= goal && !alreadyClaimed && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 1.1 }}
+              className="flex flex-col items-center mt-2"
             >
               <button
                 onClick={async () => {
                   try {
                     const result = await claim();
                     if (result?.ok && result.rewardId) {
+                      toast.success("🎁 PowerBank получен!");
                       await Promise.all([
                         refetchEP(),
                         refetchPowerBanks(),
@@ -181,25 +176,30 @@ export default function Dashboard() {
                       ]);
                     }
                   } catch {
-                    alert("❌ Не удалось забрать PowerBank");
+                    toast.error("❌ Не удалось забрать PowerBank");
                   }
                 }}
-                className="mt-3 px-6 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-full shadow transition"
+                className="px-6 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-full shadow transition mb-2"
               >
                 🎁 Забрать PowerBank
               </button>
+              <div className="text-sm text-emerald-400 text-center">
+                ⚡ PowerBank: {powerbankCount}
+              </div>
             </motion.div>
           )}
 
-          {/* ⚡ PowerBank Индикатор */}
-          <motion.div
-            className="text-sm text-emerald-400 text-center mt-2 mb-3"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1.2 }}
-          >
-            ⚡ PowerBank: {powerbankCount}
-          </motion.div>
+          {/* ⚡ PowerBank Индикатор (если нет кнопки) */}
+          {(!ep >= goal || alreadyClaimed) && (
+            <motion.div
+              className="text-sm text-emerald-400 text-center mt-2 mb-3"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 1.2 }}
+            >
+              ⚡ PowerBank: {powerbankCount}
+            </motion.div>
+          )}
         </motion.div>
       )}
 
