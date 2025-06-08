@@ -1,7 +1,11 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 import { useUserEP } from "../hooks/useUserEP";
 import { usePowerBanks } from "../hooks/usePowerBanks";
+import { useSession } from "../context/SessionContext";
 
 type PowerBank = {
   id: string;
@@ -14,9 +18,9 @@ type PowerBank = {
 };
 
 export const PowerBankInventory: React.FC = () => {
-  const [message, setMessage] = useState<string | null>(null);
   const [usingId, setUsingId] = useState<string | null>(null);
 
+  const { accessToken } = useSession();
   const { ep, refetch: refetchEP, loading: epLoading } = useUserEP();
   const {
     powerbanks,
@@ -26,41 +30,49 @@ export const PowerBankInventory: React.FC = () => {
 
   const handleUse = async (id: string) => {
     if (ep >= 1000) {
-      alert("⚡ Энергия уже полная. Использовать PowerBank нельзя.");
+      toast.info("⚡ Энергия уже полная. Использовать PowerBank нельзя.");
       return;
     }
 
     try {
       setUsingId(id);
-      setMessage(null);
 
-      const res = await axios.post("/api/powerbanks/use", { id }, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-        },
-      });
+      const res = await axios.post(
+        "/api/powerbanks/use",
+        { id },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
 
-      setMessage(res.data.message || "✅ PowerBank активирован");
+      toast.success(res.data.message || "✅ PowerBank активирован");
 
-      await Promise.all([
-        refetchPowerbanks(),
-        refetchEP(),
-      ]);
+      await Promise.all([refetchPowerbanks(), refetchEP()]);
     } catch (err: any) {
-      const msg = err.response?.data?.error || "❌ Ошибка применения PowerBank";
-      alert(msg);
-      setMessage(msg);
+      const msg =
+        err.response?.data?.error || "❌ Ошибка применения PowerBank";
+      toast.error(msg);
     } finally {
       setUsingId(null);
     }
   };
 
   if (loadingPB || epLoading) {
-    return <div className="text-white text-center py-4">🔄 Загрузка PowerBank...</div>;
+    return (
+      <div className="text-white text-center py-4">
+        🔄 Загрузка PowerBank...
+      </div>
+    );
   }
 
   if (!powerbanks.length) {
-    return <div className="text-white text-center py-4">😕 У вас нет PowerBank'ов.</div>;
+    return (
+      <div className="text-white text-center py-4">
+        😕 У вас нет PowerBank'ов.
+      </div>
+    );
   }
 
   return (
@@ -68,12 +80,6 @@ export const PowerBankInventory: React.FC = () => {
       <h2 className="text-xl font-bold text-center text-white mb-2">
         ⚡ Инвентарь PowerBank'ов
       </h2>
-
-      {message && (
-        <div className="text-center text-emerald-400 font-medium">
-          {message}
-        </div>
-      )}
 
       {powerbanks.map((pb) => (
         <div
