@@ -1,3 +1,4 @@
+// src/hooks/useUserEP.ts — v2.2.0
 import { useEffect, useState, useCallback } from "react";
 import { api } from "../api/apiClient";
 
@@ -40,15 +41,8 @@ export function useUserEP() {
     fetchEP();
   }, [version]);
 
+  // ❗️Цель EP всегда фиксированная, даже если doubleGoal
   const goal = 1000;
 
-  return {
-    ep,
-    goal,
-    doubleGoal,
-    epClaimed,
-    loading,
-    error,
-    refetch,
-  };
+  return { ep, goal, doubleGoal, epClaimed, loading, error, refetch };
 }
