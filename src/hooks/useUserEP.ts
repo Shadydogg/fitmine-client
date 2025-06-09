@@ -4,11 +4,13 @@ import { api } from "../api/apiClient";
 type EpResponse = {
   ep: number;
   double_goal?: boolean;
+  ep_reward_claimed?: boolean;
 };
 
 export function useUserEP() {
   const [ep, setEp] = useState<number>(0);
   const [doubleGoal, setDoubleGoal] = useState<boolean>(false);
+  const [rewardClaimed, setRewardClaimed] = useState<boolean>(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [version, setVersion] = useState(0); // 🔁 для refetch
@@ -25,6 +27,7 @@ export function useUserEP() {
         const rawEP = Math.round(res.data.ep || 0);
         setEp(rawEP);
         setDoubleGoal(!!res.data.double_goal);
+        setRewardClaimed(!!res.data.ep_reward_claimed);
         setError(null);
       } catch (err: any) {
         console.error("❌ Ошибка получения EP:", err);
@@ -40,5 +43,13 @@ export function useUserEP() {
   // ❗️Цель EP всегда фиксированная, даже если double_goal
   const goal = 1000;
 
-  return { ep, goal, doubleGoal, loading, error, refetch };
+  return {
+    ep,
+    goal,
+    doubleGoal,
+    rewardClaimed,
+    loading,
+    error,
+    refetch,
+  };
 }
