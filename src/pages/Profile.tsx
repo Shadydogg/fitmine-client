@@ -9,18 +9,15 @@ import BottomTab from "../components/BottomTab";
 import ConnectGoogleFit from "../components/ConnectGoogleFit";
 import { usePowerbankStats } from "../hooks/usePowerbankStats";
 import { PowerBankInventory } from "../components/PowerBankInventory";
-import { useUserEP } from "../hooks/useUserEP";
 import EPBatterySVG from "../components/EPBatterySVG";
-import useSyncActivity from "../hooks/useSyncActivity";
-import DashboardSummary from "../components/DashboardSummary";
+import { useUserEP } from "../hooks/useUserEP";
 
 export default function Profile() {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { accessToken, isAuthenticated, sessionLoaded, user } = useSession();
   const { usedCount, lastUsedAt, usedToday, loading: powerbankLoading } = usePowerbankStats();
-  const { ep, goal, doubleGoal, loading: epLoading } = useUserEP();
-  const activity = useSyncActivity();
+  const { ep, goal, loading: epLoading } = useUserEP();
 
   if (powerbankLoading || epLoading || !sessionLoaded) {
     return (
@@ -38,13 +35,6 @@ export default function Profile() {
       </div>
     );
   }
-
-  const epProgressText =
-    ep >= goal
-      ? doubleGoal
-        ? "✅ Цель 2000 EP выполнена (PowerBank уже получен)"
-        : "🎉 Цель выполнена! PowerBank доступен"
-      : `🧠 Осталось ${goal - ep} EP до цели`;
 
   return (
     <div className="flex flex-col items-center justify-start min-h-screen px-4 pb-24 bg-gradient-to-br from-black via-zinc-900 to-black text-white">
@@ -104,24 +94,10 @@ export default function Profile() {
         )}
       </motion.div>
 
-      {/* 🔋 EP Battery + статус */}
+      {/* 🔋 EP Battery без текста цели */}
       <div className="mt-6 max-w-md w-full px-4">
         <EPBatterySVG ep={ep} goal={goal} />
-        <div className="text-center text-sm text-lime-300 font-medium mt-2">
-          {epProgressText}
-        </div>
       </div>
-
-      {/* 📊 Activity Ring */}
-      {!activity.loading && (
-        <motion.div
-          className="mt-6"
-          initial={{ opacity: 0, y: 6 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
-          <DashboardSummary data={activity} />
-        </motion.div>
-      )}
 
       {/* ⚡ Инвентарь PowerBank */}
       <AnimatePresence>
