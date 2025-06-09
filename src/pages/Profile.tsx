@@ -9,14 +9,20 @@ import BottomTab from "../components/BottomTab";
 import ConnectGoogleFit from "../components/ConnectGoogleFit";
 import { usePowerbankStats } from "../hooks/usePowerbankStats";
 import { PowerBankInventory } from "../components/PowerBankInventory";
+import { useUserEP } from "../hooks/useUserEP";
+import EPBatterySVG from "../components/EPBatterySVG";
+import useSyncActivity from "../hooks/useSyncActivity";
+import DashboardSummary from "../components/DashboardSummary";
 
 export default function Profile() {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { accessToken, isAuthenticated, sessionLoaded, user } = useSession();
-  const { usedCount, lastUsedAt, usedToday, loading } = usePowerbankStats();
+  const { usedCount, lastUsedAt, usedToday, loading: powerbankLoading } = usePowerbankStats();
+  const { ep, goal, doubleGoal, loading: epLoading } = useUserEP();
+  const activity = useSyncActivity();
 
-  if (loading || !sessionLoaded) {
+  if (powerbankLoading || epLoading || !sessionLoaded) {
     return (
       <div className="flex items-center justify-center min-h-screen text-gray-600 text-center">
         {t("profile.loading", "Загрузка профиля...")}
@@ -32,6 +38,13 @@ export default function Profile() {
       </div>
     );
   }
+
+  const epProgressText =
+    ep >= goal
+      ? doubleGoal
+        ? "✅ Цель 2000 EP выполнена (PowerBank уже получен)"
+        : "🎉 Цель выполнена! PowerBank доступен"
+      : `🧠 Осталось ${goal - ep} EP до цели`;
 
   return (
     <div className="flex flex-col items-center justify-start min-h-screen px-4 pb-24 bg-gradient-to-br from-black via-zinc-900 to-black text-white">
@@ -77,14 +90,6 @@ export default function Profile() {
           <div>💬 ЛС: {user.allows_write_to_pm ? "✅ Да" : "❌ Нет"}</div>
         </div>
 
-        {/* 🚀 Кнопка перехода */}
-        <button
-          onClick={() => navigate("/dashboard")}
-          className="mt-6 px-4 py-2 bg-gradient-to-r from-lime-400 to-emerald-500 text-white rounded-full shadow hover:scale-105 transition-transform font-semibold"
-        >
-          {t("profile.goDashboard", "Назад к активности")}
-        </button>
-
         {/* ⚡ PowerBank статистика */}
         {typeof usedCount === "number" && (
           <div className="mt-4 text-sm text-emerald-300">
@@ -93,13 +98,30 @@ export default function Profile() {
             {usedToday
               ? "Сегодня уже использован"
               : `Последнее использование: ${
-                  lastUsedAt
-                    ? new Date(lastUsedAt).toLocaleString()
-                    : "—"
+                  lastUsedAt ? new Date(lastUsedAt).toLocaleString() : "—"
                 }`}
           </div>
         )}
       </motion.div>
+
+      {/* 🔋 EP Battery + статус */}
+      <div className="mt-6 max-w-md w-full px-4">
+        <EPBatterySVG ep={ep} goal={goal} />
+        <div className="text-center text-sm text-lime-300 font-medium mt-2">
+          {epProgressText}
+        </div>
+      </div>
+
+      {/* 📊 Activity Ring */}
+      {!activity.loading && (
+        <motion.div
+          className="mt-6"
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <DashboardSummary data={activity} />
+        </motion.div>
+      )}
 
       {/* ⚡ Инвентарь PowerBank */}
       <AnimatePresence>
