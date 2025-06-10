@@ -1,4 +1,3 @@
-// src/components/ActivityRingSVG.tsx — v2.6.0 (добавлено кольцо active_minutes)
 import { motion } from "framer-motion";
 
 interface Props {
@@ -86,6 +85,8 @@ export default function ActivityRingSVG({
         height="200"
         className="-rotate-90"
         xmlns="http://www.w3.org/2000/svg"
+        role="img"
+        aria-label="Activity Rings"
       >
         {renderRing("#00DBDE", stepsPercent, 0, 0.1, "#00FFFF")}       {/* Steps */}
         {renderRing("#FF5F6D", caloriesPercent, 10, 0.5, "#FF5F6D")}    {/* Calories */}
@@ -96,7 +97,7 @@ export default function ActivityRingSVG({
       <div className="absolute bottom-0 w-full text-sm text-center text-white leading-tight mt-2 px-2 pointer-events-none">
         <div>👟 {Math.round(steps)} / {stepsGoal} шагов</div>
         <div>🔥 {Math.round(calories)} / {caloriesGoal} ккал</div>
-        <div>📏 {distance.toFixed(2)} / {distanceGoal} км</div>
+        <div>📏 {distance.toFixed(2)} / {Math.round(distanceGoal)} км</div>
         <div>⏱ {Math.round(activeMinutes)} / {activeMinutesGoal} мин</div>
       </div>
     </div>
