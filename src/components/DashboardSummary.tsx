@@ -1,6 +1,6 @@
-// src/components/DashboardSummary.tsx — v3.1.3
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
+import { useUserEP } from "../hooks/useUserEP";
 import ActivityRingSVG from "./ActivityRingSVG";
 
 interface Props {
@@ -13,19 +13,21 @@ interface Props {
     isPremium: boolean;
     loading: boolean;
   };
-  doubleGoal: boolean;
 }
 
-export default function DashboardSummary({ data, doubleGoal }: Props) {
+export default function DashboardSummary({ data }: Props) {
   const { t } = useTranslation();
+  const { doubleGoal } = useUserEP();
 
-  // 🎯 Цели (удваиваются, если активен PowerBank)
+  // 🎯 Цели в зависимости от PowerBank
   const stepsGoal = doubleGoal ? 20000 : 10000;
   const caloriesGoal = doubleGoal ? 4000 : 2000;
   const distanceGoal = doubleGoal ? 10 : 5; // км
   const activeMinutesGoal = doubleGoal ? 90 : 45;
 
+  // 📊 Метрики пользователя
   const { steps, calories, distance, activeMinutes } = data;
+  const distanceKm = distance / 1000;
 
   return (
     <div className="w-full flex flex-col items-center justify-center py-6 px-4">
@@ -40,7 +42,7 @@ export default function DashboardSummary({ data, doubleGoal }: Props) {
           stepsGoal={stepsGoal}
           calories={calories}
           caloriesGoal={caloriesGoal}
-          distance={distance / 1000} // м → км
+          distance={distanceKm}
           distanceGoal={distanceGoal}
           activeMinutes={activeMinutes}
           activeMinutesGoal={activeMinutesGoal}
