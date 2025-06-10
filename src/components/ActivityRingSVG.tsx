@@ -1,4 +1,3 @@
-// src/components/ActivityRingSVG.tsx — v2.1.0
 import { motion } from "framer-motion";
 
 interface Props {
@@ -6,7 +5,7 @@ interface Props {
   stepsGoal: number;
   calories: number;
   caloriesGoal: number;
-  distance: number; // в километрах
+  distance: number; // в км
   distanceGoal: number;
   activeMinutes: number;
   activeMinutesGoal: number;
@@ -89,16 +88,16 @@ export default function ActivityRingSVG({
         role="img"
         aria-label="Activity Rings"
       >
-        {renderRing("#00DBDE", stepsPercent, 0, 0.1, "#00FFFF")}
-        {renderRing("#FF5F6D", caloriesPercent, 10, 0.5, "#FF5F6D")}
-        {renderRing("#FCEE09", distancePercent, 20, 0.9, "#FCEE09")}
-        {renderRing("#9F7AEA", minutesPercent, 30, 1.3, "#B794F4")}
+        {renderRing("#00DBDE", stepsPercent, 0, 0.1, "#00FFFF")}       {/* Steps */}
+        {renderRing("#FF5F6D", caloriesPercent, 10, 0.5, "#FF5F6D")}    {/* Calories */}
+        {renderRing("#FCEE09", distancePercent, 20, 0.9, "#FCEE09")}   {/* Distance */}
+        {renderRing("#9F7AEA", minutesPercent, 30, 1.3, "#B794F4")}     {/* Active Minutes */}
       </svg>
 
       <div className="absolute bottom-0 w-full text-sm text-center text-white leading-tight mt-2 px-2 pointer-events-none">
         <div>👟 {Math.round(steps)} / {stepsGoal} шагов</div>
         <div>🔥 {Math.round(calories)} / {caloriesGoal} ккал</div>
-        <div>📏 {distance.toFixed(2)} / {distanceGoal.toFixed(2)} км</div>
+        <div>📏 {distance.toFixed(2)} / {distanceGoal} км</div>
         <div>⏱ {Math.round(activeMinutes)} / {activeMinutesGoal} мин</div>
       </div>
     </div>
