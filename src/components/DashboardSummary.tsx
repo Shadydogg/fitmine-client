@@ -1,3 +1,4 @@
+// src/components/DashboardSummary.tsx — v3.1.0
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import ActivityRingSVG from "./ActivityRingSVG";
@@ -18,7 +19,7 @@ interface Props {
 export default function DashboardSummary({ data, doubleGoal }: Props) {
   const { t } = useTranslation();
 
-  // 🎯 Цели дня — удваиваются, если активирован PowerBank
+  // 🎯 Цели: удвоенные при doubleGoal
   const stepsGoal = doubleGoal ? 20000 : 10000;
   const caloriesGoal = doubleGoal ? 4000 : 2000;
   const distanceGoal = doubleGoal ? 10 : 5; // км
@@ -37,7 +38,7 @@ export default function DashboardSummary({ data, doubleGoal }: Props) {
         <ActivityRingSVG
           steps={steps}
           stepsGoal={stepsGoal}
-          calories={calories} // ✅ Фикс
+          calories={calories} {/* ✅ фикс */}
           caloriesGoal={caloriesGoal}
           distance={distance}
           distanceGoal={distanceGoal}
