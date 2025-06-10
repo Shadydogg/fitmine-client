@@ -240,7 +240,6 @@ export default function Dashboard() {
               isPremium: activity.isPremium || false,
               loading: activity.loading,
             }}
-            doubleGoal={doubleGoal}
           />
         </motion.div>
       )}
