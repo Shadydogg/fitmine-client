@@ -1,4 +1,3 @@
-// src/hooks/useUserEP.ts — v2.3.0
 import { useEffect, useState, useCallback } from "react";
 import { api } from "../api/apiClient";
 
@@ -26,7 +25,7 @@ export function useUserEP() {
       try {
         const res = await api.get<EpResponse>("/ep");
 
-        const rawEP = Math.round(res.data.ep || 0);
+        const rawEP = Math.round(res.data.ep ?? 0);
         const isDouble = !!res.data.double_goal;
         const isClaimed = !!res.data.ep_reward_claimed;
 
@@ -45,7 +44,7 @@ export function useUserEP() {
     fetchEP();
   }, [version]);
 
-  // ❗️Цель всегда 1000 — даже при double goal, он влияет на отображение и прогресс
+  // 🎯 Цель фиксирована — 1000 EP в день
   const goal = 1000;
 
   return {
