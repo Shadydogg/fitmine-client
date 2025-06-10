@@ -59,4 +59,4 @@ export default function DashboardSummary({ data, doubleGoal }: Props) {
       </motion.div>
     </div>
   );
-}
+} 
