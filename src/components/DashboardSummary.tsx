@@ -18,7 +18,6 @@ interface Props {
 export default function DashboardSummary({ data, doubleGoal }: Props) {
   const { t } = useTranslation();
 
-  // 🎯 Базовые цели
   const stepsGoal = doubleGoal ? 20000 : 10000;
   const caloriesGoal = doubleGoal ? 4000 : 2000;
   const distanceGoal = doubleGoal ? 10 : 5; // км
@@ -37,7 +36,7 @@ export default function DashboardSummary({ data, doubleGoal }: Props) {
         <ActivityRingSVG
           steps={steps}
           stepsGoal={stepsGoal}
-          calories={calories} {/* 🔧 Была ошибка */}
+          calories={calories}
           caloriesGoal={caloriesGoal}
           distance={distance}
           distanceGoal={distanceGoal}
@@ -59,4 +58,4 @@ export default function DashboardSummary({ data, doubleGoal }: Props) {
       </motion.div>
     </div>
   );
-} 
+}
