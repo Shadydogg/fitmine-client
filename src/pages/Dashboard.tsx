@@ -233,7 +233,7 @@ export default function Dashboard() {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.7 }}
         >
-          <DashboardSummary data={activity} />
+          <DashboardSummary data={activity} doubleGoal={doubleGoal} />
         </motion.div>
       )}
 
