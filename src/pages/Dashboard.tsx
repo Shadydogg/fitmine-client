@@ -1,3 +1,5 @@
+// src/pages/Dashboard.tsx — v3.6.0
+
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -96,8 +98,8 @@ export default function Dashboard() {
   const epProgressText = doubleGoal
     ? "⚡ PowerBank активен до конца дня"
     : ep >= goal
-      ? "🎉 Цель достигнута! Забери PowerBank"
-      : `🧠 Осталось ${goal - ep} EP до цели`;
+    ? "🎉 Цель достигнута! Забери PowerBank"
+    : `🧠 Осталось ${goal - ep} EP до цели`;
 
   const nearComplete = ep >= goal * 0.9 && ep < goal;
 
