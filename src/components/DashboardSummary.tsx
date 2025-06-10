@@ -1,4 +1,4 @@
-// src/components/DashboardSummary.tsx — v2.7.0 (добавлено active_minutes и обновлено описание)
+// src/components/DashboardSummary.tsx — v2.8.0
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import ActivityRingSVG from "./ActivityRingSVG";
@@ -6,31 +6,26 @@ import ActivityRingSVG from "./ActivityRingSVG";
 interface Props {
   data: {
     steps: number;
-    stepsGoal: number;
     calories: number;
-    caloriesGoal: number;
     distance: number; // в метрах
-    distanceGoal: number; // в километрах
     activeMinutes: number;
-    activeMinutesGoal: number;
     hasNFT: boolean;
     isPremium: boolean;
     loading: boolean;
   };
+  doubleGoal?: boolean; // 🔁 новый проп
 }
 
-export default function DashboardSummary({ data }: Props) {
+export default function DashboardSummary({ data, doubleGoal = false }: Props) {
   const { t } = useTranslation();
-  const {
-    steps,
-    stepsGoal,
-    calories,
-    caloriesGoal,
-    distance,
-    distanceGoal,
-    activeMinutes,
-    activeMinutesGoal,
-  } = data;
+
+  // 🎯 Базовые цели
+  const stepsGoal = doubleGoal ? 20000 : 10000;
+  const caloriesGoal = doubleGoal ? 4000 : 2000;
+  const distanceGoal = doubleGoal ? 10 : 5; // км
+  const activeMinutesGoal = doubleGoal ? 90 : 45;
+
+  const { steps, calories, distance, activeMinutes } = data;
 
   return (
     <div className="w-full flex flex-col items-center justify-center py-6 px-4">
@@ -45,8 +40,8 @@ export default function DashboardSummary({ data }: Props) {
           stepsGoal={stepsGoal}
           calories={calories}
           caloriesGoal={caloriesGoal}
-          distance={distance} // в метрах
-          distanceGoal={distanceGoal} // в км
+          distance={distance}
+          distanceGoal={distanceGoal}
           activeMinutes={activeMinutes}
           activeMinutesGoal={activeMinutesGoal}
         />
