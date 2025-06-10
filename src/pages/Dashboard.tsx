@@ -1,5 +1,3 @@
-// src/pages/Dashboard.tsx — v2.9.0
-
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -154,6 +152,8 @@ export default function Dashboard() {
       >
         {doubleGoal
           ? "⚡ PowerBank активен до конца дня"
+          : epClaimed
+          ? "⚡ PowerBank уже получен сегодня"
           : `⚡ PowerBank: ${powerbankCount}`}
       </motion.div>
     );
