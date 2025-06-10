@@ -1,4 +1,4 @@
-// src/pages/Dashboard.tsx — v3.2.0
+// src/pages/Dashboard.tsx — v3.3.0
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -230,8 +230,13 @@ export default function Dashboard() {
           transition={{ delay: 0.7 }}
         >
           <DashboardSummary
-            data={activity}
-            doubleGoal={doubleGoal} // ✅ doubleGoal теперь однозначный источник
+            data={{
+              ...activity,
+              stepsGoal: doubleGoal ? 20000 : 10000,
+              caloriesGoal: doubleGoal ? 4000 : 2000,
+              distanceGoal: doubleGoal ? 10 : 5,
+              activeMinutesGoal: doubleGoal ? 90 : 45,
+            }}
           />
         </motion.div>
       )}
