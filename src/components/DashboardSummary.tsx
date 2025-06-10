@@ -1,10 +1,11 @@
+// src/components/DashboardSummary.tsx — v3.2.0
 import ActivityRingSVG from "./ActivityRingSVG";
 
 interface Props {
   data: {
     steps: number;
     calories: number;
-    distance: number; // метры
+    distance: number; // в метрах
     activeMinutes: number;
     hasNFT: boolean;
     isPremium: boolean;
@@ -22,15 +23,15 @@ export default function DashboardSummary({ data, doubleGoal }: Props) {
     loading,
   } = data;
 
-  // 🎯 Цели по умолчанию
+  // 🎯 Базовые дневные цели
   const baseGoals = {
-    steps: 8000,
-    calories: 400,
-    distance: 5000, // в метрах
-    activeMinutes: 45,
+    steps: 10000,            // шагов
+    calories: 2000,          // ккал
+    distance: 5000,          // метров (5 км)
+    activeMinutes: 45        // минут активности
   };
 
-  // ✅ Удвоенные цели, если doubleGoal = true
+  // ⚡ Удвоение целей, если PowerBank активен
   const multiplier = doubleGoal ? 2 : 1;
 
   const stepsGoal = baseGoals.steps * multiplier;
@@ -44,8 +45,8 @@ export default function DashboardSummary({ data, doubleGoal }: Props) {
       stepsGoal={stepsGoal}
       calories={calories}
       caloriesGoal={caloriesGoal}
-      distance={distance / 1000} // переводим в километры
-      distanceGoal={distanceGoal / 1000}
+      distance={distance / 1000}             // из м в км
+      distanceGoal={distanceGoal / 1000}     // из м в км
       activeMinutes={activeMinutes}
       activeMinutesGoal={activeMinutesGoal}
     />
