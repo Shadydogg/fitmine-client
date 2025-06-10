@@ -1,72 +1,53 @@
-import { motion } from "framer-motion";
-import { useTranslation } from "react-i18next";
 import ActivityRingSVG from "./ActivityRingSVG";
 
 interface Props {
   data: {
     steps: number;
     calories: number;
-    distance: number; // в метрах
+    distance: number; // метры
     activeMinutes: number;
     hasNFT: boolean;
     isPremium: boolean;
     loading: boolean;
-    doubleGoal: boolean;
   };
+  doubleGoal: boolean;
 }
 
-export default function DashboardSummary({ data }: Props) {
-  const { t } = useTranslation();
+export default function DashboardSummary({ data, doubleGoal }: Props) {
   const {
     steps,
     calories,
     distance,
     activeMinutes,
-    hasNFT,
-    isPremium,
     loading,
-    doubleGoal,
   } = data;
 
-  // 🎯 Цели зависят от PowerBank
-  const stepsGoal = doubleGoal ? 20000 : 10000;
-  const caloriesGoal = doubleGoal ? 4000 : 2000;
-  const distanceGoal = doubleGoal ? 10 : 5; // в км
-  const activeMinutesGoal = doubleGoal ? 90 : 45;
+  // 🎯 Цели по умолчанию
+  const baseGoals = {
+    steps: 8000,
+    calories: 400,
+    distance: 5000, // в метрах
+    activeMinutes: 45,
+  };
 
-  const distanceInKm = distance / 1000;
+  // ✅ Удвоенные цели, если doubleGoal = true
+  const multiplier = doubleGoal ? 2 : 1;
+
+  const stepsGoal = baseGoals.steps * multiplier;
+  const caloriesGoal = baseGoals.calories * multiplier;
+  const distanceGoal = baseGoals.distance * multiplier;
+  const activeMinutesGoal = baseGoals.activeMinutes * multiplier;
 
   return (
-    <div className="w-full flex flex-col items-center justify-center py-6 px-4">
-      <motion.div
-        className="flex flex-col items-center w-full max-w-md gap-6"
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <ActivityRingSVG
-          steps={steps}
-          stepsGoal={stepsGoal}
-          calories={calories}
-          caloriesGoal={caloriesGoal}
-          distance={distanceInKm}
-          distanceGoal={distanceGoal}
-          activeMinutes={activeMinutes}
-          activeMinutesGoal={activeMinutesGoal}
-        />
-
-        <motion.div
-          className="text-sm text-zinc-300 font-medium text-center leading-relaxed px-4 whitespace-pre-line text-balance"
-          initial={{ opacity: 0, y: 6 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-        >
-          {t(
-            "dashboard.ringHint",
-            "Все 4 цели: шаги, калории, дистанция и активные минуты объединены в кольцо.\nЗаполни каждую секцию — получи бонус!"
-          )}
-        </motion.div>
-      </motion.div>
-    </div>
+    <ActivityRingSVG
+      steps={steps}
+      stepsGoal={stepsGoal}
+      calories={calories}
+      caloriesGoal={caloriesGoal}
+      distance={distance / 1000} // переводим в километры
+      distanceGoal={distanceGoal / 1000}
+      activeMinutes={activeMinutes}
+      activeMinutesGoal={activeMinutesGoal}
+    />
   );
 }
