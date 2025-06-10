@@ -1,4 +1,3 @@
-// src/components/DashboardSummary.tsx — v2.9.0
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import ActivityRingSVG from "./ActivityRingSVG";
@@ -12,25 +11,20 @@ interface Props {
     hasNFT: boolean;
     isPremium: boolean;
     loading: boolean;
-    stepsGoal: number;
-    caloriesGoal: number;
-    distanceGoal: number;
-    activeMinutesGoal: number;
   };
+  doubleGoal: boolean;
 }
 
-export default function DashboardSummary({ data }: Props) {
+export default function DashboardSummary({ data, doubleGoal }: Props) {
   const { t } = useTranslation();
-  const {
-    steps,
-    calories,
-    distance,
-    activeMinutes,
-    stepsGoal,
-    caloriesGoal,
-    distanceGoal,
-    activeMinutesGoal,
-  } = data;
+
+  // 🎯 Базовые цели
+  const stepsGoal = doubleGoal ? 20000 : 10000;
+  const caloriesGoal = doubleGoal ? 4000 : 2000;
+  const distanceGoal = doubleGoal ? 10 : 5; // км
+  const activeMinutesGoal = doubleGoal ? 90 : 45;
+
+  const { steps, calories, distance, activeMinutes } = data;
 
   return (
     <div className="w-full flex flex-col items-center justify-center py-6 px-4">
@@ -43,7 +37,7 @@ export default function DashboardSummary({ data }: Props) {
         <ActivityRingSVG
           steps={steps}
           stepsGoal={stepsGoal}
-          calories={calories}
+          calories={caloriesGoal}
           caloriesGoal={caloriesGoal}
           distance={distance}
           distanceGoal={distanceGoal}
