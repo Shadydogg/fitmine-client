@@ -236,12 +236,12 @@ export default function Dashboard() {
           <DashboardSummary
             data={{
               ...activity,
+              distance: activity.distance / 1000,
               hasNFT: activity.hasNFT || false,
               isPremium: activity.isPremium || false,
               loading: activity.loading,
-              doubleGoal: doubleGoal,
-              distance: activity.distance / 1000, // 🧠 distance в КИЛОМЕТРАХ
             }}
+            doubleGoal={doubleGoal}
           />
         </motion.div>
       )}
