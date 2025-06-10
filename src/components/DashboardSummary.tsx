@@ -18,7 +18,7 @@ interface Props {
 export default function DashboardSummary({ data, doubleGoal }: Props) {
   const { t } = useTranslation();
 
-  // 🎯 Базовые цели
+  // 🎯 Цели дня — удваиваются, если активирован PowerBank
   const stepsGoal = doubleGoal ? 20000 : 10000;
   const caloriesGoal = doubleGoal ? 4000 : 2000;
   const distanceGoal = doubleGoal ? 10 : 5; // км
@@ -37,7 +37,7 @@ export default function DashboardSummary({ data, doubleGoal }: Props) {
         <ActivityRingSVG
           steps={steps}
           stepsGoal={stepsGoal}
-          calories={caloriesGoal}
+          calories={calories} // ✅ Фикс
           caloriesGoal={caloriesGoal}
           distance={distance}
           distanceGoal={distanceGoal}
