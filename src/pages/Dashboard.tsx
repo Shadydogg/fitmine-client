@@ -96,8 +96,8 @@ export default function Dashboard() {
   const epProgressText = doubleGoal
     ? "⚡ PowerBank активен до конца дня"
     : ep >= goal
-      ? "🎉 Цель достигнута! Забери PowerBank"
-      : `🧠 Осталось ${goal - ep} EP до цели`;
+    ? "🎉 Цель достигнута! Забери PowerBank"
+    : `🧠 Осталось ${goal - ep} EP до цели`;
 
   const nearComplete = ep >= goal * 0.9 && ep < goal;
 
@@ -235,15 +235,13 @@ export default function Dashboard() {
         >
           <DashboardSummary
             data={{
-              steps: activity.steps,
-              calories: activity.calories,
-              distance: activity.distance,
-              activeMinutes: activity.activeMinutes,
+              ...activity,
               hasNFT: activity.hasNFT || false,
               isPremium: activity.isPremium || false,
               loading: activity.loading,
+              doubleGoal: doubleGoal,
+              distance: activity.distance / 1000, // 🧠 distance в КИЛОМЕТРАХ
             }}
-            doubleGoal={doubleGoal}
           />
         </motion.div>
       )}
