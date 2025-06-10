@@ -234,12 +234,7 @@ export default function Dashboard() {
           transition={{ delay: 0.7 }}
         >
           <DashboardSummary
-            data={{
-              ...activity,
-              hasNFT: activity.hasNFT || false,
-              isPremium: activity.isPremium || false,
-              loading: activity.loading,
-            }}
+            data={activity}
             doubleGoal={doubleGoal}
           />
         </motion.div>
