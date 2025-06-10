@@ -97,7 +97,7 @@ export default function ActivityRingSVG({
       <div className="absolute bottom-0 w-full text-sm text-center text-white leading-tight mt-2 px-2 pointer-events-none">
         <div>👟 {Math.round(steps)} / {stepsGoal} шагов</div>
         <div>🔥 {Math.round(calories)} / {caloriesGoal} ккал</div>
-        <div>📏 {distance.toFixed(2)} / {Math.round(distanceGoal)} км</div>
+        <div>📏 {distance.toFixed(2)} / {distanceGoal} км</div>
         <div>⏱ {Math.round(activeMinutes)} / {activeMinutesGoal} мин</div>
       </div>
     </div>
