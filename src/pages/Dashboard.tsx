@@ -28,6 +28,7 @@ export default function Dashboard() {
     goal,
     doubleGoal,
     epClaimed,
+    epFrozen, // 🟢 добавлено
     loading: epLoading,
     refetch: refetchEP,
   } = useUserEP();
@@ -95,6 +96,8 @@ export default function Dashboard() {
 
   const epProgressText = doubleGoal
     ? "⚡ PowerBank активен до конца дня"
+    : epFrozen
+    ? "⚠️ Сегодня PowerBank уже использован"
     : ep >= goal
     ? "🎉 Цель достигнута! Забери PowerBank"
     : `🧠 Осталось ${goal - ep} EP до цели`;
@@ -121,7 +124,7 @@ export default function Dashboard() {
   };
 
   const renderPowerBankStatus = () => {
-    if (ep >= goal && !epClaimed && !doubleGoal) {
+    if (ep >= goal && !epClaimed && !doubleGoal && !epFrozen) {
       return (
         <motion.div
           initial={{ opacity: 0 }}
@@ -152,7 +155,7 @@ export default function Dashboard() {
       >
         {doubleGoal
           ? "⚡ PowerBank активен до конца дня"
-          : epClaimed
+          : epClaimed || epFrozen
           ? "⚡ PowerBank уже получен сегодня"
           : `⚡ PowerBank: ${powerbankCount}`}
       </motion.div>
@@ -233,10 +236,7 @@ export default function Dashboard() {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.7 }}
         >
-          <DashboardSummary
-            data={activity}
-            doubleGoal={doubleGoal}
-          />
+          <DashboardSummary data={activity} doubleGoal={doubleGoal} />
         </motion.div>
       )}
 
