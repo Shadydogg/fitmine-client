@@ -1,4 +1,4 @@
-// /src/components/PowerBankInventory.tsx — v3.4.1
+// /src/components/PowerBankInventory.tsx — v3.4.2
 import React, { useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -86,7 +86,8 @@ export const PowerBankInventory: React.FC = () => {
     );
   }
 
-  const sortedPowerbanks = [...powerbanks].sort((a: PowerBank, b: PowerBank) => {
+  // ❗️ Без явного указания типов — позволяем TypeScript вывести типы автоматически
+  const sortedPowerbanks = [...powerbanks].sort((a, b) => {
     const dateA = new Date(a.claimed_at || "").getTime();
     const dateB = new Date(b.claimed_at || "").getTime();
     return dateB - dateA;
