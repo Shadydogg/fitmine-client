@@ -1,17 +1,8 @@
+// /src/hooks/usePowerBanks.ts — v2.1.0
 import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import { useSession } from "../context/SessionContext";
-
-type PowerBank = {
-  id: string;
-  used: boolean;
-  used_at?: string;
-  claimed_at?: string;
-  powerbank_type?: string;
-  source?: string;
-  ep_amount?: number;
-  usedToday?: boolean; // 🆕
-};
+import { PowerBank } from "@/types/PowerBank";
 
 export function usePowerBanks() {
   const { accessToken } = useSession();
@@ -33,13 +24,13 @@ export function usePowerBanks() {
       if (Array.isArray(data.powerbanks)) {
         const today = new Date().toISOString().slice(0, 10);
 
-        const cleanList: PowerBank[] = data.powerbanks
-          .map((pb: any) => {
-            const used_at = pb.used_at ? new Date(pb.used_at).toISOString().slice(0, 10) : null;
+        const cleanList = data.powerbanks
+          .map((pb: PowerBank) => {
+            const usedAtDay = pb.used_at ? pb.used_at.slice(0, 10) : null;
             return {
               ...pb,
               used: pb.used === true,
-              usedToday: used_at === today, // 🆕
+              usedToday: usedAtDay === today,
             };
           })
           .sort((a, b) => {
