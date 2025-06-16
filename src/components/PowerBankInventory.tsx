@@ -1,3 +1,4 @@
+// /src/components/PowerBankInventory.tsx — v3.4.1
 import React, { useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -9,7 +10,7 @@ import { useSession } from "../context/SessionContext";
 
 type PowerBank = {
   id: string;
-  ep_amount?: number;
+  ep_amount: number;
   claimed_at?: string;
   used: boolean;
   used_at?: string | null;
@@ -63,6 +64,12 @@ export const PowerBankInventory: React.FC = () => {
     }
   };
 
+  const isToday = (isoDate?: string | null) => {
+    if (!isoDate) return false;
+    const today = new Date().toISOString().slice(0, 10);
+    return isoDate.slice(0, 10) === today;
+  };
+
   if (loadingPB || epLoading) {
     return (
       <div className="text-white text-center py-4">
@@ -79,13 +86,7 @@ export const PowerBankInventory: React.FC = () => {
     );
   }
 
-  const isToday = (isoDate?: string | null) => {
-    if (!isoDate) return false;
-    const today = new Date().toISOString().slice(0, 10);
-    return isoDate.slice(0, 10) === today;
-  };
-
-  const sortedPowerbanks = [...powerbanks].sort((a, b) => {
+  const sortedPowerbanks = [...powerbanks].sort((a: PowerBank, b: PowerBank) => {
     const dateA = new Date(a.claimed_at || "").getTime();
     const dateB = new Date(b.claimed_at || "").getTime();
     return dateB - dateA;
@@ -120,7 +121,7 @@ export const PowerBankInventory: React.FC = () => {
                 {pb.claimed_at
                   ? new Date(pb.claimed_at).toLocaleDateString()
                   : "—"}{" "}
-                • EP: {pb.ep_amount ?? "—"}
+                • EP: {pb.ep_amount}
               </p>
               {pb.used && pb.used_at && (
                 <p className="text-xs text-yellow-400 mt-1">
