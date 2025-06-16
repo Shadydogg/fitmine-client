@@ -6,16 +6,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { useUserEP } from "../hooks/useUserEP";
 import { usePowerBanks } from "../hooks/usePowerBanks";
 import { useSession } from "../context/SessionContext";
-
-type PowerBank = {
-  id: string;
-  ep_amount: number;
-  claimed_at?: string;
-  used: boolean;
-  used_at?: string | null;
-  powerbank_type: "basic" | "rare" | "epic" | "event";
-  source?: string;
-};
+import { PowerBank } from "../types/PowerBank";
 
 export const PowerBankInventory: React.FC = () => {
   const [usingId, setUsingId] = useState<string | null>(null);
@@ -85,13 +76,11 @@ export const PowerBankInventory: React.FC = () => {
     );
   }
 
-  const sortedPowerbanks = [...powerbanks].sort(
-    (a: PowerBank, b: PowerBank): number => {
-      const dateA = new Date(a.claimed_at || "").getTime();
-      const dateB = new Date(b.claimed_at || "").getTime();
-      return dateB - dateA;
-    }
-  );
+  const sortedPowerbanks = [...powerbanks].sort((a, b) => {
+    const dateA = new Date(a.claimed_at || "").getTime();
+    const dateB = new Date(b.claimed_at || "").getTime();
+    return dateB - dateA;
+  });
 
   return (
     <div className="w-full max-w-md mx-auto px-4 py-2 space-y-4">
