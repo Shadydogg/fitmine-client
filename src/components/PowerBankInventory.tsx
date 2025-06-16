@@ -1,3 +1,4 @@
+// /src/components/PowerBankInventory.tsx — v3.5.0
 import React, { useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -79,11 +80,17 @@ export const PowerBankInventory: React.FC = () => {
     );
   }
 
-  const isToday = (isoDate?: string | null) => {
+  const isToday = (isoDate?: string | null): boolean => {
     if (!isoDate) return false;
     const today = new Date().toISOString().slice(0, 10);
     return isoDate.slice(0, 10) === today;
   };
+
+  const sortedPowerbanks = [...powerbanks].sort((a: PowerBank, b: PowerBank) => {
+    const dateA = new Date(a.claimed_at || "").getTime();
+    const dateB = new Date(b.claimed_at || "").getTime();
+    return dateB - dateA;
+  });
 
   return (
     <div className="w-full max-w-md mx-auto px-4 py-2 space-y-4">
@@ -91,7 +98,7 @@ export const PowerBankInventory: React.FC = () => {
         ⚡ Инвентарь PowerBank'ов
       </h2>
 
-      {powerbanks.map((pb) => {
+      {sortedPowerbanks.map((pb) => {
         const usedToday = pb.used && isToday(pb.used_at);
         const isDisabled =
           pb.used || usedToday || ep >= 1000 || doubleGoal || usingId === pb.id;
