@@ -47,7 +47,8 @@ export const PowerBankInventory: React.FC = () => {
         { id },
         {
           headers: {
-            Authorization: `Bearer ${accessToken}` },
+            Authorization: `Bearer ${accessToken}`,
+          },
         }
       );
 
@@ -78,6 +79,12 @@ export const PowerBankInventory: React.FC = () => {
     );
   }
 
+  const isToday = (isoDate?: string | null) => {
+    if (!isoDate) return false;
+    const today = new Date().toISOString().slice(0, 10);
+    return isoDate.slice(0, 10) === today;
+  };
+
   return (
     <div className="w-full max-w-md mx-auto px-4 py-2 space-y-4">
       <h2 className="text-xl font-bold text-center text-white mb-2">
@@ -85,12 +92,18 @@ export const PowerBankInventory: React.FC = () => {
       </h2>
 
       {powerbanks.map((pb) => {
-        const isDisabled = pb.used || ep >= 1000 || doubleGoal || usingId === pb.id;
+        const usedToday = pb.used && isToday(pb.used_at);
+        const isDisabled =
+          pb.used || usedToday || ep >= 1000 || doubleGoal || usingId === pb.id;
 
         return (
           <div
             key={pb.id}
-            className="bg-zinc-900 rounded-xl p-4 flex items-center justify-between shadow-md border border-zinc-700"
+            className={`rounded-xl p-4 flex items-center justify-between shadow-md border border-zinc-700 ${
+              pb.used
+                ? "bg-zinc-800"
+                : "bg-zinc-900 hover:shadow-lg transition-shadow"
+            }`}
           >
             <div>
               <p className="text-lg font-semibold text-white capitalize">
@@ -114,7 +127,7 @@ export const PowerBankInventory: React.FC = () => {
               onClick={() => handleUse(pb.id)}
               disabled={isDisabled}
               className={`px-4 py-2 rounded-lg text-white font-bold transition-all ${
-                pb.used
+                pb.used || usedToday
                   ? "bg-gray-500 cursor-not-allowed"
                   : ep >= 1000
                   ? "bg-yellow-500 cursor-not-allowed"
