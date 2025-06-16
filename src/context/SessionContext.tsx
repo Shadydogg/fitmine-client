@@ -1,3 +1,4 @@
+// SessionProvider.tsx — v2.3.1
 import React, { createContext, useContext, useEffect, useState } from 'react';
 
 type Session = {
@@ -8,7 +9,7 @@ type Session = {
   sessionLoaded: boolean;
   setTokens: (access: string, refresh: string, user: any) => void;
   clearSession: () => void;
-  refreshUser: () => Promise<void>; // ✅ новое
+  refreshUser: () => Promise<void>;
 };
 
 const SessionContext = createContext<Session | undefined>(undefined);
@@ -19,7 +20,6 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
   const [user, setUser] = useState<any>(null);
   const [sessionLoaded, setSessionLoaded] = useState(false);
 
-  // ✅ Гарантированная инициализация токенов из localStorage
   useEffect(() => {
     const syncFromStorage = () => {
       const storedAccess = localStorage.getItem('access_token');
@@ -34,7 +34,6 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
     syncFromStorage();
     setSessionLoaded(true);
 
-    // 🔄 Автообновление из других вкладок
     const onStorageChange = () => {
       syncFromStorage();
     };
@@ -43,7 +42,6 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
     return () => window.removeEventListener('storage', onStorageChange);
   }, []);
 
-  // ✅ Устанавливаем токены и обновляем стейт
   const setTokens = (access: string, refresh: string, userObj: any) => {
     localStorage.setItem('access_token', access);
     localStorage.setItem('refresh_token', refresh);
@@ -55,7 +53,6 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
     setSessionLoaded(true);
   };
 
-  // ✅ Обновление user из API /profile
   const refreshUser = async () => {
     if (!accessToken) return;
 
@@ -65,14 +62,20 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
           Authorization: `Bearer ${accessToken}`,
         },
       });
+
       const data = await res.json();
+
       if (data.ok && data.user) {
         localStorage.setItem('user', JSON.stringify(data.user));
         setUser(data.user);
         console.log('✅ Пользователь обновлён через refreshUser');
+      } else {
+        console.warn('⚠️ Невалидный ответ при refreshUser, выходим');
+        clearSession();
       }
     } catch (err) {
       console.warn('⚠️ Ошибка при обновлении пользователя:', err);
+      clearSession();
     }
   };
 
@@ -97,7 +100,7 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
         sessionLoaded,
         setTokens,
         clearSession,
-        refreshUser, // ✅ экспортируем
+        refreshUser,
       }}
     >
       {children}
