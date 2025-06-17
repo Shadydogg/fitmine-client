@@ -1,3 +1,4 @@
+// /src/hooks/useSyncActivity.ts — v2.2.0
 import { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import { useSession } from "../context/SessionContext";
@@ -40,16 +41,10 @@ export default function useSyncActivity(): ActivityData {
   }, []);
 
   useEffect(() => {
-    if (!sessionLoaded) return;
+    if (!sessionLoaded || !accessToken || !isAuthenticated) return;
 
     const fetchData = async () => {
       try {
-        if (!accessToken || !isAuthenticated) {
-          console.warn("❌ Нет accessToken или пользователь не авторизован");
-          setData((prev) => ({ ...prev, loading: false }));
-          return;
-        }
-
         const res = await axios.post(
           "https://api.fitmine.vip/api/sync",
           {},
@@ -62,14 +57,12 @@ export default function useSyncActivity(): ActivityData {
 
         const d = res.data;
 
-        const distanceKm = (d.distance ?? 0) / 1000;
-
         setData({
           steps: d.steps ?? 0,
           stepsGoal: d.stepsGoal ?? 10000,
           calories: d.calories ?? 0,
           caloriesGoal: d.caloriesGoal ?? 2000,
-          distance: distanceKm,
+          distance: (d.distance ?? 0) / 1000, // из метров в км
           distanceGoal: d.distanceGoal ?? 5,
           activeMinutes: d.minutes ?? 0,
           activeMinutesGoal: d.minutesGoal ?? 45,
@@ -78,7 +71,7 @@ export default function useSyncActivity(): ActivityData {
           loading: false,
         });
       } catch (err) {
-        console.error("❌ Ошибка при синхронизации данных:", err);
+        console.error("❌ Ошибка при синхронизации активности:", err);
         setData((prev) => ({ ...prev, loading: false }));
       }
     };
