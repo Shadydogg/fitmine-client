@@ -1,4 +1,4 @@
-// /src/components/ConnectGoogleFit.tsx — v2.2.0
+// /src/components/ConnectGoogleFit.tsx — v2.6.0
 import { usePlatform } from '../hooks/usePlatform';
 import { useSession } from '../context/SessionContext';
 import { useEffect, useState } from 'react';
@@ -15,6 +15,12 @@ export default function ConnectGoogleFit() {
   const { isTelegramIOS } = usePlatform();
   const { refreshUser } = useSession();
   const [connecting, setConnecting] = useState(false);
+  const [needReconnect, setNeedReconnect] = useState(false);
+
+  useEffect(() => {
+    const need = window.needGoogleReauth || localStorage.getItem('needGoogleReauth') === 'true';
+    setNeedReconnect(need);
+  }, []);
 
   const handleGoogleConnect = () => {
     const initData = localStorage.getItem('initData') || '';
@@ -41,8 +47,11 @@ export default function ConnectGoogleFit() {
       if (authWindow?.closed) {
         clearInterval(interval);
         console.log('🔄 Окно авторизации закрыто, обновляем пользователя...');
-        refreshUser(); // ⚡️ вот ключевой вызов
+        refreshUser();
         setConnecting(false);
+        window.needGoogleReauth = false;
+        localStorage.setItem('needGoogleReauth', 'false');
+        setNeedReconnect(false);
       }
     }, 1000);
   };
@@ -65,10 +74,18 @@ export default function ConnectGoogleFit() {
           onClick={handleGoogleConnect}
           disabled={connecting}
           className={`px-6 py-2 text-white font-bold rounded-full shadow transition-transform ${
-            connecting ? 'bg-gray-500 cursor-not-allowed' : 'bg-green-500 hover:scale-105'
+            connecting
+              ? 'bg-gray-500 cursor-not-allowed'
+              : needReconnect
+              ? 'bg-red-500 hover:bg-red-600'
+              : 'bg-green-500 hover:scale-105'
           }`}
         >
-          {connecting ? '⏳ Подключение...' : '🔓 Подключить Google Fit'}
+          {connecting
+            ? '⏳ Подключение...'
+            : needReconnect
+            ? '🔁 Повторно подключить Google Fit'
+            : '🔓 Подключить Google Fit'}
         </button>
       )}
     </div>
