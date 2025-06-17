@@ -1,3 +1,5 @@
+// /src/pages/Dashboard.tsx — v3.6.0
+
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -28,7 +30,7 @@ export default function Dashboard() {
     goal,
     doubleGoal,
     epClaimed,
-    epFrozen, // 🟢 добавлено
+    epFrozen,
     loading: epLoading,
     refetch: refetchEP,
   } = useUserEP();
