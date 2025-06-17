@@ -1,4 +1,5 @@
-// SessionProvider.tsx — v2.3.1
+// /src/context/SessionProvider.tsx — v2.4.0
+
 import React, { createContext, useContext, useEffect, useState } from 'react';
 
 type Session = {
@@ -20,6 +21,7 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
   const [user, setUser] = useState<any>(null);
   const [sessionLoaded, setSessionLoaded] = useState(false);
 
+  // ✅ Инициализация
   useEffect(() => {
     const syncFromStorage = () => {
       const storedAccess = localStorage.getItem('access_token');
@@ -42,6 +44,7 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
     return () => window.removeEventListener('storage', onStorageChange);
   }, []);
 
+  // ✅ Обновление токенов и пользователя
   const setTokens = (access: string, refresh: string, userObj: any) => {
     localStorage.setItem('access_token', access);
     localStorage.setItem('refresh_token', refresh);
@@ -53,6 +56,7 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
     setSessionLoaded(true);
   };
 
+  // ✅ Обновление профиля
   const refreshUser = async () => {
     if (!accessToken) return;
 
@@ -70,7 +74,7 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
         setUser(data.user);
         console.log('✅ Пользователь обновлён через refreshUser');
       } else {
-        console.warn('⚠️ Невалидный ответ при refreshUser, выходим');
+        console.warn('⚠️ Невалидный ответ при refreshUser, выходим из сессии');
         clearSession();
       }
     } catch (err) {
@@ -79,6 +83,18 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
     }
   };
 
+  // 🔁 Автообновление профиля каждые 15 мин
+  useEffect(() => {
+    if (!accessToken) return;
+    const interval = setInterval(() => {
+      console.log('⏳ Автообновление профиля...');
+      refreshUser();
+    }, 15 * 60 * 1000); // 15 минут
+
+    return () => clearInterval(interval);
+  }, [accessToken]);
+
+  // 🧼 Очистка сессии
   const clearSession = () => {
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
