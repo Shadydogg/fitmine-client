@@ -39,23 +39,27 @@ export default function useSyncGoogleFit() {
         });
 
         if (res.data.ok) {
-          setData({
-            steps: res.data.steps || 0,
-            calories: res.data.calories || 0,
-            minutes: res.data.minutes || 0,
-            distance: res.data.distance || 0,
-            date: res.data.date || new Date().toISOString(),
-          });
+          const {
+            steps = 0,
+            calories = 0,
+            minutes = 0,
+            distance = 0,
+            date = new Date().toISOString(),
+          } = res.data;
 
+          setData({ steps, calories, minutes, distance, date });
           window.needGoogleReauth = false;
         } else {
+          console.warn('⚠️ Google Fit sync error:', res.data.error);
           setError(res.data.error || 'Ошибка при синхронизации');
+
           if (res.data.need_reauth) {
             window.needGoogleReauth = true;
           }
         }
 
       } catch (err: any) {
+        console.error('❌ Ошибка подключения к Google Fit:', err);
         setError(err?.message || 'Ошибка подключения');
       } finally {
         setLoading(false);
