@@ -1,41 +1,69 @@
-// /src/components/ConnectGoogleFit.tsx — v2.5.1 (Fixed: строка + backticks)
-import React from "react";
-import { useSession } from "../context/SessionContext";
+import { useEffect, useState } from 'react';
+import axios from 'axios';
+import { useSession } from '../context/SessionContext';
 
-export default function ConnectGoogleFit() {
-  const { accessToken } = useSession();
+interface GoogleActivityData {
+  steps: number;
+  calories: number;
+  minutes: number;
+  distance: number;
+  date: string;
+}
 
-  const handleConnect = () => {
-    if (!accessToken) return;
+export default function useSyncGoogleFit() {
+  const { accessToken, sessionLoaded } = useSession();
 
-    const state = btoa(localStorage.getItem("initDataRaw") || "");
-    const clientId = process.env.REACT_APP_GOOGLE_CLIENT_ID;
-    const redirectUri = encodeURIComponent("https://api.fitmine.vip/api/oauth/callback");
+  const [data, setData] = useState<GoogleActivityData | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-    const scope = encodeURIComponent([
-      "https://www.googleapis.com/auth/fitness.activity.read",
-      "https://www.googleapis.com/auth/fitness.location.read",
-      "https://www.googleapis.com/auth/fitness.body.read",
-    ].join(" "));
+  useEffect(() => {
+    if (!sessionLoaded || !accessToken) return;
 
-    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
-      `client_id=${clientId}` +
-      `&redirect_uri=${redirectUri}` +
-      `&response_type=code` +
-      `&scope=${scope}` +
-      `&access_type=offline` + // ✅ для получения refresh_token
-      `&prompt=consent` +      // ✅ запрашивает refresh_token каждый раз
-      `&state=${state}`;
+    const fetchGoogleFit = async () => {
+      setLoading(true);
+      try {
+        const res = await axios.post<{
+          ok: boolean;
+          steps?: number;
+          calories?: number;
+          minutes?: number;
+          distance?: number;
+          date?: string;
+          error?: string;
+          need_reauth?: boolean;
+        }>('https://api.fitmine.vip/api/sync/google', {}, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
 
-    window.open(authUrl, "_blank");
-  };
+        if (res.data.ok) {
+          setData({
+            steps: res.data.steps || 0,
+            calories: res.data.calories || 0,
+            minutes: res.data.minutes || 0,
+            distance: res.data.distance || 0,
+            date: res.data.date || new Date().toISOString(),
+          });
 
-  return (
-    <button
-      onClick={handleConnect}
-      className="mt-3 px-5 py-2 bg-emerald-600 text-white rounded-full shadow hover:bg-emerald-700 transition"
-    >
-      🔐 Подключить Google Fit
-    </button>
-  );
+          window.needGoogleReauth = false;
+        } else {
+          setError(res.data.error || 'Ошибка при синхронизации');
+          if (res.data.need_reauth) {
+            window.needGoogleReauth = true;
+          }
+        }
+
+      } catch (err: any) {
+        setError(err?.message || 'Ошибка подключения');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchGoogleFit();
+  }, [accessToken, sessionLoaded]);
+
+  return { data, loading, error };
 }
