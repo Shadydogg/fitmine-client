@@ -1,4 +1,3 @@
-// hooks/useUserEP.ts — v2.2.0
 import { useEffect, useState, useCallback } from "react";
 import { api } from "../api/apiClient";
 
@@ -16,7 +15,7 @@ export function useUserEP() {
   const [epFrozen, setEpFrozen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [version, setVersion] = useState(0); // 🔁 для ручного refetch
+  const [version, setVersion] = useState(0); // 🔁 триггер перезагрузки
 
   const refetch = useCallback(() => {
     setVersion((v) => v + 1);
@@ -28,8 +27,7 @@ export function useUserEP() {
       try {
         const res = await api.get<EpResponse>("/ep");
 
-        const rawEP = Math.round(res.data.ep ?? 0);
-        setEp(rawEP);
+        setEp(Math.round(res.data.ep ?? 0));
         setDoubleGoal(!!res.data.double_goal);
         setEpClaimed(!!res.data.ep_reward_claimed);
         setEpFrozen(!!res.data.ep_frozen);
@@ -45,8 +43,7 @@ export function useUserEP() {
     fetchEP();
   }, [version]);
 
-  // 🎯 Цель фиксирована — 1000 EP в день
-  const goal = 1000;
+  const goal = 1000; // 🎯 ежедневная цель
 
   return {
     ep,
