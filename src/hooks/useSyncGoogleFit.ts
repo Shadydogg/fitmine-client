@@ -1,4 +1,4 @@
-// /src/components/ConnectGoogleFit.tsx — v2.5.0
+// /src/components/ConnectGoogleFit.tsx — v2.5.1 (Fixed: строка + backticks)
 import React from "react";
 import { useSession } from "../context/SessionContext";
 
@@ -15,7 +15,7 @@ export default function ConnectGoogleFit() {
     const scope = encodeURIComponent([
       "https://www.googleapis.com/auth/fitness.activity.read",
       "https://www.googleapis.com/auth/fitness.location.read",
-      "https://www.googleapis.com/auth/fitness.body.read"
+      "https://www.googleapis.com/auth/fitness.body.read",
     ].join(" "));
 
     const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
@@ -23,8 +23,8 @@ export default function ConnectGoogleFit() {
       `&redirect_uri=${redirectUri}` +
       `&response_type=code` +
       `&scope=${scope}` +
-      `&access_type=offline` + // ✅ обязательно для получения refresh_token
-      `&prompt=consent` +      // ✅ принудительно возвращает refresh_token
+      `&access_type=offline` + // ✅ для получения refresh_token
+      `&prompt=consent` +      // ✅ запрашивает refresh_token каждый раз
       `&state=${state}`;
 
     window.open(authUrl, "_blank");
